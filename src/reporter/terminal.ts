@@ -35,6 +35,7 @@ export interface TerminalPresenter {
   fileAnalysisError(err: import("../core/types.js").AnalysisError): void;
   targetNotFound(target: string): void;
   parserError(err: ParserError, debug?: boolean): void;
+  configurationError(message: string, suggestion?: string): void;
   error(title: string, detail?: string): void;
   warning(title: string, detail?: string): void;
   divider(): void;
@@ -512,9 +513,12 @@ export class DefaultTerminalPresenter implements TerminalPresenter {
    */
   targetNotFound(target: string): void {
     console.log();
-    console.log(`${symbols.failure} ${chalk.red.bold("Audit target does not exist")}`);
+    console.log(`${symbols.failure} ${chalk.red.bold("SIS ERROR")}`);
     console.log();
-    console.log(`  ${chalk.dim(target)}`);
+    console.log(`Audit target does not exist:`);
+    console.log(`  ${chalk.cyan(target)}`);
+    console.log();
+    console.log(chalk.dim("Check the path and try again."));
     console.log();
   }
 
@@ -523,10 +527,12 @@ export class DefaultTerminalPresenter implements TerminalPresenter {
    */
   parserError(err: ParserError, debug = false): void {
     console.log();
-    console.log(`${symbols.failure} ${chalk.red.bold("Failed to parse file")}`);
+    console.log(`${symbols.failure} ${chalk.red.bold("SIS ERROR")}`);
     console.log();
+    console.log(`Unable to parse source file:`);
     const loc = err.line ? `${err.file}:${err.line}${err.column ? `:${err.column}` : ""}` : err.file;
     console.log(`  ${chalk.cyan(loc)}`);
+    console.log();
     console.log(`  ${chalk.red(err.message)}`);
     if (debug && err.detail) {
       console.log();
@@ -540,10 +546,28 @@ export class DefaultTerminalPresenter implements TerminalPresenter {
    */
   error(title: string, detail?: string): void {
     console.log();
-    console.log(`${symbols.failure} ${chalk.red.bold(title)}`);
+    console.log(`${symbols.failure} ${chalk.red.bold("SIS ERROR")}`);
+    console.log();
+    console.log(`  ${chalk.bold(title)}`);
     if (detail) {
       console.log();
       console.log(`  ${chalk.dim(detail)}`);
+    }
+    console.log();
+  }
+
+  /**
+   * Renders a configuration error diagnostic.
+   */
+  configurationError(message: string, suggestion?: string): void {
+    console.log();
+    console.log(`${symbols.failure} ${chalk.red.bold("SIS ERROR")}`);
+    console.log();
+    console.log(`Invalid configuration:`);
+    console.log(`  ${chalk.red(message)}`);
+    if (suggestion) {
+      console.log();
+      console.log(chalk.dim(suggestion));
     }
     console.log();
   }

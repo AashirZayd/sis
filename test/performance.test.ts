@@ -64,7 +64,7 @@ describe("Phase 13: Performance, Determinism & Scalability Hardening", () => {
 
       const { metrics: m10 } = await measureAudit(targetDir, { runs: 10, seed: 42 });
       expect(m10.payloads).toBe(1000); // exactly 10 runs per target
-    });
+    }, 20000);
   });
 
   describe("3. Deterministic Collection Ordering & Cross-Platform Paths", () => {

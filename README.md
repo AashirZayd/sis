@@ -45,10 +45,16 @@ DEVELOPER-FRIENDLY REPORT
 npx sis audit .
 
 # Generate machine-readable JSON output (Version 1 schema)
+npx sis audit . --json > sis-report.json
 npx sis audit . --format json > sis-report.json
 
 # Generate OASIS SARIF 2.1.0 output for CI/CD and security scanners
+npx sis audit . --sarif > sis-results.sarif
 npx sis audit . --format sarif > sis-results.sarif
+
+# Run silently (no terminal UI, preserves exit code and machine-readable stdout)
+npx sis audit . --silent
+npx sis audit . --json --silent > report.json
 
 # Audit with custom fuzzing runs, deterministic base seed, and execution timeout
 npx sis audit . --runs 25 --seed 42 --timeout 20
@@ -67,6 +73,19 @@ npx sis audit ./app/components/ProfileCard.tsx
 npx sis audit . --no-shrink
 npx sis audit . --max-shrink-attempts 50
 ```
+
+### Exit Code Contract
+
+SIS provides deterministic, standardized process exit codes for integration into CI/CD pipelines and developer tooling:
+
+| Exit Code | Meaning | Description |
+| :---: | :--- | :--- |
+| `0` | **Success / Clean** | Audit completed successfully with zero actionable findings or invariant violations. |
+| `1` | **Violations Detected** | Audit completed and actionable findings (taint leaks, runtime exceptions, timeouts, serialization errors) were detected. |
+| `2` | **Usage / Config / Input Error** | Target path not found, invalid numeric option (e.g. `--runs <= 0`), conflicting output flags (`--json` and `--sarif`), or malformed invocation. |
+| `3` | **Internal Execution Error** | Unexpected internal executor or isolate failure. |
+| `130` | **Interrupted** | Process cleanly terminated by user (`SIGINT` / `Ctrl+C`). |
+
 
 ### Directory Audit Example
 
@@ -351,10 +370,18 @@ SIS is being developed across rigorous, incremental phases. We prioritize correc
   - 100% deterministic, byte-for-byte finding reproducibility across repeated runs given the same `--seed`.
   - Zero-overhead static-only classification bypassing isolate creation for framework-bound actions.
   - Bounded shrink overhead under `--max-shrink-attempts` and isolate timeouts.
+- [x] **Phase 14 — CLI/UX & Error Handling Polish**: Developer experience, error diagnostics, and CLI refinement:
+  - Comprehensive input validation and non-zero exit codes for invalid options (`--runs`, `--timeout`, `--max-shrink-attempts`, `--seed`, `--max-analysis-depth`).
+  - Conflicting flag detection preventing corrupted multi-format invocations.
+  - Direct `--json` and `--sarif` aliases emitting 100% pure parseable output to `stdout`.
+  - Strict `stdout`/`stderr` separation ensuring error messages, diagnostics, and stack traces never corrupt machine-readable streams.
+  - Graceful `SIGINT` / `SIGTERM` cancellation handling with standardized exit code 130.
+  - Transparent static-only action presentation and compiler-grade error boxes (`SIS ERROR`).
+  - Standardized exit code contract (`0` clean, `1` findings, `2` config/input error, `3` internal error, `130` interrupted).
 
 ### Planned (Upcoming Phases)
 
-- [ ] **Phase 14 — Automated Invariant Remediation & Patch Generation**: Automated code transforms, boundary validation decorators, and interactive patch synthesis.
+- [ ] **Phase 15 — Automated Invariant Remediation & Patch Generation**: Automated code transforms, boundary validation decorators, and interactive patch synthesis.
 
 ---
 

@@ -359,4 +359,220 @@ describe("CLI Executable End-to-End", () => {
       expect(execError.stdout).toContain("components/profile.tsx:JSX expression");
     }
   });
+
+  describe("Phase 14 — CLI Input Validation & Options Hardening", () => {
+    it("should reject negative or zero --runs with exit code 2 and actionable diagnostic", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--runs",
+          "-5",
+        ]);
+        expect.fail("Should have exited with code 2 on negative --runs");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --runs value");
+        expect(execError.stdout).toContain("Must be a positive integer");
+      }
+
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--runs",
+          "0",
+        ]);
+        expect.fail("Should have exited with code 2 on zero --runs");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --runs value");
+      }
+    });
+
+    it("should reject non-numeric --runs with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--runs",
+          "invalid",
+        ]);
+        expect.fail("Should have exited with code 2 on non-numeric --runs");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --runs value");
+      }
+    });
+
+    it("should reject negative or zero --timeout with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--timeout",
+          "-10",
+        ]);
+        expect.fail("Should have exited with code 2 on negative --timeout");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --timeout value");
+      }
+    });
+
+    it("should reject negative --max-shrink-attempts with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--max-shrink-attempts",
+          "-1",
+        ]);
+        expect.fail("Should have exited with code 2 on negative --max-shrink-attempts");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --max-shrink-attempts value");
+      }
+    });
+
+    it("should reject negative or zero --max-analysis-depth with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--max-analysis-depth",
+          "0",
+        ]);
+        expect.fail("Should have exited with code 2 on zero --max-analysis-depth");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --max-analysis-depth value");
+      }
+    });
+
+    it("should reject non-numeric --seed with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--seed",
+          "not-a-number",
+        ]);
+        expect.fail("Should have exited with code 2 on invalid --seed");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toContain("SIS ERROR");
+        expect(execError.stdout).toContain("Invalid --seed value");
+      }
+    });
+
+    it("should reject conflicting --json and --sarif flags with exit code 2", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/runtime-safe-action.ts",
+          "--json",
+          "--sarif",
+        ]);
+        expect.fail("Should have exited with code 2 on conflicting flags");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stderr: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stderr).toContain("SIS ERROR");
+        expect(execError.stderr).toContain("Cannot specify both --json and --sarif simultaneously");
+      }
+    });
+
+    it("should support direct --json flag alias emitting pure parseable JSON", async () => {
+      const { stdout } = await execFileAsync(process.execPath, [
+        cliPath,
+        "audit",
+        "./test/fixtures/runtime-safe-action.ts",
+        "--json",
+      ]);
+
+      const parsed = JSON.parse(stdout);
+      expect(parsed.version).toBe("1");
+      expect(parsed.tool.name).toBe("sis");
+      expect(parsed.summary.verifiedFindings).toBe(0);
+    });
+
+    it("should support direct --sarif flag alias emitting pure parseable SARIF", async () => {
+      const { stdout } = await execFileAsync(process.execPath, [
+        cliPath,
+        "audit",
+        "./test/fixtures/runtime-safe-action.ts",
+        "--sarif",
+      ]);
+
+      const sarif = JSON.parse(stdout);
+      expect(sarif.version).toBe("2.1.0");
+      expect(sarif.runs[0].tool.driver.name).toBe("SIS");
+    });
+
+    it("should support --silent mode suppressing terminal output while returning exit code 0", async () => {
+      const { stdout } = await execFileAsync(process.execPath, [
+        cliPath,
+        "audit",
+        "./test/fixtures/runtime-safe-action.ts",
+        "--silent",
+      ]);
+
+      expect(stdout.trim()).toBe("");
+    });
+
+    it("should support --silent mode with findings returning exit code 1 and no stdout", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./test/fixtures/fragile-action.ts",
+          "--silent",
+        ]);
+        expect.fail("Should have exited with code 1 due to findings");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string };
+        expect(execError.code).toBe(1);
+        expect(execError.stdout.trim()).toBe("");
+      }
+    });
+
+    it("should direct machine-readable errors to stderr and keep stdout empty", async () => {
+      try {
+        await execFileAsync(process.execPath, [
+          cliPath,
+          "audit",
+          "./does-not-exist-dir",
+          "--json",
+        ]);
+        expect.fail("Should have exited with code 2 on non-existent path");
+      } catch (err: unknown) {
+        const execError = err as { code: number; stdout: string; stderr: string };
+        expect(execError.code).toBe(2);
+        expect(execError.stdout).toBe("");
+        expect(execError.stderr).toContain("Audit target does not exist");
+      }
+    });
+  });
 });
