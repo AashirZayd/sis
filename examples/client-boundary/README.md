@@ -10,7 +10,7 @@ This example demonstrates a properly defended Server Action invoked from a Clien
 ## Run Audit
 
 ```bash
-npx sis audit examples/client-boundary
+npx @aashirzayd/sis audit examples/client-boundary
 ```
 
 ## What SIS Finds

@@ -6,10 +6,10 @@
 
 SIS is a zero-configuration analysis and speculative fuzzing tool for modern Next.js App Router and React Server Component boundaries. It discovers Client/Server module boundaries, traces secret data flows, models React Flight serializability contracts, synthesizes targeted adversarial payloads, and dynamically verifies invariants inside an isolated V8 execution sandbox.
 
-[![npm version](https://img.shields.io/badge/npm-v0.1.3-blue.svg)](https://www.npmjs.com/package/sis)
-[![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
+[![npm package](https://img.shields.io/badge/npm-%40aashirzayd%2Fsis-blue.svg)](https://github.com/AashirZayd/sis)
+[![node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-205%20passed-success.svg)](test/)
+[![tests](https://img.shields.io/badge/tests-215%20passed-success.svg)](test/)
 
 [Get Started](#installation) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
 
@@ -104,7 +104,7 @@ Developers expect standard positive numbers. But what happens when unexpected va
 When audited, SIS synthesizes numeric edge cases (`0`, `-0`, `NaN`, `Infinity`, `-Infinity`, `null`, `undefined`), executes the candidate inside the V8 isolate, and shrinks the failing payload:
 
 ```text
-$ npx sis audit app/actions/pricing.ts
+$ npx @aashirzayd/sis audit app/actions/pricing.ts
 
 SIS  Speculative Invariant Synthesis
 Autonomous runtime verification for Next.js boundaries
@@ -270,7 +270,7 @@ If a reduced payload fails to reproduce the exact original failure signature, th
 SIS guarantees reproducible audits:
 
 ```bash
-npx sis audit app/ --seed 42
+npx @aashirzayd/sis audit app/ --seed 42
 ```
 
 Specifying a seed produces deterministic results across runs:
@@ -308,18 +308,24 @@ This per-target allocation prevents combinatorial explosion ($O(T \cdot N)$ rath
 Run SIS on-demand using `npx`:
 
 ```bash
-npx sis audit .
+npx @aashirzayd/sis audit .
 ```
 
 Or add it to your project's development dependencies:
 
 ```bash
-npm install --save-dev sis
+npm install --save-dev @aashirzayd/sis
+```
+
+Once installed locally, you can invoke the executable directly:
+
+```bash
+sis audit .
 ```
 
 ### System Requirements
 
-- **Node.js**: `>= 18.0.0`
+- **Node.js**: `>= 24.0.0`
 - **Module System**: ESM (ECMAScript Modules)
 - **Target Projects**: Next.js App Router applications (TypeScript or JavaScript)
 
@@ -328,28 +334,32 @@ npm install --save-dev sis
 ## CLI Reference
 
 ```bash
-npx sis audit [target] [options]
+# Using npx
+npx @aashirzayd/sis audit [target] [options]
+
+# Or using the locally installed binary
+sis audit [target] [options]
 ```
 
 ### Common Commands
 
 ```bash
 # Audit entire repository
-npx sis audit .
+npx @aashirzayd/sis audit .
 
 # Audit a specific Server Action or component file
-npx sis audit app/actions/checkout.ts
-npx sis audit app/components/Card.tsx
+npx @aashirzayd/sis audit app/actions/checkout.ts
+npx @aashirzayd/sis audit app/components/Card.tsx
 
 # Emit machine-readable JSON or SARIF to stdout
-npx sis audit . --json > sis-report.json
-npx sis audit . --sarif > sis-results.sarif
+npx @aashirzayd/sis audit . --json > sis-report.json
+npx @aashirzayd/sis audit . --sarif > sis-results.sarif
 
 # Run silently in CI scripts (exit code only)
-npx sis audit . --silent
+npx @aashirzayd/sis audit . --silent
 
 # Configure fuzzing budget and deterministic seed
-npx sis audit . --runs 25 --seed 42 --timeout 50
+npx @aashirzayd/sis audit . --runs 25 --seed 42 --timeout 50
 ```
 
 ### Options
@@ -438,8 +448,8 @@ When `--json` or `--sarif` is specified, SIS enforces strict stream separation:
 Piping stdout to a file will never produce corrupted JSON:
 
 ```bash
-npx sis audit . --json > sis-report.json
-npx sis audit . --sarif > sis-results.sarif
+npx @aashirzayd/sis audit . --json > sis-report.json
+npx @aashirzayd/sis audit . --sarif > sis-results.sarif
 ```
 
 ### GitHub Actions Workflow
@@ -468,13 +478,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
 
       - name: Run SIS Audit
-        run: npx sis audit . --sarif > sis-results.sarif
+        run: npx @aashirzayd/sis audit . --sarif > sis-results.sarif
         continue-on-error: true
 
       - name: Upload SARIF to GitHub Code Scanning

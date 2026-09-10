@@ -8,10 +8,11 @@ describe("Release & Packaging Validation", () => {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
 
   it("package.json contains all required release metadata", () => {
-    expect(pkg.name).toBe("sis");
+    expect(pkg.name).toBe("@aashirzayd/sis");
     expect(pkg.license).toBe("MIT");
     expect(pkg.type).toBe("module");
-    expect(pkg.engines?.node).toBe(">=18");
+    expect(pkg.engines?.node).toBe(">=24.0.0");
+    expect(pkg.publishConfig?.access).toBe("public");
     expect(pkg.author).toBe("Aashir Zayd");
     expect(pkg.repository?.url).toBe("git+https://github.com/AashirZayd/sis.git");
     expect(pkg.homepage).toBe("https://github.com/AashirZayd/sis#readme");
@@ -47,8 +48,9 @@ describe("Release & Packaging Validation", () => {
 
   it("README installation and rule catalog align with package and types", () => {
     const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
-    expect(readme).toContain("npm install --save-dev sis");
-    expect(readme).toContain("npx sis audit");
+    expect(readme).toContain("npm install --save-dev @aashirzayd/sis");
+    expect(readme).toContain("npx @aashirzayd/sis audit");
+    expect(readme).toContain("sis audit .");
 
     // Verify all 5 stable rules documented
     expect(readme).toContain("SIS001");

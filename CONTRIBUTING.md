@@ -9,7 +9,7 @@ SIS is an autonomous runtime verification and speculative fuzzing tool for Next.
 ## Getting Started
 
 ### Prerequisites
-- **Node.js**: `>= 18.0.0`
+- **Node.js**: `>= 24.0.0`
 - **Package Manager**: `npm`
 
 ### Repository Setup

@@ -1,8 +1,11 @@
 {
-  "name": "sis",
+  "name": "@aashirzayd/sis",
   "version": "0.1.0",
   "description": "Autonomous runtime verification for Next.js boundaries",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "sis": "./dist/cli.js"
   },
@@ -25,7 +28,7 @@
     "url": "https://github.com/AashirZayd/sis/issues"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "build": "tsc",

@@ -5,9 +5,9 @@ All notable changes to **SIS (Speculative Invariant Synthesis)** will be documen
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> **Note on Registry History**: The npm registry name `sis` was previously associated with an unrelated legacy library published in 2014–2015 (v0.1.0 through v0.1.3). The history below documents the genuine development milestones of the Speculative Invariant Synthesis engine.
+> **Note on Package Identity**: The unscoped npm package name `sis` was historically registered by an unrelated legacy library published in 2014–2015. Speculative Invariant Synthesis is prepared for its initial release under the scoped package name `@aashirzayd/sis`.
 
-## [0.1.0]
+## [0.1.0] - Preparation for Initial Scoped Release
 
 ### Added
 - **Core Engine & AST Analysis**: SWC-based parsing of TypeScript and TSX, identifying Next.js App Router boundaries (`"use client"`, `"use server"`) and candidate Server Actions.

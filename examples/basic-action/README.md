@@ -9,7 +9,7 @@ This example demonstrates how SIS discovers a candidate Server Action, infers pa
 ## Run Audit
 
 ```bash
-npx sis audit examples/basic-action/actions.ts
+npx @aashirzayd/sis audit examples/basic-action/actions.ts
 ```
 
 ## What SIS Finds

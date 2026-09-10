@@ -61,12 +61,12 @@ auditCmd.addHelpText(
   "after",
   `
 Examples:
-  $ npx sis audit .
-  $ npx sis audit app/actions.ts --runs 25
-  $ npx sis audit app/ --seed 42
-  $ npx sis audit app/ --json
-  $ npx sis audit app/ --sarif
-  $ npx sis audit app/ --timeout 50 --max-shrink-attempts 50
+  $ npx @aashirzayd/sis audit .
+  $ sis audit app/actions.ts --runs 25
+  $ sis audit app/ --seed 42
+  $ sis audit app/ --json
+  $ sis audit app/ --sarif
+  $ sis audit app/ --timeout 50 --max-shrink-attempts 50
 `
 );
 

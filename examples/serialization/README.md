@@ -10,7 +10,7 @@ This example illustrates React Server Component (RSC) boundary rules under React
 ## Run Audit
 
 ```bash
-npx sis audit examples/serialization
+npx @aashirzayd/sis audit examples/serialization
 ```
 
 ## What SIS Finds

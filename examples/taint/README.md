@@ -10,7 +10,7 @@ This example demonstrates how SIS performs interprocedural data-flow analysis to
 ## Run Audit
 
 ```bash
-npx sis audit examples/taint
+npx @aashirzayd/sis audit examples/taint
 ```
 
 ## What SIS Finds
