@@ -1,4 +1,4 @@
-﻿# Dependencies
+# Dependencies
 node_modules/
 
 # Build outputs
@@ -17,3 +17,6 @@ npm-debug.log*
 # OS artifacts
 .DS_Store
 Thumbs.db
+
+# Package tarballs
+*.tgz

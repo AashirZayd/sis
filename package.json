@@ -8,6 +8,22 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AashirZayd/sis.git"
+  },
+  "homepage": "https://github.com/AashirZayd/sis#readme",
+  "bugs": {
+    "url": "https://github.com/AashirZayd/sis/issues"
+  },
   "engines": {
     "node": ">=18"
   },

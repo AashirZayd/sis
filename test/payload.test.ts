@@ -125,7 +125,7 @@ describe("Payload Arbitraries - Category Coverage", () => {
   });
 
   it("generates primitive type mismatches", () => {
-    const samples = fc.sample(primitiveMismatchArbitrary, { numRuns: 100 });
+    const samples = fc.sample(primitiveMismatchArbitrary, { numRuns: 100, seed: 42 });
     const values = samples.map((s) => s.value);
 
     expect(values.some((v) => typeof v === "string")).toBe(true);
