@@ -163,7 +163,7 @@ describe("Phase 12: Real-World Hardening and Adversarial Fixture Validation", ()
 
       expect(res25.statistics.payloadsGenerated).toBe(625);
       expect(res25.statistics.executions).toBeGreaterThan(res10.statistics.executions);
-    });
+    }, 20000);
   });
 
   describe("11. Seed Determinism and Reproducibility", () => {

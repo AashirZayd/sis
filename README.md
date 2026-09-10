@@ -1,262 +1,450 @@
 # SIS
 
-**Speculative Invariant Synthesis**
+### Speculative Invariant Synthesis
 
-> Autonomous runtime verification for Next.js boundaries.
+> What if your Next.js app could find the edge cases you forgot to test?
 
-SIS is a zero-configuration developer tool and compiler-level verification engine designed for modern Next.js App Router and React Server Components (RSC) codebases. It identifies Server/Client boundaries, tracks secret flows across component boundaries, synthesizes adversarial inputs, and verifies runtime invariants inside an isolated execution environment.
+SIS is a zero-configuration analysis and speculative fuzzing tool for modern Next.js App Router and React Server Component boundaries. It discovers Client/Server module boundaries, traces secret data flows, models React Flight serializability contracts, synthesizes targeted adversarial payloads, and dynamically verifies invariants inside an isolated V8 execution sandbox.
 
----
+[![npm version](https://img.shields.io/badge/npm-v0.1.3-blue.svg)](https://www.npmjs.com/package/sis)
+[![node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
+[![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![tests](https://img.shields.io/badge/tests-205%20passed-success.svg)](test/)
 
-## Architectural Pipeline
-
-```text
-SOURCE CODE
-    ↓
-PROJECT DISCOVERY
-    ↓
-SWC AST ANALYSIS
-    ↓
-SERVER/CLIENT BOUNDARY DISCOVERY
-    ↓
-SECRET TAINT ANALYSIS
-    ↓
-SERVER ACTION DISCOVERY
-    ↓
-ADVERSARIAL PAYLOAD SYNTHESIS
-    ↓
-SANDBOX-COMPATIBLE RUNTIME EXECUTION
-    ↓
-INVARIANT VERIFICATION
-    ↓
-FAILURE SHRINKING
-    ↓
-MINIMAL REPRODUCTION
-    ↓
-DEVELOPER-FRIENDLY REPORT
-```
+[Get Started](#installation) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
 
 ---
 
-## Usage
+## The Problem
 
-```bash
-# Audit the entire Next.js repository (recursive discovery)
-npx sis audit .
+Modern Next.js applications split application logic across Server Components, Client Components, and Server Actions. While happy-path unit and integration tests verify that features work when given expected inputs, production boundaries frequently encounter edge cases developers did not anticipate:
 
-# Generate machine-readable JSON output (Version 1 schema)
-npx sis audit . --json > sis-report.json
-npx sis audit . --format json > sis-report.json
+- **Unexpected Argument Shapes**: `null`, `undefined`, sparse arrays, and missing nested keys causing runtime `TypeError: Cannot read properties of undefined`.
+- **Numeric Hazards**: Unchecked `NaN`, `-0`, `Infinity`, and precision loss propagating into downstream business logic or database queries.
+- **Prototype-Sensitive Objects**: Payloads containing `__proto__` or `constructor` causing unexpected object behavior.
+- **Serialization Traps**: Event handlers, custom class instances, and unregistered symbols crossing the Server $\to$ Client boundary and breaking React Flight wire transfer.
+- **Secret Taint Leaks**: Private server environment variables (`process.env.AUTH_SECRET`) inadvertently forwarded into Client Component props or JSX sinks.
+- **Nested Destructuring Failures**: Complex parameter unpacking failing violently when encountering empty objects or scalar values.
 
-# Generate OASIS SARIF 2.1.0 output for CI/CD and security scanners
-npx sis audit . --sarif > sis-results.sarif
-npx sis audit . --format sarif > sis-results.sarif
+Traditional testing validates developer-written examples. **SIS asks:** *What happens when the boundary receives something you did not think to test?*
 
-# Run silently (no terminal UI, preserves exit code and machine-readable stdout)
-npx sis audit . --silent
-npx sis audit . --json --silent > report.json
+---
 
-# Audit with custom fuzzing runs, deterministic base seed, and execution timeout
-npx sis audit . --runs 25 --seed 42 --timeout 20
+## What SIS Actually Does
 
-# Configure maximum call-depth for interprocedural data-flow analysis
-npx sis audit . --max-analysis-depth 10
+SIS analyzes your Next.js codebase through an integrated static and dynamic verification pipeline:
 
-# Ignore custom folders in addition to standard defaults
-npx sis audit . --ignore e2e tests/fixtures
-
-# Audit an individual Server Action or client component file
-npx sis audit ./app/actions/transfer.ts
-npx sis audit ./app/components/ProfileCard.tsx
-
-# Disable automatic failure shrinking or adjust max attempts
-npx sis audit . --no-shrink
-npx sis audit . --max-shrink-attempts 50
+```mermaid
+flowchart TD
+    Source["Source Code (*.ts, *.tsx)"] --> Scanner["Project Discovery & Scanner"]
+    Scanner --> AST["SWC AST & Directive Analysis"]
+    AST --> Boundary["Boundary Model
+(Client / Server / Props / Actions)"]
+    Boundary --> Dataflow["Interprocedural Module Graph
+& Data-Flow Analysis"]
+    Dataflow --> Taint["Static Secret Taint Tracking
+(process.env.* -> Sinks)"]
+    Boundary --> Shape["AST Shape & Signature Inference"]
+    Shape --> Fuzz["Boundary-Directed Speculative Fuzzing
+(fast-check + Specialized Mutations)"]
+    Fuzz --> Gate{"Compatibility Gate"}
+    Gate -->|"sandbox-compatible"| Sandbox["isolated-vm Zero-Privilege Sandbox
+(Enforced Execution Budget)"]
+    Gate -->|"framework-dependent"| StaticOnly["Static-Only Classification
+(Preserves Safety, Bypasses Isolate)"]
+    Sandbox -->|"Execution Error"| Shrinker["Delta-Debugging Shrinking Engine
+(Signature Preservation)"]
+    Shrinker --> Repro["Minimal Reproducible Failure"]
+    Sandbox -->|"Clean / Handled"| Findings["Finding Synthesis"]
+    Taint --> Findings
+    StaticOnly --> Findings
+    Repro --> Findings
+    Findings --> Reporter["Reporters: Terminal · JSON v1 · SARIF 2.1.0"]
 ```
 
-### Exit Code Contract
+1. **AST & Boundary Discovery**: Uses `@swc/core` to parse TypeScript and TSX, identifying `"use client"` and `"use server"` directives, exported Server Actions, and component props.
+2. **Interprocedural Data-Flow & Taint**: Constructs a local module call graph to trace sensitive environment variables across helper functions into Client boundaries.
+3. **React Flight Serializability**: Evaluates props passed to Client Components against React Flight serialization specifications.
+4. **Speculative Shape Inference**: Infers parameter shapes from TypeScript types, destructuring patterns, and property accesses.
+5. **Boundary-Directed Fuzzing**: Synthesizes adversarial payloads targeting boundary hazards using `fast-check` and targeted mutation strategies.
+6. **Isolated Runtime Verification**: Executes sandbox-compatible actions in an `isolated-vm` V8 isolate under an execution budget (default: 20ms).
+7. **Failure-Preserving Shrinking**: Automatically delta-debugs failing payloads to the smallest reproducible input that triggers the identical error signature.
+8. **Deterministic Reporting**: Formats results as actionable terminal output, Version 1 JSON, or OASIS SARIF 2.1.0.
 
-SIS provides deterministic, standardized process exit codes for integration into CI/CD pipelines and developer tooling:
+---
 
-| Exit Code | Meaning | Description |
-| :---: | :--- | :--- |
-| `0` | **Success / Clean** | Audit completed successfully with zero actionable findings or invariant violations. |
-| `1` | **Violations Detected** | Audit completed and actionable findings (taint leaks, runtime exceptions, timeouts, serialization errors) were detected. |
-| `2` | **Usage / Config / Input Error** | Target path not found, invalid numeric option (e.g. `--runs <= 0`), conflicting output flags (`--json` and `--sarif`), or malformed invocation. |
-| `3` | **Internal Execution Error** | Unexpected internal executor or isolate failure. |
-| `130` | **Interrupted** | Process cleanly terminated by user (`SIGINT` / `Ctrl+C`). |
+## Why SIS Is Different
 
+| Approach | What It Does | SIS Difference |
+| :--- | :--- | :--- |
+| **Unit tests** | Verify developer-written examples | SIS generates boundary-directed adversarial edge cases automatically. |
+| **Generic fuzzing** | Explores arbitrary, untyped inputs | SIS targets discovered Next.js boundary contracts and inferenced shapes. |
+| **Static analysis** | Identifies suspicious syntax patterns | SIS dynamically executes and verifies sandbox-compatible candidates in an isolate. |
+| **Taint analysis** | Traces sensitive values to sinks | SIS combines interprocedural taint with React Server/Client boundary semantics. |
+| **SIS** | Unifies boundary discovery, taint, fuzzing, and shrinking | Delivers verified, minimal reproducers for edge cases developers miss. |
 
-### Directory Audit Example
+> SIS does not replace your test suite or linter. It complements them by exploring boundary behaviors beyond your happy paths.
 
-Running SIS against a repository automatically discovers all relevant source files (`.ts`, `.tsx`, `.js`, `.jsx`), filters out dependencies and build artifacts (`node_modules`, `.git`, `.next`, `dist`, `build`, `coverage`), and executes isolated static and dynamic checks across all boundaries:
+---
+
+## See It in Action
+
+Consider a simple Server Action designed to calculate discounts:
+
+```typescript
+"use server";
+
+export async function calculatePrice(value: number) {
+  return value.toFixed(2);
+}
+```
+
+Developers expect standard positive numbers. But what happens when unexpected values arrive across the network?
+
+When audited, SIS synthesizes numeric edge cases (`0`, `-0`, `NaN`, `Infinity`, `-Infinity`, `null`, `undefined`), executes the candidate inside the V8 isolate, and shrinks the failing payload:
 
 ```text
-$ npx sis audit .
+$ npx sis audit app/actions/pricing.ts
+
 SIS  Speculative Invariant Synthesis
 Autonomous runtime verification for Next.js boundaries
 
-Scanning 147 source files...
+◇ DISCOVERY
+  Target: app/actions/pricing.ts (Single File)
+
+Scanning 1 source file...
 
 ◆ DISCOVERY
-  ✓ 18 server boundaries
-  ✓ 4 client boundaries
-  ✓ 31 candidate Server Actions
+  ✓ 1 server boundary
+  ✓ 1 candidate Server Action
 
-◆ TAINT ANALYSIS
-  ✖ 2 high-confidence secret flows
-
-    process.env.PRIVATE_API_KEY
-      → secret
-      → JSX expression
-    components/UserProfile.tsx:14
-
-◆ PAYLOAD SYNTHESIS
-  ✓ 1,240 adversarial payloads
+◆ SPECULATIVE FUZZING
+  ◇ 1 boundary target discovered
+  ⟳ 4 fuzz strategies applied
+  ✓ 10 boundary-directed payloads
 
 ◆ RUNTIME VERIFICATION
-  ✓ 1,137 passed
-  ✖ 41 failed
-  ⊘ 62 unsupported
+  ✓ 6 passed
+  ✖ 4 failed
 
-  ✖ riskyTransfer
-    Payload #4
-    Input: null
-    TypeError: Cannot read properties of null (reading 'amount')
-    app/actions/transfer.ts:18
+  ✖ calculatePrice
+    Payload #1
+    Input: -Infinity
+    RangeError: toFixed() digits argument must be between 0 and 100
+    app/actions/pricing.ts:4
+
+    Execution: 2ms / 20ms budget
+    Wall time: 6ms
 
 ◆ FAILURE SHRINKING
-  ✓ 41 failures reduced
+  ✓ 4 failures reduced
 
-  ✖ riskyTransfer
-    Original: { metadata: { client: "web" }, amount: null }
-    Minimal reproducer: { amount: null }
-    Attempts: 2
-    Reduction: 74.2%
+  ✖ calculatePrice
+    Original: -Infinity
+    Minimal reproducer: -Infinity
+    Attempts: 1
+    Reduction: 0%
     Verification: ✓ failure preserved
 
 ────────────────────────────────────────
 AUDIT COMPLETE
-  Files analyzed:        147
-  Server boundaries:      18
-  Candidate actions:      31
-  Runtime failures:       41
-  Taint violations:        2
-  Analysis errors:         0
+  Files analyzed:        1
+  Server boundaries:     1
+  Candidate actions:     1
+  Runtime failures:      4
+  Taint violations:      0
 
-✖ SIS found 43 verified findings
+✖ SIS found 4 verified findings
 ────────────────────────────────────────
 ```
 
-### Failure Shrinking Example
-
-When runtime verification discovers a failing adversarial payload, SIS automatically invokes its failure-preserving shrinking engine. It systematically reduces strings, numbers, arrays, and objects using delta debugging to find the smallest reproducible input that triggers the identical error signature:
-
-```typescript
-"use server";
-
-export async function processNestedConfig(payload: any) {
-  if (typeof payload.user.profile.settings.theme.primary !== "string") {
-    throw new TypeError("Invalid theme primary color");
-  }
-  return { success: true };
-}
-```
+When encountering complex nested inputs, the shrinking engine systematically strips irrelevant properties:
 
 ```text
-◆ FAILURE SHRINKING
-
-  ✖ processNestedConfig
-    Original: { user: { profile: { settings: { theme: { primary: 123, font: "sans" } } } }, extra: [1, 2, 3] }
-    Minimal reproducer: { user: { profile: { settings: { theme: { primary: 0 } } } } }
-    Attempts: 4
-    Reduction: 68.5%
+  ✖ processOrder
+    Original: { user: { profile: { accountId: null, role: "admin" } }, tags: ["urgent"] }
+    Minimal reproducer: { user: { profile: { accountId: null } } }
+    Attempts: 3
+    Reduction: 73.1%
     Verification: ✓ failure preserved
 ```
 
-### Isolated Runtime Execution Example
+---
 
-When candidate Server Actions (`"use server"`) are detected, SIS synthesizes adversarial payloads and executes sandbox-compatible candidates inside a secure, zero-privilege `isolated-vm` V8 isolate with a 20ms execution budget:
+## Boundary Awareness
 
-```typescript
-"use server";
+SIS models the full spectrum of Next.js App Router boundary semantics:
 
-export async function executeTransfer(payload: { amount: number }) {
-  return payload.amount.toFixed(2);
-}
+- **Client Modules**: Files marked with top-level `"use client"`.
+- **Server Modules**: Files marked with top-level `"use server"`.
+- **Server Components**: Default React components in App Router executed on the server.
+- **Server Actions**: Async functions explicitly callable from the client, designated via module-level or inline `"use server"` directive prologues.
+- **Server Functions**: General server-side utility functions. *Not every Server Function is a Server Action.*
+- **Server-to-Client Props**: Prop expressions passed from Server Components into Client Components (`<ClientComponent prop={value} />`).
+
+Boundary semantics determine where adversarial inputs and invariants matter. Server Actions require fuzzing and parameter validation; Client Component boundaries require serializability and secret taint checks.
+
+---
+
+## React Flight Serialization
+
+React Server Components transfer data over the wire using the React Flight protocol. Props passed from Server Components to Client Components, as well as return values from Server Actions, must be transferable.
+
 ```
+JSON.stringify semantics  ≠  React Flight semantics
+```
+
+SIS inspects boundary expressions against React Flight specifications:
+
+- **Supported Built-ins**: Primitives (`string`, `number`, `boolean`, `null`, `undefined`), `Date`, `Map`, `Set`, `ArrayBuffer`, typed arrays (`Uint8Array`, etc.), plain objects, arrays, and functions with `"use server"`.
+- **Unsupported Hazards**:
+  - Ordinary functions and closures without `"use server"` (e.g. `onClick={() => {}}` passed from a Server Component).
+  - Custom class instances (e.g. `new DatabaseClient()`, `new UserSession()`).
+  - Unregistered `Symbol()` identifiers.
+  - Circular and non-transferable data structures.
+
+When non-transferable values cross boundaries, SIS emits `SIS002: serialization-violation`.
+
+---
+
+## Static Taint Analysis
+
+SIS tracks sensitive server environment variables through AST data flows and interprocedural helper chains until they reach a boundary:
 
 ```text
-◆ RUNTIME VERIFICATION
-
-  Executed 23 transferable payloads
-  Unsupported 2
-  Passed 2
-  Failed 21
-
-  ✖ executeTransfer
-    Payload #1
-    Category: numeric-extreme
-    Input: -Infinity
-
-    TypeError: Cannot read properties of undefined (reading 'toFixed')
-    ./test/fixtures/payload-fragile-action.ts:3
-
-    Execution: 3ms / 20ms budget
-    Wall time: 8ms
-
-  ✖ executeTransfer
-    Payload #22
-    Category: nullish
-    Input: null
-
-    TypeError: Cannot read properties of null (reading 'amount')
-    ./test/fixtures/payload-fragile-action.ts:3
-
-    Execution: 2ms / 20ms budget
-    Wall time: 6ms
+process.env.AUTH_SECRET  ──>  getSessionSecret()  ──>  <UserProfile secret={...} />
 ```
 
-> **Timeout & Execution Semantics**:
-> SIS applies the `--timeout` value as a per-payload candidate execution budget inside the isolated V8 context. Isolate startup, payload preparation, and teardown are outside this budget, so total wall-clock time may exceed the configured execution timeout.
->
-> For example, `--timeout 20` means:
-> * **Candidate execution budget**: 20ms (strictly enforced inside the isolate)
-> * **Total wall-clock observation**: ~25–30ms (including V8 isolate spinup, context creation, and teardown)
+- **Sensitive Sources**: Automatically matches environment variables matching `*_KEY`, `*_SECRET`, `*_TOKEN`, `*_PASSWORD`, `PRIVATE_*`, and `SECRET_*`.
+- **Safe Variables**: Public environment variables (`NEXT_PUBLIC_*`) are explicitly recognized as safe and excluded from taint tracking.
+- **Sinks**: Direct assignments, object literals, array elements, and template strings reaching `"use client"` boundaries or JSX expressions.
 
-> **Important Guarantee**:
-> SIS currently verifies sandbox-compatible Server Action candidates. It does not recreate the full Next.js runtime and therefore does not claim to execute every real-world Server Action. Actions relying on external database connections, complex framework imports, or host globals are conservatively classified as `static-only`.
+If a sensitive flow is detected, SIS reports a static `SIS001: taint-violation` with source location and trace details.
 
-### Static Taint Analysis Example
+---
 
-SIS tracks AST-level data flows from sensitive server environment variables into `"use client"` boundaries:
+## Isolated Runtime Verification
 
-```tsx
-"use client";
+When candidate Server Actions are identified, SIS evaluates their execution compatibility:
 
-const secret = process.env.PRIVATE_API_KEY;
-const value = secret;
-
-export function Profile() {
-  return <div>{value}</div>;
-}
-```
+- **Sandbox-Compatible**: Self-contained functions without host dependencies or unresolved external imports. These are executed directly inside an `isolated-vm` V8 isolate.
+- **Static-Only**: Functions that depend on external infrastructure (Next.js `cookies()`, `headers()`, `redirect()`, `notFound()`, database connections, ORMs, or network sockets).
 
 ```text
-◆ TAINT ANALYSIS
-  ✖ 1 sensitive value reaches client boundary
-
-    process.env.PRIVATE_API_KEY
-      → secret
-      → value
-      → JSX expression
-
-  ./app/components/Profile.tsx:7
+Framework-dependent action
+        ↓
+    cookies()
+        ↓
+   static-only
+        ↓
+Static analysis continues
+Runtime isolate skipped
 ```
 
-### GitHub Actions CI / CodeQL SARIF Integration
+> **Why this matters**: `isolated-vm` provides a secure, zero-privilege execution sandbox without access to `process`, `fs`, `fetch`, or host environment variables. SIS does not claim to be a full Next.js runtime. Bypassing isolate execution for framework-dependent functions prevents false-positive crashes while verifying pure logic safely.
 
-Integrate SIS into GitHub Actions to automatically verify Next.js App Router boundaries on every pull request and upload findings directly to GitHub Security / Code Scanning:
+---
+
+## Failure Shrinking
+
+When a synthesized payload triggers a runtime failure, raw property-based inputs are often noisy and complex. SIS invokes a failure-preserving delta-debugging shrinker:
+
+```text
+Complex failing payload
+        ↓
+Capture failure signature (action + error name + message pattern)
+        ↓
+Systematically strip properties / simplify scalar values
+        ↓
+Verify candidate in sandbox (re-check failure signature)
+        ↓
+Smallest useful failing payload (Minimal Reproducer)
+```
+
+If a reduced payload fails to reproduce the exact original failure signature, the shrinker discards it and preserves the verified parent state.
+
+---
+
+## Determinism & Reproducibility
+
+SIS guarantees reproducible audits:
+
+```bash
+npx sis audit app/ --seed 42
+```
+
+Specifying a seed produces deterministic results across runs:
+- **Lexicographical File Ordering**: Directory discovery sorts files consistently across operating systems.
+- **Per-File Seed Derivation**: Each file receives a deterministic seed derived via 32-bit FNV-1a hashing of the base seed and relative file path.
+- **Deterministic Payload Generation**: The underlying `fast-check` PRNG produces identical payloads.
+- **Reproducible Repro Payloads**: Failure signatures and minimal reproducers match across runs.
+
+*(Note: While findings and payloads are deterministic, execution timing measurements naturally vary depending on system hardware).*
+
+---
+
+## Performance & Scaling
+
+SIS enforces a linear budget model:
+
+```text
+Total Payloads  =  Targets (T)  ×  Runs (N)
+```
+
+The `--runs` option defines the quota **per candidate target**, rather than a global pool:
+
+- **10 targets** $\times$ `--runs 10` = 100 synthesized payloads.
+- **100 targets** $\times$ `--runs 10` = 1,000 synthesized payloads.
+- **100 targets** $\times$ `--runs 100` = 10,000 synthesized payloads.
+
+This per-target allocation prevents combinatorial explosion ($O(T \cdot N)$ rather than $O(T \cdot N \cdot S)$), ensuring predictable memory and execution time across large projects.
+
+*(Example benchmark on local developer hardware: 20 targets audit in ~0.8s; 100 targets audit in ~3.5s. Exact timings depend on host machine specifications).*
+
+---
+
+## Installation
+
+Run SIS on-demand using `npx`:
+
+```bash
+npx sis audit .
+```
+
+Or add it to your project's development dependencies:
+
+```bash
+npm install --save-dev sis
+```
+
+### System Requirements
+
+- **Node.js**: `>= 18.0.0`
+- **Module System**: ESM (ECMAScript Modules)
+- **Target Projects**: Next.js App Router applications (TypeScript or JavaScript)
+
+---
+
+## CLI Reference
+
+```bash
+npx sis audit [target] [options]
+```
+
+### Common Commands
+
+```bash
+# Audit entire repository
+npx sis audit .
+
+# Audit a specific Server Action or component file
+npx sis audit app/actions/checkout.ts
+npx sis audit app/components/Card.tsx
+
+# Emit machine-readable JSON or SARIF to stdout
+npx sis audit . --json > sis-report.json
+npx sis audit . --sarif > sis-results.sarif
+
+# Run silently in CI scripts (exit code only)
+npx sis audit . --silent
+
+# Configure fuzzing budget and deterministic seed
+npx sis audit . --runs 25 --seed 42 --timeout 50
+```
+
+### Options
+
+| Category | Option | Description | Default |
+| :--- | :--- | :--- | :--- |
+| **Audit** | `<target>` | Path to target project, directory, or individual source file. | *(Required)* |
+| | `--ignore <patterns...>` | Additional directories or file patterns to ignore. | `[]` |
+| | `--max-analysis-depth <n>` | Maximum call-depth for interprocedural analysis. | `8` |
+| **Output** | `-f, --format <format>` | Output format: `terminal`, `json`, or `sarif`. | `"terminal"` |
+| | `--json` | Emit output as machine-readable JSON (alias for `--format json`). | `false` |
+| | `--sarif` | Emit output as OASIS SARIF 2.1.0 (alias for `--format sarif`). | `false` |
+| | `--silent` | Suppress human-readable terminal progress and output. | `false` |
+| **Execution** | `-r, --runs <n>` | Number of synthesized payloads allocated per candidate target. | `10` |
+| | `-t, --timeout <ms>` | Candidate JavaScript execution budget inside the isolate in ms. | `20` |
+| | `--no-shrink` | Disable automatic failure shrinking. | `false` |
+| | `--max-shrink-attempts <n>` | Maximum shrinking iterations per failing payload. | `30` |
+| **Reproducibility** | `-s, --seed <n>` | Explicit seed for deterministic synthesis and file ordering. | `Date.now()` |
+| **Global** | `--debug` | Display verbose diagnostics and error stack traces. | `false` |
+| | `-v, --version` | Display current SIS version. | |
+| | `-h, --help` | Display command help. | |
+
+> **Execution Timeout Semantics (`--timeout <ms>`)**:
+> The `--timeout` option configures the **maximum execution budget for candidate JavaScript execution inside the V8 isolate**. It is NOT total audit wall-clock time. Host AST parsing, payload synthesis, isolate spinup, and teardown are not deducted from this budget.
+
+### Exit Code Contract
+
+| Exit Code | Classification | Description |
+| :---: | :--- | :--- |
+| **`0`** | **Clean Audit** | Audit completed successfully with zero actionable findings or invariant violations. |
+| **`1`** | **Violations Detected** | Actionable findings detected (taint leaks, runtime exceptions, timeouts, or serialization errors). |
+| **`2`** | **CLI / Config Error** | Target path not found, invalid numeric option (`--runs <= 0`), conflicting output flags, or malformed arguments. |
+| **`3`** | **Engine Failure** | Unexpected internal executor or isolate failure. |
+| **`130`** | **Interrupted** | Execution canceled by user via `SIGINT` (`Ctrl+C`). |
+| **`143`** | **Terminated** | Execution terminated via `SIGTERM`. |
+
+---
+
+## Findings Catalog
+
+SIS assigns persistent, stable rule identifiers:
+
+| Rule ID | Name | Mode | Severity | Description |
+| :---: | :--- | :---: | :---: | :--- |
+| **`SIS001`** | `taint-violation` | Static | `error` | Sensitive server environment variable flows into a Client boundary. |
+| **`SIS002`** | `serialization-violation` | Static | `error` | Non-transferable value crosses React Flight boundary. |
+| **`SIS003`** | `runtime-exception` | Runtime | `error` | Candidate Server Action threw an unhandled runtime exception. |
+| **`SIS004`** | `timeout` | Runtime | `error` | Candidate Server Action exceeded its allocated execution budget. |
+| **`SIS005`** | `invariant-violation` | Dynamic / Static | `error` | Boundary invariant assertion violated during execution. |
+
+### Rule Details
+
+#### `SIS001`: Taint Violation
+- **Meaning**: Server-side credentials or secrets are accessible in a Client Component or returned to client code.
+- **Example**: `const key = process.env.API_SECRET; return <div>{key}</div>;` inside `"use client"`.
+- **Remediation**: Remove secret references from Client Components. Access secrets only inside server-only modules or Server Actions without returning them.
+
+#### `SIS002`: Serialization Violation
+- **Meaning**: A Server Component passes a prop to a Client Component that cannot be serialized over React Flight.
+- **Example**: `<ClientButton onClick={() => doServerWork()} />` where `onClick` is an ordinary server function without `"use server"`.
+- **Remediation**: Convert the handler to a Server Action with `"use server"`, or pass serializable primitive identifiers.
+
+#### `SIS003`: Runtime Exception
+- **Meaning**: An exported Server Action threw an uncaught error (such as `TypeError` or `RangeError`) when invoked with boundary edge cases.
+- **Example**: `export async function update(data) { return data.user.id; }` fails when `data` is `null`.
+- **Remediation**: Implement defensive parameter validation at the top of the Server Action (e.g. using Zod, ArkType, or explicit guards).
+
+#### `SIS004`: Timeout
+- **Meaning**: An action entered an infinite loop or exceeded its isolate execution budget.
+- **Example**: `while (condition) { ... }` without an exit condition.
+- **Remediation**: Check loop termination conditions and bound recursion depth.
+
+#### `SIS005`: Invariant Violation
+- **Meaning**: A synthesized boundary invariant was breached during analysis or execution.
+- **Remediation**: Review the specific failure diagnostic reported in the audit findings.
+
+---
+
+## Machine-Readable Output & CI
+
+### Stream Discipline
+When `--json` or `--sarif` is specified, SIS enforces strict stream separation:
+- **`stdout`**: Reserved strictly for valid JSON or SARIF.
+- **`stderr`**: Receives all diagnostic notices, progress banners, and error boxes.
+
+Piping stdout to a file will never produce corrupted JSON:
+
+```bash
+npx sis audit . --json > sis-report.json
+npx sis audit . --sarif > sis-results.sarif
+```
+
+### GitHub Actions Workflow
+
+Integrate SIS into GitHub Actions to scan pull requests and publish findings directly to GitHub Security Code Scanning:
 
 ```yaml
 name: SIS Security Audit
@@ -285,11 +473,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run SIS Audit (SARIF)
-        run: npx sis audit . --format sarif > sis-results.sarif
+      - name: Run SIS Audit
+        run: npx sis audit . --sarif > sis-results.sarif
         continue-on-error: true
 
-      - name: Upload SARIF report to GitHub Code Scanning
+      - name: Upload SARIF to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: sis-results.sarif
@@ -297,95 +485,42 @@ jobs:
 
 ---
 
-### Performance Controls & Fuzz Budget Semantics
+## Limitations
 
-SIS is engineered for deterministic, predictable scaling across projects with dozens or hundreds of candidate actions:
+To maintain technical precision and credibility, SIS explicitly identifies its architectural boundaries:
 
-* **Per-Target Budget Allocation (`--runs <n>`)**:
-  The `--runs` option (default: `10`) configures the **per-candidate action fuzzing quota**, *not* a flat global pool. For a project with $T$ discovered candidate Server Actions, SIS synthesizes up to $T \times N$ adversarial payloads. Each candidate target receives proportional exploration across structural object mutations, numeric extremes, string hazards, nullish inputs, and wire serialization traps without risk of combinatorial explosion ($O(T \cdot N)$ rather than $O(T \cdot N \cdot S)$).
-* **Deterministic Pseudo-Random Seed (`--seed <number>`)**:
-  Specifying `--seed` (default: `Date.now()`) seeds both directory traversal hashing (FNV-1a per-file seeds) and the underlying `fast-check` generator. Given the same source code, configuration, and seed, SIS produces 100% deterministic, byte-for-byte identical findings, reproducer payloads, and failure signatures across runs.
-* **Isolate Execution Budget (`--timeout <ms>`)**:
-  Enforces a strict execution deadline (default: `20ms`) strictly on **candidate JavaScript execution inside the V8 isolate**. Host-side compilation, AST parsing, payload preparation, and isolate spinup/teardown do not deplete the candidate's execution budget.
-* **Failure Shrinking Bounds (`--max-shrink-attempts <n>`, `--no-shrink`)**:
-  Limits the maximum delta-reduction iterations per failing candidate (default: `30`) to guarantee deterministic bounded runtime overhead.
+1. **Not a Full Next.js Runtime**: SIS uses `isolated-vm` to execute JavaScript in a clean V8 isolate. It does not run a mock Next.js server, emulate the React reconciler, or provide Next.js routing infrastructure.
+2. **Static-Only for Framework Globals**: Actions requiring live Next.js request context (`cookies()`, `headers()`, `redirect()`, `notFound()`) or external database connections are classified as `static-only` and safely skipped from isolate execution.
+3. **Flight Modeling vs Bundler Emulation**: React Flight serializability is modeled against published protocol specifications; it does not invoke React's internal webpack flight client/server plugin.
+4. **Targeted Fuzzing vs Formal Proof**: Speculative invariant synthesis generates targeted boundary payloads. Passing an audit verifies that tested invariants held against synthesized inputs; it is not a mathematical proof of absolute security.
+5. **Static Taint Reach**: Static analysis operates over discoverable local module graphs. Dynamic evaluation (`eval()`, dynamically constructed `import()`, or obfuscated property access) cannot be tracked.
 
 ---
 
-## Real-World Validation
+## Roadmap
 
-SIS is hardened and continuously verified against realistic, messy, and adversarial Next.js App Router patterns across dedicated fixture suites in `test/fixtures/real-world/`:
+SIS is developed in rigorous, phased milestones:
 
-* **Nested Boundaries**: Deeply composed Client and Server Components (`"use client"`, `"use server"`, inline Server Actions, and shared helper utilities) verified without false positives or lost candidate actions.
-* **Complex Interprocedural Data-Flow**: Multi-hop taint propagation tracing sensitive server-side configuration across modular helper chains (`config.ts` → `session.ts` → `user.ts` → `page.tsx`) into client component JSX sinks.
-* **React Flight Serialization**: Accurate classification of Flight-compatible props (primitives, `Date`, `Map`, `Set`, typed arrays) versus non-serializable values (event handlers, functions without `'use server'`, custom class instances, and database handles).
-* **Taint & Serialization Boundary Interaction**: Distinct reporting of secret leakage (`SIS001`) and non-serializable values (`SIS002`) crossing the exact same component prop boundary without collapsing or masking either violation.
-* **Complex Destructuring**: Nested object destructuring, aliased properties, defaults, and tuple/array unpacking under synthesized adversarial inputs, driving minimal reproducer shrinking.
-* **Import Resolution Edge Cases**: Extensionless imports, `.js` specifiers resolving to `.ts`/`.tsx` sources, directory `index.ts` resolution, and resilience against unresolvable external module imports.
-* **Framework Dependencies & Static-Only Classification**: Robust isolation identifying framework APIs (`prisma`, `cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`) and classifying them as `static-only` while safely verifying self-contained actions in `isolated-vm`.
-* **Runtime Hazards**: Hard execution timeout budgets (`--timeout`) enforcing termination on infinite loops, and graceful containment of deep recursion stack exhaustion (`RangeError`).
-* **Noise & False-Positive Elimination**: Zero false alarms on public environment variables (`NEXT_PUBLIC_*`), server-internal helper routines, and serializable standard objects.
-* **Deterministic Fuzzing & Budget Scaling**: Predictable linear budget scaling under high action density (25+ actions) and deterministic finding reproducibility across runs (`--seed`).
-* **Schema-Compliant Output Purity**: Strict validation ensuring clean stdout emission of Version 1 JSON and OASIS SARIF 2.1.0 formats even on complex adversarial projects.
-
----
-
-## Status & Roadmap
-
-SIS is being developed across rigorous, incremental phases. We prioritize correctness over simulated behavior: if an invariant cannot be safely verified at runtime, it is explicitly classified as static-only.
-
-### Implemented
-
-- [x] **Phase 1 — Foundation & CLI Shell**: Production CLI executable built on Commander with Node.js >=18 and strict ESM. High-contrast terminal presentation layer (`◇`, `◆`, `⟳`, `⚡`, `✂`, `✓`, `✖`, `⚠`). Core contracts for `Boundary`, `ServerAction`, `Finding`, and `AuditResult`.
-- [x] **Phase 2 — SWC AST Parser & Boundary Discovery**: Compiler-grade AST parsing using `@swc/core` for TypeScript and TSX. Accurate discovery of prologue directives (`"use client"`, `"use server"`), zero-copy source location mapping (`file:line:col`), candidate Server Action detection (`export async function`, `export const fn = async () => {}`, named export declarations), and clean compiler diagnostics on syntax errors (`ParserError`).
-- [x] **Phase 3 — Static Taint Analysis**: AST-driven data-flow tracking for sensitive environment variables (`*_KEY`, `*_SECRET`, `*_TOKEN`, `*_PASSWORD`, `*_PRIVATE_KEY`, `*_API_KEY`, `PRIVATE_*`, `SECRET_*`) propagating across direct assignments, variable reassignments, object properties, nested objects, array elements, and template literal interpolations into `"use client"` boundaries. Strict exclusion of public environment variables (`NEXT_PUBLIC_*`).
-- [x] **Phase 4 — Property-Based Payload Synthesis**: Adversarial input synthesis for candidate Server Actions powered by `fast-check`. Features 7 specialized failure-inducing categories (`nullish`, `empty`, `numeric-extreme`, `prototype-sensitive`, `deep-nested`, `serialization-trap`, `primitive-mismatch`), recursion-depth bounding (depth <= 5), deterministic PRNG seed configuration (`--seed`), and safe terminal representation of unprintable, circular, and exotic values.
-- [x] **Phase 5 — Isolated Runtime Execution**: Bounded, secure execution of sandbox-compatible candidate Server Actions against synthesized payloads inside a controlled `isolated-vm` V8 isolate. Enforces hard execution deadlines (default 20ms, `--timeout`), non-mutating transfer compatibility checks, strict host isolation (no `process`, `require`, `fs`, `fetch`, or env vars), deterministic failure detection (`runtime-exception`, `timeout`), and clean distinction between transferable, unsupported, and static-only candidates.
-- [x] **Phase 6 — Failure Shrinking / Minimal Reproduction Synthesis**: Delta-debugging and structural shrinking engine that reduces complex failing payloads to minimal reproducers while strictly preserving failure signatures (action name + status + error name + normalized message pattern). Enforces per-candidate attempt budgets (default: 30, `--max-shrink-attempts`), executes all shrink iterations in isolated V8 sandboxes, and verifies the minimal reproducer prior to reporting with automatic fallback to original payload.
-- [x] **Phase 7 — Directory-Wide Auditing & Production CLI Experience**: Recursive directory discovery, default exclusion filters (`node_modules`, `.next`, `dist`, `build`, `coverage`, `.git`), deterministic lexicographical ordering, FNV-1a per-file seed derivation, per-file isolation (one broken file does not halt the audit), POSIX-normalized cross-platform paths, and production CLI exit codes (`0` clean, `1` verified findings, `2` fatal CLI errors).
-- [x] **Phase 8 — Machine-Readable Results, JSON & SARIF**: Dual machine-readable output formats (`--format json`, `--format sarif`), deterministic Version 1 JSON schema, OASIS SARIF 2.1.0 specification compliance, stable rule catalog (`SIS001` - `SIS005`), structured serialization preserving exotic JavaScript values (`undefined`, `NaN`, `Infinity`, `BigInt`, circular references), strict `stdout` purity, and seamless GitHub Actions Code Scanning integration.
-- [x] **Phase 9 — Interprocedural Data-Flow & Boundary Analysis**: Bounded, conservative local call-graph and module-graph analysis tracking sensitive server environment data through multi-hop helper functions, arguments, return values, structured object properties, array elements, destructuring, and template literals into `"use client"` component boundaries and Server Action returns. Cycle-safe recursion bounding (`--max-analysis-depth`).
-- [x] **Phase 10 — Next.js-Aware Boundary Semantics**: Fine-grained Next.js App Router and React Server Components (RSC) boundary modeling:
-  - **Boundary Classification**: Distinguishes `client-module`, `server-module`, `server-component`, `server-action`, `server-function`, `candidate-server-function`, and `server-to-client-props`.
-  - **Function-Level "use server"**: Identifies inline directive prologues in function declarations, function expressions, and arrow functions with strict directive prologue correctness.
-  - **Server Action Confidence**: Differentiates `definite` (directive-marked), `candidate` (async server exports), and `ordinary` server functions.
-  - **React Flight Serializability**: Evaluates serializability of props crossing from Server Components into Client Components (`<ClientComponent prop={value} />`) and Server Action return values. Supports primitives, `Date`, `Map`, `Set`, `ArrayBuffer`, typed arrays, plain objects, arrays, JSX elements, and Server Functions; rejects unmarked function callbacks, custom class instances, database handles, and unregistered Symbols (`SIS002: serialization-violation`).
-  - **Runtime vs Static-Only Distinction**: Identifies framework-dependent actions (ORM, database queries, Next.js server APIs like `cookies()`, `headers()`, `redirect()`) and marks them as `static-only`, executing only self-contained actions in `isolated-vm`.
-- [x] **Phase 11 — Boundary-Aware Speculative Fuzzing**: Directed adversarial input generation and invariant verification guided by boundary contracts:
-  - **AST-Driven Shape Inference**: Infers parameter and return shapes from TypeScript type annotations (`TsTypeLiteral`, `TsKeywordType`, `TsArrayType`, `TsUnionType`), destructuring patterns, default argument values, and function body property and method usage heuristics.
-  - **Targeted Mutation Strategies**: Systematically mutates boundaries based on target contracts: numbers (extremes, `NaN`, `-0`, `Infinity`, precision loss), strings (null byte `\0`, whitespace hazards, control chars, long strings), booleans, and structural objects (property deletion, empty structures, null property values, and prototype pollution keys `__proto__`, `constructor`, `prototype`).
-  - **React Flight & Wire Serialization Traps**: Synthesizes classified serialization traps (unregistered `Symbol()`, custom class instances, unmarked closure functions, cyclic references, BigInt boundaries) to verify Flight protocol resilience across Client/Server boundaries.
-  - **Deterministic Budgeting Algorithm**: Proportional budget distribution across discovered targets with clamped per-target quotas and seeded permutation to prevent single-target dominance and Cartesian explosion.
-  - **Isolated Execution & Minimal Reproduction**: Executes sandbox-compatible candidates in `isolated-vm` within runtime budgets, capturing failure signatures and automatically reducing failing payloads to minimal reproducers.
-  - **Richer Metadata Reporting**: Terminal, JSON, and SARIF 2.1.0 outputs enriched with `fuzzTarget`, `strategy`, `invariant`, and `parameter` provenance.
-- [x] **Phase 12 — Real-World Hardening & Adversarial Fixture Validation**: End-to-end stress-testing and pipeline verification against complex real-world code patterns:
-  - Validated on 11 real-world and adversarial fixture suites covering nested boundaries, Flight serialization, multi-hop interprocedural taint flows, runtime timeouts, deep recursion, and complex destructuring.
-  - Zero false-positive regressions for valid constructs (`NEXT_PUBLIC_*`, internal helpers, `Date`).
-  - Strict host isolation verification (zero leaks of `process`, `require`, `fs`, `fetch`).
-  - Scalable fuzz budgeting and verified seed reproducibility across varied suites.
-  - Format validation ensuring clean terminal rendering and schema-valid JSON / SARIF 2.1.0 outputs.
-- [x] **Phase 13 — Performance, Determinism & Scalability Hardening**: Predictable and scalable analysis across large codebases:
-  - Validated on 7 dedicated benchmark suites (`tiny`, `medium`, `deep-module-graph`, `many-targets`, `heavy-fuzzing`, `mixed-real-world`, and `large` 100-file project).
-  - Verified linear budget scaling ($O(T \cdot N)$) across 100 candidate actions without Cartesian explosion.
-  - 100% deterministic, byte-for-byte finding reproducibility across repeated runs given the same `--seed`.
-  - Zero-overhead static-only classification bypassing isolate creation for framework-bound actions.
-  - Bounded shrink overhead under `--max-shrink-attempts` and isolate timeouts.
-- [x] **Phase 14 — CLI/UX & Error Handling Polish**: Developer experience, error diagnostics, and CLI refinement:
-  - Comprehensive input validation and non-zero exit codes for invalid options (`--runs`, `--timeout`, `--max-shrink-attempts`, `--seed`, `--max-analysis-depth`).
-  - Conflicting flag detection preventing corrupted multi-format invocations.
-  - Direct `--json` and `--sarif` aliases emitting 100% pure parseable output to `stdout`.
-  - Strict `stdout`/`stderr` separation ensuring error messages, diagnostics, and stack traces never corrupt machine-readable streams.
-  - Graceful `SIGINT` / `SIGTERM` cancellation handling with standardized exit code 130.
-  - Transparent static-only action presentation and compiler-grade error boxes (`SIS ERROR`).
-  - Standardized exit code contract (`0` clean, `1` findings, `2` config/input error, `3` internal error, `130` interrupted).
-
-### Planned (Upcoming Phases)
-
-- [ ] **Phase 15 — Automated Invariant Remediation & Patch Generation**: Automated code transforms, boundary validation decorators, and interactive patch synthesis.
+- [x] **Phase 1 — Foundation & CLI Shell**: Core contracts, Commander CLI, terminal presenter.
+- [x] **Phase 2 — SWC AST & Boundary Discovery**: Parser, `"use client"`/`"use server"` discovery, source mapping.
+- [x] **Phase 3 — Static Taint Analysis**: Sensitive environment variable tracking across AST flows.
+- [x] **Phase 4 — Property-Based Payload Synthesis**: Adversarial inputs powered by `fast-check`.
+- [x] **Phase 5 — Isolated Runtime Execution**: Zero-privilege `isolated-vm` sandbox with execution budgets.
+- [x] **Phase 6 — Failure Shrinking & Minimization**: Delta-debugging engine preserving failure signatures.
+- [x] **Phase 7 — Directory Auditing & CLI Experience**: Recursive scanning, FNV-1a seeding, exit code contract.
+- [x] **Phase 8 — Machine-Readable JSON & SARIF**: JSON schema v1, OASIS SARIF 2.1.0, stream separation.
+- [x] **Phase 9 — Interprocedural Data Flow**: Multi-hop module call graphs, cycle-safe analysis depth.
+- [x] **Phase 10 — Next.js Boundary Semantics**: Fine-grained boundary classification, React Flight modeling.
+- [x] **Phase 11 — Boundary-Aware Speculative Fuzzing**: Type-directed shape inference, targeted mutations.
+- [x] **Phase 12 — Real-World Hardening**: Validation against 11 real-world adversarial fixture suites.
+- [x] **Phase 13 — Performance & Determinism**: Linear $O(T \cdot N)$ scaling, byte-for-byte seed reproducibility.
+- [x] **Phase 14 — CLI/UX & Error Handling Polish**: Input validation, flag aliases, signal handling.
+- [x] **Phase 15 — Documentation & GitHub Excellence**: Authoritative technical documentation, architecture specs, and curated examples.
+- [ ] **Phase 16 — Automated Invariant Remediation**: Automated boundary decorators and patch generation.
 
 ---
 
-## Development
+## Development & Testing
 
 ```bash
 # Install dependencies
@@ -394,7 +529,7 @@ npm install
 # Build TypeScript
 npm run build
 
-# Run test suite
+# Run test suite (205 tests across 14 suites)
 npm test
 
 # Run tests in watch mode
@@ -405,4 +540,4 @@ npm run test:watch
 
 ## License
 
-MIT © Aashir Zayd
+MIT © 2026 Aashir Zayd. See [LICENSE](LICENSE) for details.
