@@ -1,0 +1,46 @@
+{
+  "name": "sis",
+  "version": "0.1.0",
+  "description": "Autonomous runtime verification for Next.js boundaries",
+  "type": "module",
+  "bin": {
+    "sis": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "nextjs",
+    "react-server-components",
+    "runtime-verification",
+    "invariant-synthesis",
+    "security"
+  ],
+  "author": "Aashir Zayd",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@swc/core": "^1.16.2",
+    "chalk": "^6.0.0",
+    "commander": "^15.0.0",
+    "fast-check": "^4.9.0",
+    "isolated-vm": "^7.0.1",
+    "ora": "^9.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
+  }
+}

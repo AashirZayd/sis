@@ -1,0 +1,19 @@
+﻿# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Test coverage and reports
+coverage/
+*.lcov
+
+# Environment & local files
+.env
+.env.local
+*.log
+npm-debug.log*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
