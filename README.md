@@ -9,9 +9,9 @@ SIS is a zero-configuration analysis and speculative fuzzing tool for modern Nex
 [![npm package](https://img.shields.io/badge/npm-%40aashirzayd%2Fsis-blue.svg)](https://github.com/AashirZayd/sis)
 [![node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-215%20passed-success.svg)](test/)
+[![tests](https://img.shields.io/badge/tests-227%20passed-success.svg)](test/)
 
-[Get Started](#installation) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
+[Website](https://aashirzayd.github.io/sis/) · [Get Started](#installation) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
 
 ---
 

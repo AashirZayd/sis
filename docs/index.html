@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIS — Speculative Invariant Synthesis</title>
+  <meta name="description" content="Zero-configuration runtime verification and speculative fuzzing for modern Next.js Server Actions and React Server Component boundaries.">
+  <meta name="author" content="Aashir Zayd">
+  <meta name="keywords" content="Next.js, React Server Components, Server Actions, Fuzzing, Runtime Verification, Security, Taint Analysis, SARIF">
+
+  <!-- Open Graph / Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://aashirzayd.github.io/sis/">
+  <meta property="og:title" content="SIS — Speculative Invariant Synthesis">
+  <meta property="og:description" content="Find the edge cases you forgot to test. Runtime verification and speculative fuzzing for Next.js boundaries.">
+  <meta property="og:site_name" content="SIS">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="SIS — Speculative Invariant Synthesis">
+  <meta name="twitter:description" content="Find the edge cases you forgot to test. Zero-configuration runtime verification for Next.js boundaries.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- Script -->
+  <script src="./script.js" defer></script>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo-group" aria-label="SIS Home">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="6" fill="#09090b"/>
+            <path d="M16 6 L26 11.5 L26 20.5 L16 26 L6 20.5 L6 11.5 Z" stroke="#ffffff" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="16" cy="16" r="3" fill="#ffffff"/>
+            <path d="M16 6 L16 11" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M16 21 L16 26" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span>SIS</span>
+        <span class="logo-badge">v0.1.0</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Main Navigation">
+        <a href="#hazards">Boundary Hazards</a>
+        <a href="#pipeline">How It Works</a>
+        <a href="#features">Features</a>
+        <a href="#nextjs">Next.js Focus</a>
+        <a href="#cli">CLI Reference</a>
+        <a href="./architecture.md">Architecture</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" aria-label="GitHub Repository">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="hero-badge-wrap">
+          <div class="hero-badge">
+            <span class="badge-dot"></span>
+            <span>Open Source • Developer Tool</span>
+          </div>
+        </div>
+
+        <h1 class="hero-title">
+          Find the edge cases you forgot to test.
+        </h1>
+
+        <p class="hero-subtitle">
+          SIS is a zero-configuration runtime verification tool for modern Next.js Server Actions and React Server Component boundaries.
+        </p>
+
+        <div class="hero-ctas">
+          <a href="#cli" class="btn btn-primary btn-lg">Get Started</a>
+          <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
+            <span>View on GitHub</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17l9.2-9.2M17 17V7H7"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Installation Command Block -->
+        <div class="hero-command-container" id="installation">
+          <div class="command-box">
+            <div class="command-left">
+              <span class="command-prompt">$</span>
+              <code class="command-text" id="hero-cmd">npx @aashirzayd/sis audit .</code>
+            </div>
+            <div class="command-right">
+              <span class="command-tag">Node.js 24+</span>
+              <button class="copy-btn" data-copy-target="hero-cmd" aria-label="Copy to clipboard" title="Copy command">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p class="command-subtext">Works directly with npx — no global install required.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Visual / Terminal Output Demo -->
+    <section class="visual-section" aria-label="CLI Demonstration">
+      <div class="container">
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <div class="terminal-title">sis audit . — bash</div>
+            <div class="terminal-actions">
+              <button class="copy-btn" data-copy-target="terminal-text-block" aria-label="Copy terminal text" title="Copy output">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="terminal-body" id="terminal-text-block">
+            <div class="t-prompt">$ <span>npx @aashirzayd/sis audit .</span></div>
+
+            <div class="t-logo">SIS — Speculative Invariant Synthesis</div>
+            <div class="t-sub">Autonomous runtime verification for Next.js boundaries</div>
+
+            <div class="t-section">
+              <div class="t-stage">◇ DISCOVERY</div>
+              <span class="t-line">Target: . (Next.js App Router project)</span>
+              <span class="t-line">Scanning 209 source files...</span>
+            </div>
+
+            <div class="t-section">
+              <div class="t-stage">◆ BOUNDARY CLASSIFICATION</div>
+              <span class="t-line"><span class="t-check">✓</span> 53 server boundaries discovered</span>
+              <span class="t-line"><span class="t-check">✓</span> 203 candidate Server Actions identified</span>
+              <span class="t-line"><span class="t-check">✓</span> 78 Server → Client prop boundaries mapped</span>
+            </div>
+
+            <div class="t-section">
+              <div class="t-stage">◆ STATIC TAINT ANALYSIS</div>
+              <span class="t-line"><span class="t-cross">✖</span> 16 secret taint violations detected (<span class="t-warn">SIS001</span>)</span>
+              <span class="t-line t-arrow">  process.env.AUTH_SECRET ──> getSessionToken() ──> &lt;UserProfile secret={...} /&gt;</span>
+            </div>
+
+            <div class="t-section">
+              <div class="t-stage">◆ SPECULATIVE FUZZING &amp; RUNTIME VERIFICATION</div>
+              <span class="t-line">⟳ Synthesizing adversarial payloads (linear O(T·N) budget)</span>
+              <span class="t-line"><span class="t-check">✓</span> 2,030 boundary-directed payloads executed in isolated-vm V8 sandbox</span>
+              <span class="t-line"><span class="t-cross">✖</span> 2,533 runtime invariant failures detected (<span class="t-warn">SIS003</span> / <span class="t-warn">SIS004</span>)</span>
+            </div>
+
+            <div class="t-section">
+              <div class="t-stage">◆ FAILURE SHRINKING</div>
+              <span class="t-line"><span class="t-check">✓</span> 2,533 failures reduced to minimal reproducers</span>
+              <span class="t-line"><span class="t-cross">✖</span> processOrder</span>
+              <span class="t-line">  Original: { user: { profile: { accountId: null, role: "admin" } }, tags: ["urgent"] }</span>
+              <span class="t-line">  Minimal reproducer: <span class="t-warn">{ user: { profile: { accountId: null } } }</span></span>
+              <span class="t-line">  Reduction: 73.1% (<span class="t-check">✓ failure preserved</span>)</span>
+            </div>
+
+            <!-- Structured Metrics Box -->
+            <div class="t-metric-box">
+              <div class="t-metric-item">
+                <span class="t-metric-label">Files analyzed</span>
+                <span class="t-metric-val">209</span>
+              </div>
+              <div class="t-metric-item">
+                <span class="t-metric-label">Server boundaries</span>
+                <span class="t-metric-val">53</span>
+              </div>
+              <div class="t-metric-item">
+                <span class="t-metric-label">Candidate actions</span>
+                <span class="t-metric-val">203</span>
+              </div>
+              <div class="t-metric-item">
+                <span class="t-metric-label">Prop boundaries</span>
+                <span class="t-metric-val">78</span>
+              </div>
+              <div class="t-metric-item">
+                <span class="t-metric-label">Runtime failures</span>
+                <span class="t-metric-val danger">2533</span>
+              </div>
+              <div class="t-metric-item">
+                <span class="t-metric-label">Taint violations</span>
+                <span class="t-metric-val danger">16</span>
+              </div>
+            </div>
+
+            <div class="t-divider"></div>
+            <div class="t-summary">✖ SIS found 2560 verified findings</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem / Value Section -->
+    <section class="section" id="hazards">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Boundary Realities</span>
+          <h2 class="section-title">Testing shouldn't stop at the happy path.</h2>
+          <p class="section-desc">
+            Traditional tests validate the shapes developers expect. In production, untrusted network inputs and React Flight serialization cross boundaries with values you never thought to test.
+          </p>
+        </div>
+
+        <div class="hazards-grid">
+          <!-- Item 1 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">null &amp; undefined</span>
+              <span class="hazard-rule">SIS003</span>
+            </div>
+            <h3 class="hazard-title">Unchecked Nullish Access</h3>
+            <p class="hazard-desc">
+              Missing nested properties causing runtime crashes when destructuring unexpected network inputs.
+            </p>
+            <pre class="hazard-code"><code>TypeError: Cannot read properties of undefined</code></pre>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">NaN, Infinity &amp; -0</span>
+              <span class="hazard-rule">SIS003</span>
+            </div>
+            <h3 class="hazard-title">Numeric Hazards</h3>
+            <p class="hazard-desc">
+              Unchecked float singularities silently corrupting pricing, inventory, and database queries.
+            </p>
+            <pre class="hazard-code"><code>RangeError: toFixed() digits argument out of range</code></pre>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">prototype-sensitive</span>
+              <span class="hazard-rule">SIS003</span>
+            </div>
+            <h3 class="hazard-title">Prototype Pollution Traps</h3>
+            <p class="hazard-desc">
+              Adversarial inputs containing __proto__ or constructor modifying base Object behavior.
+            </p>
+            <pre class="hazard-code"><code>{ __proto__: { admin: true } }</code></pre>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">deep-nested</span>
+              <span class="hazard-rule">SIS003</span>
+            </div>
+            <h3 class="hazard-title">Deeply Nested Payloads</h3>
+            <p class="hazard-desc">
+              Multi-level object and array unpacking failing violently when encountering empty or partial trees.
+            </p>
+            <pre class="hazard-code"><code>const { user: { profile: { id } } } = data;</code></pre>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">React Flight</span>
+              <span class="hazard-rule">SIS002</span>
+            </div>
+            <h3 class="hazard-title">Serialization Violations</h3>
+            <p class="hazard-desc">
+              Non-transferable closures, class instances, or unregistered symbols crossing to Client Components.
+            </p>
+            <pre class="hazard-code"><code>&lt;ClientButton onClick={() =&gt; doServer()} /&gt;</code></pre>
+          </div>
+
+          <!-- Item 6 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">primitive-mismatch</span>
+              <span class="hazard-rule">SIS003</span>
+            </div>
+            <h3 class="hazard-title">Primitive Type Mismatches</h3>
+            <p class="hazard-desc">
+              Stringified numbers or arrays evading loose equality checks and breaking mathematical logic.
+            </p>
+            <pre class="hazard-code"><code>"42" !== 42 // triggers silent logic divergence</code></pre>
+          </div>
+
+          <!-- Item 7 -->
+          <div class="hazard-card">
+            <div class="hazard-header">
+              <span class="hazard-badge">secret-taint</span>
+              <span class="hazard-rule">SIS001</span>
+            </div>
+            <h3 class="hazard-title">Secret Data Leaks</h3>
+            <p class="hazard-desc">
+              Private server environment variables (AUTH_SECRET, API_KEY) inadvertently leaked into client JSX sinks.
+            </p>
+            <pre class="hazard-code"><code>process.env.AUTH_SECRET ──&gt; &lt;Profile token={...} /&gt;</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works / Pipeline -->
+    <section class="section section-subtle" id="pipeline">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Verification Lifecycle</span>
+          <h2 class="section-title">An integrated static and dynamic pipeline.</h2>
+          <p class="section-desc">
+            SIS connects SWC AST parsing, interprocedural taint analysis, property-based payload synthesis, and isolated runtime verification.
+          </p>
+        </div>
+
+        <div class="pipeline-track">
+          <!-- Step 1 -->
+          <div class="pipeline-step">
+            <div class="step-num">01</div>
+            <h3 class="step-title">Source Code</h3>
+            <p class="step-desc">Discovers TypeScript and TSX files across App Router directories deterministically.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="pipeline-step">
+            <div class="step-num">02</div>
+            <h3 class="step-title">AST Analysis</h3>
+            <p class="step-desc">SWC extracts directives ("use client", "use server"), props, and candidate actions.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="pipeline-step">
+            <div class="step-num">03</div>
+            <h3 class="step-title">Data Flow &amp; Taint</h3>
+            <p class="step-desc">Resolves multi-hop call graphs to trace private environment variables into sinks.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="pipeline-step">
+            <div class="step-num">04</div>
+            <h3 class="step-title">Adversarial Synthesis</h3>
+            <p class="step-desc">Infers AST shapes and synthesizes boundary-directed payloads using fast-check.</p>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="pipeline-step">
+            <div class="step-num">05</div>
+            <h3 class="step-title">Isolated Runtime</h3>
+            <p class="step-desc">Executes sandbox-compatible actions in isolated-vm with strict execution budgets.</p>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="pipeline-step">
+            <div class="step-num">06</div>
+            <h3 class="step-title">Failure Shrinking</h3>
+            <p class="step-desc">Delta-debugs failing inputs to the minimal reproducer preserving error signatures.</p>
+          </div>
+
+          <!-- Step 7 -->
+          <div class="pipeline-step">
+            <div class="step-num">07</div>
+            <h3 class="step-title">Actionable Report</h3>
+            <p class="step-desc">Emits pure Terminal, Version 1 JSON, or OASIS SARIF 2.1.0 for GitHub Code Scanning.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Features -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Core Capabilities</span>
+          <h2 class="section-title">Engineered for developer precision.</h2>
+          <p class="section-desc">
+            No mock environments. No speculative hallucinations. Verifiable proof for edge cases developers miss.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Feature 1 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Speculative Fuzzing</h3>
+            <p class="feature-desc">
+              Automatically generates targeted adversarial payloads for discovered boundaries, testing numeric extremes, prototype traps, and nullish hazards.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Runtime Verification</h3>
+            <p class="feature-desc">
+              Static analysis proposes candidate targets; dynamic execution inside isolated V8 isolates verifies real crashes under strict time budgets.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 14 10 14 10 20"/>
+                <polyline points="20 10 14 10 14 4"/>
+                <line x1="14" y1="10" x2="21" y2="3"/>
+                <line x1="3" y1="21" x2="10" y2="14"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Failure Shrinking</h3>
+            <p class="feature-desc">
+              Automatically delta-debugs failing payloads to minimal reproducible inputs while strictly preserving original runtime failure signatures.
+            </p>
+          </div>
+
+          <!-- Feature 4 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Secret Taint Analysis</h3>
+            <p class="feature-desc">
+              Tracks sensitive environment variables (AUTH_SECRET, PRIVATE_KEY) across multi-hop function chains into Client Component JSX sinks.
+            </p>
+          </div>
+
+          <!-- Feature 5 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Deterministic Audits</h3>
+            <p class="feature-desc">
+              Stable lexicographical traversal and FNV-1a deterministic per-file seed derivation guarantee byte-for-byte identical results across CI runs.
+            </p>
+          </div>
+
+          <!-- Feature 6 -->
+          <div class="feature-card">
+            <div class="feature-icon-wrap">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">JSON &amp; SARIF Output</h3>
+            <p class="feature-desc">
+              Enforces pure stdout stream discipline, outputting valid Version 1 JSON or OASIS SARIF 2.1.0 for native GitHub Code Scanning integration.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next.js Focus Section -->
+    <section class="section section-subtle" id="nextjs">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Architecture Focus</span>
+          <h2 class="section-title">Built for the boundaries where Next.js gets interesting.</h2>
+          <p class="section-desc">
+            Modern Next.js applications partition code across client and server environments. SIS models the exact semantic boundaries that cause production surprises.
+          </p>
+        </div>
+
+        <div class="next-focus-grid">
+          <div class="next-item-list">
+            <div class="next-item">
+              <span class="next-item-bullet">01</span>
+              <div class="next-item-content">
+                <h4>Server Actions vs Server Functions</h4>
+                <p>Not every server utility is an action. SIS identifies genuine client-callable entry points designated via module-level or inline "use server" directives.</p>
+              </div>
+            </div>
+
+            <div class="next-item">
+              <span class="next-item-bullet">02</span>
+              <div class="next-item-content">
+                <h4>React Server Component Boundaries</h4>
+                <p>Models props passed from Server Components into Client Components against React Flight serialization protocol specifications.</p>
+              </div>
+            </div>
+
+            <div class="next-item">
+              <span class="next-item-bullet">03</span>
+              <div class="next-item-content">
+                <h4>Serializable Props Enforcement</h4>
+                <p>Flags non-transferable closures, class instances, and unregistered symbols before they trigger React Flight wire serialization errors.</p>
+              </div>
+            </div>
+
+            <div class="next-item">
+              <span class="next-item-bullet">04</span>
+              <div class="next-item-content">
+                <h4>Client / Server Taint Barriers</h4>
+                <p>Detects when private server credentials inadvertently leak across the network boundary into client-rendered markup.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="sandbox-box">
+            <h3>Framework-Dependent Compatibility Gate</h3>
+            <p>
+              SIS does not attempt to emulate the entire Next.js runtime. Actions requiring live request context (e.g. <code>cookies()</code>, <code>headers()</code>, <code>redirect()</code>, <code>notFound()</code>) or external database connections are classified as <strong>static-only</strong>.
+            </p>
+            <p>
+              Static-only actions are safely analyzed for taint and syntax hazards without being executed in the isolate, eliminating false-positive sandbox crashes while verifying pure logic safely.
+            </p>
+            <div class="sandbox-callout">
+              <strong>Technical Guarantee:</strong> Dynamic execution is strictly confined to zero-privilege V8 isolates with enforced CPU budgets (default: 20ms).
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Code Examples / CLI Reference -->
+    <section class="section" id="cli">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Developer Workflow</span>
+          <h2 class="section-title">Zero configuration. One command.</h2>
+          <p class="section-desc">
+            Point SIS at your repository, directory, or individual Server Action file.
+          </p>
+        </div>
+
+        <div class="tabs-container">
+          <div class="tabs-header">
+            <div class="tab-buttons" role="tablist">
+              <button class="tab-btn active" role="tab" aria-selected="true" data-tab="audit">Whole Project</button>
+              <button class="tab-btn" role="tab" aria-selected="false" data-tab="app">App Directory</button>
+              <button class="tab-btn" role="tab" aria-selected="false" data-tab="json">JSON Output</button>
+              <button class="tab-btn" role="tab" aria-selected="false" data-tab="sarif">SARIF / CI</button>
+              <button class="tab-btn" role="tab" aria-selected="false" data-tab="seed">Deterministic Seed</button>
+            </div>
+            <div class="tabs-actions">
+              <button class="copy-btn" data-copy-target="active-code" aria-label="Copy active command" title="Copy code">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab Panel 1 -->
+          <div class="tab-panel active" id="panel-audit" role="tabpanel">
+            <div class="code-block">
+              <pre class="code-content"><span class="code-comment"># Audit entire repository with automatic boundary discovery</span>
+npx @aashirzayd/sis audit .
+
+<span class="code-comment"># Or using locally installed dependency:</span>
+npm install --save-dev @aashirzayd/sis
+sis audit .</pre>
+            </div>
+          </div>
+
+          <!-- Tab Panel 2 -->
+          <div class="tab-panel" id="panel-app" role="tabpanel" hidden>
+            <div class="code-block">
+              <pre class="code-content"><span class="code-comment"># Audit specific App Router directory or action file</span>
+npx @aashirzayd/sis audit ./app
+
+<span class="code-comment"># Audit a specific Server Action</span>
+npx @aashirzayd/sis audit app/actions/checkout.ts</pre>
+            </div>
+          </div>
+
+          <!-- Tab Panel 3 -->
+          <div class="tab-panel" id="panel-json" role="tabpanel" hidden>
+            <div class="code-block">
+              <pre class="code-content"><span class="code-comment"># Output machine-readable Version 1 JSON (stdout reserved strictly for JSON)</span>
+npx @aashirzayd/sis audit . --json > sis-report.json</pre>
+            </div>
+          </div>
+
+          <!-- Tab Panel 4 -->
+          <div class="tab-panel" id="panel-sarif" role="tabpanel" hidden>
+            <div class="code-block">
+              <pre class="code-content"><span class="code-comment"># Emit OASIS SARIF 2.1.0 for GitHub Security Code Scanning</span>
+npx @aashirzayd/sis audit . --sarif > sis-results.sarif</pre>
+            </div>
+          </div>
+
+          <!-- Tab Panel 5 -->
+          <div class="tab-panel" id="panel-seed" role="tabpanel" hidden>
+            <div class="code-block">
+              <pre class="code-content"><span class="code-comment"># Run reproducible speculative fuzzing with custom seed and execution budget</span>
+npx @aashirzayd/sis audit app/ --seed 42 --runs 25 --timeout 50</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Open Source Section -->
+    <section class="section section-subtle" id="opensource">
+      <div class="container">
+        <div class="section-header" style="text-align: center; margin-bottom: 2.5rem;">
+          <span class="section-label">Open Source</span>
+          <h2 class="section-title" style="margin-left: auto; margin-right: auto;">Built in the open.</h2>
+          <p class="section-desc" style="margin-left: auto; margin-right: auto;">
+            SIS is MIT-licensed, thoroughly tested, and developed with high-assurance testing methodologies.
+          </p>
+        </div>
+
+        <div class="oss-metrics-grid">
+          <div class="metric-card">
+            <div class="num">215+</div>
+            <div class="label">Passing Tests (16 Suites)</div>
+          </div>
+          <div class="metric-card">
+            <div class="num">Node 24+</div>
+            <div class="label">Native Prebuilt Binaries</div>
+          </div>
+          <div class="metric-card">
+            <div class="num">100%</div>
+            <div class="label">Deterministic Analysis</div>
+          </div>
+          <div class="metric-card">
+            <div class="num">MIT</div>
+            <div class="label">Permissive License</div>
+          </div>
+        </div>
+
+        <div class="oss-links-row">
+          <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span>View source on GitHub</span>
+          </a>
+
+          <a href="https://www.npmjs.com/package/@aashirzayd/sis" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0H1.763zM5.13 5.13h13.74v13.74h-3.435V8.565h-3.435v10.305H5.13V5.13z"/>
+            </svg>
+            <span>View package on npm</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="final-cta">
+      <div class="container">
+        <h2 class="final-cta-title">Let SIS find the cases you didn't think to test.</h2>
+        <p class="final-cta-desc">Zero configuration. Pure isolated verification. Immediate minimal reproducers.</p>
+
+        <div class="hero-command-container" style="margin-bottom: 2.25rem;">
+          <div class="command-box">
+            <div class="command-left">
+              <span class="command-prompt">$</span>
+              <code class="command-text" id="final-cmd">npx @aashirzayd/sis audit .</code>
+            </div>
+            <div class="command-right">
+              <button class="copy-btn" data-copy-target="final-cmd" aria-label="Copy to clipboard" title="Copy command">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-ctas" style="margin-bottom: 0;">
+          <a href="#top" class="btn btn-primary btn-lg">Get Started</a>
+          <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-lg">
+            <span>GitHub</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 17l9.2-9.2M17 17V7H7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Minimal Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <h4>SIS — Speculative Invariant Synthesis</h4>
+          <p>Autonomous runtime verification and speculative fuzzing for modern Next.js boundaries.</p>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-col">
+            <h5>Project</h5>
+            <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.npmjs.com/package/@aashirzayd/sis" target="_blank" rel="noopener noreferrer">npm Package</a>
+            <a href="./architecture.md">Architecture Specification</a>
+          </div>
+
+          <div class="footer-col">
+            <h5>Resources</h5>
+            <a href="https://github.com/AashirZayd/sis#readme" target="_blank" rel="noopener noreferrer">Documentation</a>
+            <a href="https://github.com/AashirZayd/sis/tree/master/examples" target="_blank" rel="noopener noreferrer">Examples</a>
+            <a href="https://github.com/AashirZayd/sis/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 Aashir Zayd. Released under the MIT License.</div>
+        <div>Engineered with isolated V8 verification &amp; delta-debugging.</div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
