@@ -173,6 +173,15 @@ export class AuditEngine {
 
       // Map genuine candidate failures/timeouts to findings
       for (const exec of runtimeResult.executions) {
+        const provenance: import("./runtime/types.js").RuntimeProvenance | undefined = exec.executionMode
+          ? {
+              mode: exec.executionMode,
+              preludesUsed: exec.preludesUsed,
+              verifiedPrefix: exec.verifiedPrefix,
+              stoppedAt: exec.stoppedAt,
+            }
+          : undefined;
+
         if (exec.status === "failed") {
           runtimeFindings.push({
             type: "runtime-exception",
@@ -193,6 +202,10 @@ export class AuditEngine {
             strategy: exec.strategy,
             invariant: exec.invariant,
             parameter: exec.parameter,
+            executionMode: exec.executionMode,
+            runtimeProvenance: provenance,
+            verifiedPrefix: exec.verifiedPrefix,
+            stoppedAt: exec.stoppedAt,
           });
         } else if (exec.status === "timeout") {
           runtimeFindings.push({
@@ -214,6 +227,10 @@ export class AuditEngine {
             strategy: exec.strategy,
             invariant: exec.invariant,
             parameter: exec.parameter,
+            executionMode: exec.executionMode,
+            runtimeProvenance: provenance,
+            verifiedPrefix: exec.verifiedPrefix,
+            stoppedAt: exec.stoppedAt,
           });
         }
       }
@@ -310,6 +327,10 @@ export class AuditEngine {
         fuzzStrategiesApplied: strategiesUsedSet.size,
         boundaryDirectedPayloads: boundaryDirectedCount,
         genericFallbackPayloads: genericFallbackCount,
+        fullExecutions: runtimeResult?.fullExecutions ?? 0,
+        prefixExecutions: runtimeResult?.prefixExecutions ?? 0,
+        staticOnlyActions: runtimeResult?.staticOnlyActions ?? 0,
+        unsupportedActions: runtimeResult?.unsupportedActions ?? 0,
       },
     };
   }
@@ -389,7 +410,12 @@ export class AuditEngine {
     let totalFuzzTargets = 0;
     let totalBoundaryDirectedPayloads = 0;
     let totalGenericFallbackPayloads = 0;
+    let totalFullExecutions = 0;
+    let totalPrefixExecutions = 0;
+    let totalStaticOnlyActions = 0;
+    let totalUnsupportedActions = 0;
     const allStrategiesUsedSet = new Set<string>();
+
 
     for (const file of discovery.files) {
       try {
@@ -469,9 +495,22 @@ export class AuditEngine {
           totalFailed += runtimeResult.failed;
           totalTimeout += runtimeResult.timedOut;
           totalUnsupported += runtimeResult.unsupported;
+          totalFullExecutions += runtimeResult.fullExecutions ?? 0;
+          totalPrefixExecutions += runtimeResult.prefixExecutions ?? 0;
+          totalStaticOnlyActions += runtimeResult.staticOnlyActions ?? 0;
+          totalUnsupportedActions += runtimeResult.unsupportedActions ?? 0;
 
           const fileRuntimeFindings: import("./core/types.js").Finding[] = [];
           for (const exec of runtimeResult.executions) {
+            const provenance: import("./runtime/types.js").RuntimeProvenance | undefined = exec.executionMode
+              ? {
+                  mode: exec.executionMode,
+                  preludesUsed: exec.preludesUsed,
+                  verifiedPrefix: exec.verifiedPrefix,
+                  stoppedAt: exec.stoppedAt,
+                }
+              : undefined;
+
             if (exec.status === "failed") {
               fileRuntimeFindings.push({
                 type: "runtime-exception",
@@ -492,6 +531,10 @@ export class AuditEngine {
                 strategy: exec.strategy,
                 invariant: exec.invariant,
                 parameter: exec.parameter,
+                executionMode: exec.executionMode,
+                runtimeProvenance: provenance,
+                verifiedPrefix: exec.verifiedPrefix,
+                stoppedAt: exec.stoppedAt,
               });
             } else if (exec.status === "timeout") {
               fileRuntimeFindings.push({
@@ -513,6 +556,10 @@ export class AuditEngine {
                 strategy: exec.strategy,
                 invariant: exec.invariant,
                 parameter: exec.parameter,
+                executionMode: exec.executionMode,
+                runtimeProvenance: provenance,
+                verifiedPrefix: exec.verifiedPrefix,
+                stoppedAt: exec.stoppedAt,
               });
             }
           }
@@ -687,6 +734,10 @@ export class AuditEngine {
         fuzzStrategiesApplied: allStrategiesUsedSet.size,
         boundaryDirectedPayloads: totalBoundaryDirectedPayloads,
         genericFallbackPayloads: totalGenericFallbackPayloads,
+        fullExecutions: totalFullExecutions,
+        prefixExecutions: totalPrefixExecutions,
+        staticOnlyActions: totalStaticOnlyActions,
+        unsupportedActions: totalUnsupportedActions,
       },
     };
 

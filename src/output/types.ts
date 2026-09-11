@@ -31,6 +31,9 @@ export interface JsonActionSummary {
   file: string;
   line: number;
   column: number;
+  executionCompatibility?: import("../core/types.js").ExecutionCompatibility;
+  executionMode?: import("../runtime/types.js").ExecutionMode;
+  stoppedAt?: import("../runtime/types.js").StoppedAt;
 }
 
 export interface JsonFindingRuntime {
@@ -65,6 +68,9 @@ export interface JsonFinding {
   strategy?: string;
   invariant?: string;
   parameter?: string;
+  executionMode?: import("../runtime/types.js").ExecutionMode;
+  verifiedPrefix?: import("../runtime/types.js").PrefixBoundary;
+  stoppedAt?: import("../runtime/types.js").StoppedAt;
   runtime?: JsonFindingRuntime;
   shrink?: JsonFindingShrink;
   trace?: string[];

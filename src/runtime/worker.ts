@@ -1,5 +1,6 @@
 import ivm from "isolated-vm";
 import type { CandidateFunctionSource, RuntimeExecutionOptions, RuntimeStatus } from "./types.js";
+import { getPreludesCode } from "./preludes/index.js";
 
 export interface WorkerExecutionResult {
   status: RuntimeStatus;
@@ -52,8 +53,11 @@ export async function runInIsolate(
     const copy = new ivm.ExternalCopy(payload);
     await jail.set("__sisPayload", copy.copyInto());
 
+    const preludesCode = getPreludesCode(candidate.preludesUsed);
+
     const harnessCode = `
       (async function() {
+        ${preludesCode}
         ${candidate.code}
         return await ${candidate.actionName}(__sisPayload);
       })()
@@ -80,6 +84,20 @@ export async function runInIsolate(
         error = {
           name: "TimeoutError",
           message: `Script execution timed out after ${timeout}ms execution budget`,
+          stack: errorObj.stack,
+        };
+      } else if (
+        errorObj.message.includes("NEXT_REDIRECT") ||
+        errorObj.message.includes("NEXT_NOT_FOUND")
+      ) {
+        status = "passed";
+      } else if (errorObj.name === "ReferenceError") {
+        // Isolate sandbox limitation: missing host global or unbundled module binding
+        // Must never be reported as an application runtime exception finding (SIS003)
+        status = "unsupported";
+        error = {
+          name: "ReferenceError",
+          message: errorObj.message,
           stack: errorObj.stack,
         };
       } else {

@@ -12,6 +12,40 @@ export type RuntimeStatus =
   | "execution-error";
 
 /**
+ * Execution mode distinguishing full execution from prefix execution or static-only fallback.
+ */
+export type ExecutionMode = "FULL" | "PREFIX" | "STATIC_ONLY" | "UNSUPPORTED";
+
+/**
+ * Line/column span of verified prefix code in a Server Action.
+ */
+export interface PrefixBoundary {
+  startLine: number;
+  endLine: number;
+  startColumn?: number;
+  endColumn?: number;
+}
+
+/**
+ * Reason and location where prefix execution terminated.
+ */
+export interface StoppedAt {
+  dependency: string;
+  reason: "unsupported-runtime" | "framework-boundary" | "cloud-sdk";
+  line?: number;
+}
+
+/**
+ * Detailed runtime provenance for audit findings and reporters.
+ */
+export interface RuntimeProvenance {
+  mode: ExecutionMode;
+  preludesUsed?: string[];
+  verifiedPrefix?: PrefixBoundary;
+  stoppedAt?: StoppedAt;
+}
+
+/**
  * Options for configuring isolated-vm execution.
  */
 export interface RuntimeExecutionOptions {
@@ -71,6 +105,26 @@ export interface RuntimeExecutionResult {
   strategy?: string;
   invariant?: string;
   parameter?: string;
+
+  /**
+   * Execution mode under which this result was obtained.
+   */
+  executionMode?: ExecutionMode;
+
+  /**
+   * Verified prefix boundary if executionMode === "PREFIX".
+   */
+  verifiedPrefix?: PrefixBoundary;
+
+  /**
+   * Details on the unsupported dependency where execution stopped.
+   */
+  stoppedAt?: StoppedAt;
+
+  /**
+   * Framework preludes utilized during this execution.
+   */
+  preludesUsed?: string[];
 }
 
 /**
@@ -84,6 +138,10 @@ export interface RuntimeVerificationSummary {
   timedOut: number;
   unsupported: number;
   timeoutMs: number;
+  fullExecutions?: number;
+  prefixExecutions?: number;
+  staticOnlyActions?: number;
+  unsupportedActions?: number;
 }
 
 /**
@@ -93,4 +151,9 @@ export interface CandidateFunctionSource {
   actionName: string;
   code: string;
   location: SourceLocation;
+  executionMode?: ExecutionMode;
+  verifiedPrefix?: PrefixBoundary;
+  stoppedAt?: StoppedAt;
+  preludesUsed?: string[];
 }
+

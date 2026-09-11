@@ -1,13 +1,13 @@
 {
   "metadata": {
     "sisVersion": "0.1.0",
-    "sisCommit": "a805cfdfe8e64e95baa371571867c3bfa74ef284",
+    "sisCommit": "14501ad70d2199027f09872de759923ecfcaa446",
     "nodeVersion": "v24.19.0",
     "platform": "win32",
     "arch": "x64",
     "cpuModel": "12th Gen Intel(R) Core(TM) i5-12450HX",
     "corpusVersion": "1.0.0",
-    "timestamp": "2026-09-11T15:28:13.084Z",
+    "timestamp": "2026-09-11T18:52:05.571Z",
     "baseSeed": 42,
     "runs": 10,
     "timeoutMs": 20
@@ -30,7 +30,7 @@
       "analysisErrors": 0,
       "verifiedFindings": 0,
       "runtimeCompatibleCandidates": 0,
-      "auditWallTimeMs": 3291,
+      "auditWallTimeMs": 4074,
       "seed": 1487551117,
       "findingBreakdown": {
         "taintViolations": 0,
@@ -58,7 +58,7 @@
       "analysisErrors": 0,
       "verifiedFindings": 0,
       "runtimeCompatibleCandidates": 0,
-      "auditWallTimeMs": 2109,
+      "auditWallTimeMs": 2363,
       "seed": 1510897324,
       "findingBreakdown": {
         "taintViolations": 0,
@@ -86,7 +86,7 @@
       "analysisErrors": 0,
       "verifiedFindings": 9,
       "runtimeCompatibleCandidates": 0,
-      "auditWallTimeMs": 2204,
+      "auditWallTimeMs": 2566,
       "seed": 1437905706,
       "findingBreakdown": {
         "taintViolations": 0,
@@ -123,6 +123,33 @@
           "strategy": "prototype-sensitive",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "__proto__": {
               "polluted": true
@@ -161,7 +188,7 @@
           "category": "deep-nested",
           "payloadDescription": "serialization-edge: Deeply nested object structure (>5 levels)",
           "executionMs": 1,
-          "wallTimeMs": 2,
+          "wallTimeMs": 4,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -169,6 +196,33 @@
           "strategy": "serialization-edge",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "a": {
               "b": {
@@ -203,7 +257,7 @@
           "category": "nullish",
           "payloadDescription": "nullability: Direct null value",
           "executionMs": 1,
-          "wallTimeMs": 3,
+          "wallTimeMs": 4,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -211,6 +265,33 @@
           "strategy": "nullability",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": null,
           "minimizedPayload": null,
           "shrinkAttempts": 0,
@@ -233,7 +314,7 @@
           "category": "empty",
           "payloadDescription": "structural-deletion: Empty object",
           "executionMs": 1,
-          "wallTimeMs": 2,
+          "wallTimeMs": 4,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -241,6 +322,33 @@
           "strategy": "structural-deletion",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {},
           "minimizedPayload": {},
           "shrinkAttempts": 0,
@@ -267,7 +375,7 @@
           "category": "prototype-sensitive",
           "payloadDescription": "prototype-sensitive: Object with own prototype property",
           "executionMs": 1,
-          "wallTimeMs": 2,
+          "wallTimeMs": 3,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -275,6 +383,33 @@
           "strategy": "prototype-sensitive",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "prototype": {
               "polluted": true
@@ -303,7 +438,7 @@
           "category": "serialization-trap",
           "payloadDescription": "serialization-unsupported: Database connection / server-only handle",
           "executionMs": 1,
-          "wallTimeMs": 3,
+          "wallTimeMs": 4,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -311,6 +446,33 @@
           "strategy": "serialization-unsupported",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "connection": "postgresql://localhost:5432"
           },
@@ -341,7 +503,7 @@
           "category": "prototype-sensitive",
           "payloadDescription": "prototype-sensitive: Object with own constructor.prototype property",
           "executionMs": 1,
-          "wallTimeMs": 2,
+          "wallTimeMs": 3,
           "timeoutMs": 20,
           "durationMs": 1,
           "errorName": "TypeError",
@@ -349,6 +511,33 @@
           "strategy": "prototype-sensitive",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "constructor": {
               "prototype": {
@@ -384,6 +573,33 @@
           "strategy": "nullability",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "minimizedPayload": null,
           "shrinkAttempts": 1,
           "shrinkReduction": 0,
@@ -415,6 +631,33 @@
           "strategy": "serialization-unsupported",
           "invariant": "runtime-safety",
           "parameter": "prevState",
+          "executionMode": "PREFIX",
+          "runtimeProvenance": {
+            "mode": "PREFIX",
+            "preludesUsed": [],
+            "verifiedPrefix": {
+              "startLine": 61,
+              "endLine": 61,
+              "startColumn": 3,
+              "endColumn": 47
+            },
+            "stoppedAt": {
+              "dependency": "getCart",
+              "reason": "cloud-sdk",
+              "line": 64
+            }
+          },
+          "verifiedPrefix": {
+            "startLine": 61,
+            "endLine": 61,
+            "startColumn": 3,
+            "endColumn": 47
+          },
+          "stoppedAt": {
+            "dependency": "getCart",
+            "reason": "cloud-sdk",
+            "line": 64
+          },
           "originalPayload": {
             "name": "user"
           },
@@ -443,7 +686,7 @@
       "analysisErrors": 0,
       "verifiedFindings": 0,
       "runtimeCompatibleCandidates": 0,
-      "auditWallTimeMs": 18698,
+      "auditWallTimeMs": 29823,
       "seed": 836368802,
       "findingBreakdown": {
         "taintViolations": 0,
@@ -471,7 +714,7 @@
       "analysisErrors": 0,
       "verifiedFindings": 0,
       "runtimeCompatibleCandidates": 0,
-      "auditWallTimeMs": 3442,
+      "auditWallTimeMs": 8429,
       "seed": 1190668563,
       "findingBreakdown": {
         "taintViolations": 0,
@@ -498,6 +741,6 @@
     "totalAnalysisErrors": 0,
     "totalVerifiedFindings": 9,
     "totalRuntimeCompatibleCandidates": 0,
-    "totalWallTimeMs": 29744
+    "totalWallTimeMs": 47255
   }
 }

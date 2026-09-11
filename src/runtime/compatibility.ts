@@ -114,14 +114,20 @@ export function isPayloadTransferable(payload: unknown): CompatibilityResult {
   return check(payload, 0);
 }
 
+import type { ActionPrefixAnalysis } from "./prefix.js";
+import { analyzeActionPrefix } from "./prefix.js";
+import type { SourceMapLocator } from "../parser/location.js";
+import type { Module } from "@swc/core";
+
 /**
  * Result of evaluating action sandbox compatibility.
  */
 export interface ActionCompatibilityResult {
   compatible: boolean;
-  classification: "sandbox-compatible" | "static-only" | "unsupported-runtime" | "unknown";
+  classification: "sandbox-compatible" | "prefix-compatible" | "static-only" | "unsupported-runtime" | "unknown";
   reason?: string;
   unsupportedDependency?: string;
+  prefixAnalysis?: ActionPrefixAnalysis;
 }
 
 /**
@@ -182,94 +188,39 @@ export const EXTERNAL_CLOUD_PACKAGE_PATTERNS = [
 /**
  * Checks whether an extracted function AST node is sandbox-compatible
  * (i.e. self-contained, does not rely on missing host globals or external cloud SDKs).
- * If unsupported globals or external SDK imports are referenced, it is classified as static-only.
+ * Distinguishes fully compatible actions from prefix-compatible actions and static-only fallbacks.
  */
 export function isActionSandboxCompatible(
   node: unknown,
-  moduleAst?: unknown
+  moduleAst?: unknown,
+  locator?: SourceMapLocator
 ): ActionCompatibilityResult {
-  // 1. Collect external package and singleton bindings from module imports if AST is provided
-  const externalBindings = new Map<string, string>(); // localName -> importSource
+  const analysis = analyzeActionPrefix(node, moduleAst as Module | undefined, locator);
 
-  if (moduleAst && typeof moduleAst === "object" && "body" in (moduleAst as Record<string, unknown>)) {
-    const body = (moduleAst as { body: unknown[] }).body;
-    for (const item of body) {
-      if (item && typeof item === "object" && (item as { type: string }).type === "ImportDeclaration") {
-        const importDecl = item as {
-          type: "ImportDeclaration";
-          source: { value: string };
-          specifiers?: Array<{
-            type: string;
-            local: { value: string };
-            imported?: { value: string };
-          }>;
-        };
-
-        const src = importDecl.source?.value ?? "";
-        const isExternalOrCloud = EXTERNAL_CLOUD_PACKAGE_PATTERNS.some((pat) => pat.test(src));
-
-        if (isExternalOrCloud && importDecl.specifiers) {
-          for (const spec of importDecl.specifiers) {
-            if (spec.local?.value) {
-              externalBindings.set(spec.local.value, src);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // 2. Scan the action function AST for references to unsupported globals or external bindings
-  let unsupportedGlobal: string | undefined;
-  let externalDep: { name: string; source: string } | undefined;
-
-  function scan(n: unknown): void {
-    if (!n || typeof n !== "object" || unsupportedGlobal || externalDep) return;
-
-    if ((n as { type?: string }).type === "Identifier") {
-      const name = (n as { value?: string }).value;
-      if (name) {
-        if (UNSUPPORTED_HOST_GLOBALS.has(name)) {
-          unsupportedGlobal = name;
-          return;
-        }
-        if (externalBindings.has(name)) {
-          externalDep = { name, source: externalBindings.get(name)! };
-          return;
-        }
-      }
-    }
-
-    for (const key of Object.keys(n)) {
-      if (key === "span") continue;
-      const val = (n as Record<string, unknown>)[key];
-      if (Array.isArray(val)) {
-        for (const child of val) scan(child);
-      } else if (typeof val === "object") {
-        scan(val);
-      }
-    }
-  }
-
-  scan(node);
-
-  if (unsupportedGlobal) {
+  if (analysis.mode === "FULL") {
     return {
-      compatible: false,
-      classification: "static-only",
-      reason: `Action references host global '${unsupportedGlobal}', classified as static-only`,
-      unsupportedDependency: unsupportedGlobal,
+      compatible: true,
+      classification: "sandbox-compatible",
+      prefixAnalysis: analysis,
     };
   }
 
-  if (externalDep) {
+  if (analysis.mode === "PREFIX") {
     return {
-      compatible: false,
-      classification: "static-only",
-      reason: `Action references external dependency '${externalDep.name}' imported from '${externalDep.source}' which cannot be bound in sandbox isolate`,
-      unsupportedDependency: externalDep.name,
+      compatible: true,
+      classification: "prefix-compatible",
+      reason: analysis.reason,
+      unsupportedDependency: analysis.stoppedAt?.dependency,
+      prefixAnalysis: analysis,
     };
   }
 
-  return { compatible: true, classification: "sandbox-compatible" };
+  return {
+    compatible: false,
+    classification: "static-only",
+    reason: analysis.reason ?? `Action references unsupported dependency '${analysis.stoppedAt?.dependency}', classified as static-only`,
+    unsupportedDependency: analysis.stoppedAt?.dependency,
+    prefixAnalysis: analysis,
+  };
 }
+

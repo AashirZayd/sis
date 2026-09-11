@@ -198,6 +198,17 @@ SIS structures findings across three distinct levels of evidence:
 
 ---
 
+## Selective Runtime Verification
+
+Real Next.js Server Actions frequently execute input-dependent validation logic before interacting with databases, caches, or cloud SDKs. Because full execution of unbundled Server Actions inside a zero-privilege V8 sandbox would otherwise crash when encountering missing host infrastructure or Next.js server context, SIS employs **Selective Runtime Verification**:
+
+1. **Deterministic Preludes**: In-memory, non-mutating implementations of framework primitives (`cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`, `revalidateTag()`, `unstable_noStore()`) are bound into the sandbox context.
+2. **AST Prefix Slicing**: Using `@swc/core`, SIS parses the candidate Server Action and extracts the statement prefix executing before any unsupported cloud SDK (e.g. Prisma, Stripe, Upstash Redis), network call, or host global is reached.
+3. **Execution Provenance**: When an input causes an unhandled crash within the executed prefix (e.g. an unconditional destructuring on undefined input), SIS reports the finding with `executionMode: "PREFIX"`, exact line/column prefix coordinates, and the identifier where execution stopped.
+4. **Conservative Gating**: If an action begins with an unsupported dependency on statement 0, or requires framework-provided form context (`FormData`), SIS does not fabricate mocks. It conservatively classifies the action as `static-only`.
+
+---
+
 ## Real-World Benchmark
 
 To measure real-world boundary discovery and runtime verification without marketing exaggeration, SIS is evaluated against an automated, pinned benchmark corpus of authentic open-source Next.js applications:
@@ -784,7 +795,7 @@ SIS is developed in rigorous, phased milestones:
 - [x] **Phase 23 — Boundary Precision & Filter Hardening**: Route handler classification, hook inference, cloud SDK gating.
 - [x] **Phase 24 — Ground-Truth Expansion & Quality**: 100% review coverage across 43 lifetime benchmark records.
 - [x] **Phase 24.5 — Documentation, Benchmark Transparency & Trust**: Authoritative empirical evaluation, trust model, and transparent limitation reporting.
-- [ ] **Phase 25 — Selective Runtime Verification**: Dependency-independent prelude execution for safely verifiable Server Action prefixes.
+- [x] **Phase 25 — Selective Runtime Verification**: Dependency-independent prelude execution for safely verifiable Server Action prefixes.
 
 ---
 

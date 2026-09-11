@@ -108,19 +108,33 @@ export function extractCandidateFunction(
     return null;
   }
 
-  // Ensure candidate is sandbox-compatible (does not reference missing host globals or external cloud SDKs)
-  const compat = isActionSandboxCompatible(targetItem, parsed.ast);
+  // Ensure candidate is sandbox-compatible or prefix-compatible
+  const compat = isActionSandboxCompatible(targetItem, parsed.ast, parsed.locator);
   if (!compat.compatible) {
     action.executionCompatibility = compat.classification;
+    action.executionMode = compat.prefixAnalysis?.mode ?? "STATIC_ONLY";
+    action.stoppedAt = compat.prefixAnalysis?.stoppedAt;
     return null;
   }
+
+  if (compat.classification === "prefix-compatible") {
+    action.executionCompatibility = "prefix-compatible";
+    action.executionMode = "PREFIX";
+    action.verifiedPrefix = compat.prefixAnalysis?.verifiedPrefix;
+    action.stoppedAt = compat.prefixAnalysis?.stoppedAt;
+  } else {
+    action.executionCompatibility = "sandbox-compatible";
+    action.executionMode = "FULL";
+  }
+
+  const nodeToPrint = ((compat.prefixAnalysis?.prefixAstNode as ModuleItem) ?? targetItem);
 
   try {
     // Print the extracted AST node with SWC
     const miniModule: Module = {
       type: "Module",
-      span: targetItem.span,
-      body: [targetItem],
+      span: (nodeToPrint as { span?: any }).span ?? targetItem.span,
+      body: [nodeToPrint],
       interpreter: parsed.ast.interpreter,
     };
 
@@ -141,6 +155,10 @@ export function extractCandidateFunction(
       actionName: action.name,
       code: transformed.code,
       location: action.location,
+      executionMode: action.executionMode,
+      verifiedPrefix: action.verifiedPrefix,
+      stoppedAt: action.stoppedAt,
+      preludesUsed: compat.prefixAnalysis?.preludesNeeded,
     };
   } catch {
     return null;
@@ -185,6 +203,10 @@ export async function executeCandidateAction(
         strategy: payload.strategy,
         invariant: payload.invariant,
         parameter: payload.parameter,
+        executionMode: candidate.executionMode,
+        verifiedPrefix: candidate.verifiedPrefix,
+        stoppedAt: candidate.stoppedAt,
+        preludesUsed: candidate.preludesUsed,
       });
       continue;
     }
@@ -209,6 +231,10 @@ export async function executeCandidateAction(
       strategy: payload.strategy,
       invariant: payload.invariant,
       parameter: payload.parameter,
+      executionMode: candidate.executionMode,
+      verifiedPrefix: candidate.verifiedPrefix,
+      stoppedAt: candidate.stoppedAt,
+      preludesUsed: candidate.preludesUsed,
     });
   }
 
@@ -229,10 +255,15 @@ export async function verifyRuntimeActions(
   let failed = 0;
   let timedOut = 0;
   let unsupported = 0;
+  let fullExecutions = 0;
+  let prefixExecutions = 0;
+  let staticOnlyActions = 0;
+  let unsupportedActions = 0;
 
   for (const action of parsed.actions) {
     if (action.executionCompatibility === "static-only") {
       unsupported++;
+      staticOnlyActions++;
       continue;
     }
 
@@ -240,6 +271,7 @@ export async function verifyRuntimeActions(
     if (!candidate) {
       if ((action.executionCompatibility as string) === "static-only") {
         unsupported++;
+        staticOnlyActions++;
       }
       continue;
     }
@@ -253,6 +285,12 @@ export async function verifyRuntimeActions(
   }
 
   for (const exec of allExecutions) {
+    if (exec.executionMode === "FULL") {
+      fullExecutions++;
+    } else if (exec.executionMode === "PREFIX") {
+      prefixExecutions++;
+    }
+
     switch (exec.status) {
       case "passed":
         passed++;
@@ -282,5 +320,9 @@ export async function verifyRuntimeActions(
     timedOut,
     unsupported,
     timeoutMs: options.timeoutMs ?? 20,
+    fullExecutions,
+    prefixExecutions,
+    staticOnlyActions,
+    unsupportedActions,
   };
 }

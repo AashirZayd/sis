@@ -56,6 +56,15 @@ export function formatSarif(
     if (f.parameter) {
       properties.parameter = f.parameter;
     }
+    if (f.executionMode) {
+      properties.executionMode = f.executionMode;
+    }
+    if (f.verifiedPrefix) {
+      properties.verifiedPrefix = f.verifiedPrefix;
+    }
+    if (f.stoppedAt) {
+      properties.stoppedAt = f.stoppedAt;
+    }
     if (f.failureSignature || f.errorName) {
       properties.failureSignature = f.failureSignature ?? f.errorName;
     }

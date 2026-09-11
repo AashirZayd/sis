@@ -52,7 +52,7 @@ The benchmark harness ([`benchmarks/orchestrator.ts`](../benchmarks/orchestrator
 
 ---
 
-## 4. Multi-Phase Evolution (Phases 20 → 24)
+## 4. Multi-Phase Evolution (Phases 20 → 25)
 
 SIS did not start with a clean benchmark. The benchmark was used as an iterative instrument to expose engine flaws and measure hardening:
 
@@ -67,28 +67,51 @@ Phase 23 (Boundary Precision & Filter Hardening)
   ↳ Route Handler classification, client hook inference, test filtering, and cloud SDK gating implemented.
 Phase 24 (Complete Ground-Truth Expansion)
   ↳ 100% of findings reviewed (43 lifetime records). Emitted findings confirmed at 100% True Positives.
+Phase 25 (Selective Runtime Verification)
+  ↳ Deterministic framework preludes, AST prefix slicing, and transparent execution provenance implemented.
 ```
 
 | Evaluation Phase | Total Findings | True Positives | False Positives | Framework Artifacts | Unreachable | Active Emitted Precision | Wall Time |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Phase 22 (Pilot)** | 43 | 2 (pilot sample) | 4 | 3 | 1 | 33.3% (sample) | 41.10s |
 | **Phase 23 (Hardened)** | 9 | 2 (pilot sample) | 0 | 0 | 0 | 100.0% (emitted) | 30.29s |
-| **Phase 24 (Comprehensive)** | 9 | **9 (all confirmed)** | 0 | 0 | 0 | **100.0% (emitted)** | 32.20s |
+| **Phase 24 (Comprehensive)** | 9 | 9 (all confirmed) | 0 | 0 | 0 | 100.0% (emitted) | 32.20s |
+| **Phase 25 (Selective Runtime)** | 9 | **9 (all confirmed)** | 0 | 0 | 0 | **100.0% (emitted)** | 38.65s |
 
 ---
 
-## 5. Current Benchmark Results (Phase 24)
+## 5. Current Benchmark Results (Phase 25)
 
 Executed on Node.js `v24.19.0`, Windows `x64`, Base Seed `42`, Runs `10`, Timeout `20ms`:
 
 | Repository | Status | Files Analyzed | Boundaries | Actions | SIS001 (Taint) | SIS002 (Serial.) | SIS003 (Runtime) | SIS004 (Timeout) | SIS005 (Contract) | Verified Findings | Wall Time |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **shadcn-ui/taxonomy** | ✓ Completed | 127 | 48 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2.93s |
-| **leerob/site** | ✓ Completed | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2.01s |
-| **vercel/commerce** | ✓ Completed | 65 | 17 | 5 | 0 | 0 | 9 | 0 | 0 | **9** | 2.48s |
-| **dubinc/dub** | ✓ Completed | 3,421 | 1,587 | 11 | 0 | 0 | 0 | 0 | 0 | 0 | 19.51s |
-| **mickasmt/next-saas-stripe-starter** | ✓ Completed | 187 | 78 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 3.36s |
-| **Corpus Total** | **5 / 5 Pass** | **3,804** | **1,730** | **20** | **0** | **0** | **9** | **0** | **0** | **9** | **32.20s** |
+| **shadcn-ui/taxonomy** | ✓ Completed | 127 | 48 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2.05s |
+| **leerob/site** | ✓ Completed | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2.02s |
+| **vercel/commerce** | ✓ Completed | 65 | 17 | 5 | 0 | 0 | 9 | 0 | 0 | **9** | 2.55s |
+| **dubinc/dub** | ✓ Completed | 3,421 | 1,587 | 11 | 0 | 0 | 0 | 0 | 0 | 0 | 28.71s |
+| **mickasmt/next-saas-stripe-starter** | ✓ Completed | 187 | 78 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 3.32s |
+| **Corpus Total** | **5 / 5 Pass** | **3,804** | **1,730** | **20** | **0** | **0** | **9** | **0** | **0** | **9** | **38.65s** |
+
+### 5.1 Selective Runtime Verification & Execution Provenance
+
+In Phase 25, SIS introduced **Selective Runtime Verification**:
+- **Deterministic Preludes**: In-memory, non-mutating implementations of framework primitives (`cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`, `revalidateTag()`, `unstable_noStore()`) allow Server Actions using Next.js primitives to execute safely in zero-privilege V8 isolates.
+- **AST Prefix Slicing**: Rather than discarding actions containing cloud SDKs (e.g. Prisma, Shopify API), SIS isolates the prefix statements that execute prior to the first unsupported dependency.
+- **Execution Mode Classification**:
+  - `FULL`: The complete action function was executed in `isolated-vm`.
+  - `PREFIX`: A verified statement prefix was executed up to an unsupported dependency boundary.
+  - `STATIC_ONLY`: The action relies on unsupported infrastructure from statement 0 or requires framework form context (`FormData`).
+  - `UNSUPPORTED`: Sandbox execution was skipped due to environmental limits.
+- **Finding Provenance**: Verified findings explicitly record the prefix boundary (`verifiedPrefix`), the stop point (`stoppedAt`), and the execution mode (`PREFIX`). For example, in `vercel/commerce`:
+  ```json
+  "executionMode": "PREFIX",
+  "runtimeProvenance": {
+    "mode": "PREFIX",
+    "verifiedPrefix": { "startLine": 61, "endLine": 61, "startColumn": 3, "endColumn": 47 },
+    "stoppedAt": { "dependency": "getCart", "reason": "cloud-sdk", "line": 64 }
+  }
+  ```
 
 ---
 

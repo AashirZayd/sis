@@ -218,6 +218,9 @@ export class DefaultTerminalPresenter implements TerminalPresenter {
     console.log();
     console.log(`  ${chalk.dim(`Execution budget: ${summary.timeoutMs}ms per payload`)}`);
     console.log(`  Executed ${summary.executed} transferable payloads`);
+    if (summary.fullExecutions !== undefined || summary.prefixExecutions !== undefined) {
+      console.log(`  Full: ${summary.fullExecutions ?? 0} | Prefix: ${summary.prefixExecutions ?? 0} | Static-only: ${summary.staticOnlyActions ?? 0}`);
+    }
     console.log(`  Unsupported ${summary.unsupported}`);
     console.log(`  Passed ${summary.passed}`);
     console.log(`  Failed ${summary.failed + summary.timedOut}`);
@@ -232,6 +235,11 @@ export class DefaultTerminalPresenter implements TerminalPresenter {
     } else {
       for (const fail of failures) {
         console.log(`  ${symbols.failure} ${chalk.bold(fail.actionName)}`);
+        if (fail.executionMode === "PREFIX") {
+          const range = fail.verifiedPrefix ? `lines ${fail.verifiedPrefix.startLine}..${fail.verifiedPrefix.endLine}` : "prefix";
+          const stop = fail.stoppedAt ? `stopped before ${fail.stoppedAt.dependency}` : "";
+          console.log(`    Mode: ${chalk.yellow("PREFIX")} (${range}${stop ? `, ${stop}` : ""})`);
+        }
         console.log(`    Payload #${fail.payloadId}`);
         if (fail.parameter) {
           console.log(`    Parameter: ${chalk.cyan(fail.parameter)}`);

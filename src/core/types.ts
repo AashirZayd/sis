@@ -39,6 +39,7 @@ export interface Boundary {
 export type ServerActionConfidence = "definite" | "candidate" | "ordinary";
 export type ExecutionCompatibility =
   | "sandbox-compatible"
+  | "prefix-compatible"
   | "static-only"
   | "unsupported-runtime"
   | "unknown";
@@ -51,6 +52,9 @@ export interface ServerAction {
   isExported?: boolean;
   isInlineDirective?: boolean;
   executionCompatibility?: ExecutionCompatibility;
+  executionMode?: import("../runtime/types.js").ExecutionMode;
+  verifiedPrefix?: import("../runtime/types.js").PrefixBoundary;
+  stoppedAt?: import("../runtime/types.js").StoppedAt;
 }
 
 export type FindingType =
@@ -91,6 +95,10 @@ export interface Finding {
   strategy?: string;
   invariant?: string;
   parameter?: string;
+  executionMode?: import("../runtime/types.js").ExecutionMode;
+  runtimeProvenance?: import("../runtime/types.js").RuntimeProvenance;
+  verifiedPrefix?: import("../runtime/types.js").PrefixBoundary;
+  stoppedAt?: import("../runtime/types.js").StoppedAt;
 }
 
 export interface AnalysisError {
@@ -125,6 +133,10 @@ export interface AuditStatistics {
   fuzzStrategiesApplied?: number;
   boundaryDirectedPayloads?: number;
   genericFallbackPayloads?: number;
+  fullExecutions?: number;
+  prefixExecutions?: number;
+  staticOnlyActions?: number;
+  unsupportedActions?: number;
 }
 
 export interface AuditResult {

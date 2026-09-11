@@ -99,6 +99,15 @@ export function formatJson(
     if (f.parameter) {
       finding.parameter = f.parameter;
     }
+    if (f.executionMode) {
+      finding.executionMode = f.executionMode;
+    }
+    if (f.verifiedPrefix) {
+      finding.verifiedPrefix = f.verifiedPrefix;
+    }
+    if (f.stoppedAt) {
+      finding.stoppedAt = f.stoppedAt;
+    }
     if (runtime) {
       finding.runtime = runtime;
     }
@@ -117,6 +126,9 @@ export function formatJson(
     file: normalizePath(a.location.file),
     line: a.location.line,
     column: a.location.column,
+    executionCompatibility: a.executionCompatibility,
+    executionMode: a.executionMode,
+    stoppedAt: a.stoppedAt,
   }));
 
   const filesAnalyzed = (
