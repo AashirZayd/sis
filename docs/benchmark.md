@@ -122,7 +122,7 @@ export async function updateItemQuantity(
   const { merchandiseId, quantity } = payload; // Line 54: Unsafe destructuring outside try/catch
 ```
 
-- **Vulnerability / Fragility Mechanism**: Because the module declares `"use server"` at top-level, Next.js exposes `updateItemQuantity` as an unauthenticated public HTTP POST RPC endpoint. TypeScript type annotations are erased at runtime. The function unconditionally destructures `payload` before any runtime schema checks or `try/catch` wrapping.
+- **Vulnerability / Fragility Mechanism**: `"use server"` exposes the function through Next.js's Server Action invocation mechanism, so its runtime inputs cannot be assumed to satisfy the TypeScript parameter type. The function unconditionally destructures `payload` before any runtime schema checks or `try/catch` wrapping.
 - **Observed Failure**: Invocations with empty objects (`{}`), nullish values (`null`, `undefined`), or omitted second arguments throw an unhandled `TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.`, crashing the Server Action with an HTTP 500 error.
 - **Minimized Reproductions**: Across 9 distinct fuzzing strategies (prototype pollution, numeric extremes, structural mutation, nullish primitives), delta-debugging successfully shrunk all payloads to `{}` or `null`.
 - **Finding Fingerprints**: `b6bbfce3dbe171b5`, `84e693a7f37f6a9b`, `0300c0d145de1a6b`, `78387966d81c3cd4`, `caac0d7e2642c4fa`, `0cc2c4b41331b1de`, `a93666a2ceea9d6e`, `e37b49b0bbe4aef3`, `2129b19876f7f31a`.
@@ -203,5 +203,5 @@ npm run benchmark -- --reproduce b6bbfce3dbe171b5
 npm run benchmark -- --reproduce 84e693a7f37f6a9b
 ```
 
-> **Reproducibility Guarantee**:
+> **Reproducibility Note**:
 > Deterministic seed derivation makes generated inputs reproducible under equivalent SIS, Node.js, and execution environments. Target repositories are cloned ephemerally at immutable commit SHAs and findings receive stable SHA-256 fingerprints.

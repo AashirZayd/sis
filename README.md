@@ -311,7 +311,7 @@ export async function updateItemQuantity(
 }
 ```
 
-- **Defect Mechanism**: Declaring `"use server"` causes Next.js to expose `updateItemQuantity` as an unauthenticated public HTTP POST RPC endpoint. TypeScript types are erased at compile-time. The function unconditionally destructures `payload` outside of any runtime schema checks (e.g. Zod) or `try/catch` blocks.
+- **Defect Mechanism**: `"use server"` exposes the function through Next.js's Server Action invocation mechanism, so its runtime inputs cannot be assumed to satisfy the TypeScript parameter type. The function unconditionally destructures `payload` outside of any runtime schema checks (e.g. Zod) or `try/catch` blocks.
 - **Observed Runtime Failure**: Invocations with empty objects (`{}`), nullish values (`null`, `undefined`), or omitted arguments trigger an unhandled `TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.`, crashing the Server Action with an HTTP 500 error.
 - **Minimized Reproductions**: Across 9 distinct fuzzing strategies (prototype mutation, numeric extremes, structural mutation, nullish primitives), delta-debugging systematically shrunk all payloads to `{}` or `null`.
 - **Deterministic Fingerprints**: `b6bbfce3dbe171b5`, `84e693a7f37f6a9b`, `0300c0d145de1a6b`, `78387966d81c3cd4`, `caac0d7e2642c4fa`, `0cc2c4b41331b1de`, `a93666a2ceea9d6e`, `e37b49b0bbe4aef3`, `2129b19876f7f31a`.
@@ -518,7 +518,7 @@ If a reduced payload fails to reproduce the exact original failure signature, th
 
 ## Determinism & Reproducibility
 
-SIS guarantees reproducible audits:
+Deterministic seed derivation makes generated inputs reproducible under equivalent SIS, Node.js, and execution environments:
 
 ```bash
 npx @aashirzayd/sis audit app/ --seed 42
@@ -784,7 +784,7 @@ SIS is developed in rigorous, phased milestones:
 - [x] **Phase 23 — Boundary Precision & Filter Hardening**: Route handler classification, hook inference, cloud SDK gating.
 - [x] **Phase 24 — Ground-Truth Expansion & Quality**: 100% review coverage across 43 lifetime benchmark records.
 - [x] **Phase 24.5 — Documentation, Benchmark Transparency & Trust**: Authoritative empirical evaluation, trust model, and transparent limitation reporting.
-- [ ] **Phase 25 — Prelude Runtime Execution**: Mock stubs and safe runtime preambles for framework globals.
+- [ ] **Phase 25 — Selective Runtime Verification**: Dependency-independent prelude execution for safely verifiable Server Action prefixes.
 
 ---
 
@@ -811,7 +811,7 @@ npm run benchmark -- --review
 npm run benchmark -- --reproduce b6bbfce3dbe171b5
 ```
 
-> **Reproducibility Guarantee**:
+> **Reproducibility Note**:
 > Deterministic seed derivation makes generated inputs reproducible under equivalent SIS, Node.js, and execution environments. Target repositories are cloned ephemerally at immutable commit SHAs and findings receive stable 16-hex fingerprints.
 
 ---
