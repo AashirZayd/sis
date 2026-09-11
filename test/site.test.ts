@@ -11,8 +11,17 @@ describe("Landing Page & Static Site Validation", () => {
     expect(fs.existsSync(path.join(docsDir, "style.css"))).toBe(true);
     expect(fs.existsSync(path.join(docsDir, "script.js"))).toBe(true);
     expect(fs.existsSync(path.join(docsDir, "favicon.svg"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "og-image.svg"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "robots.txt"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "sitemap.xml"))).toBe(true);
     expect(fs.existsSync(path.join(docsDir, ".nojekyll"))).toBe(true);
     expect(fs.existsSync(path.join(docsDir, "architecture.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "server-actions-testing.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "serialization-boundaries.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "adversarial-testing.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "taint-analysis.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "ci-sarif.md"))).toBe(true);
+    expect(fs.existsSync(path.join(docsDir, "faq.md"))).toBe(true);
   });
 
   it("index.html uses strictly relative asset paths for GitHub Pages compatibility", () => {
@@ -138,5 +147,74 @@ describe("Landing Page & Static Site Validation", () => {
   it("README.md links to the deployed landing page", () => {
     const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
     expect(readme).toContain("https://aashirzayd.github.io/sis/");
+  });
+
+  it("index.html contains valid SEO, OpenGraph, and Twitter metadata", () => {
+    const html = fs.readFileSync(path.join(docsDir, "index.html"), "utf-8");
+
+    expect(html).toContain('<link rel="canonical" href="https://aashirzayd.github.io/sis/">');
+    expect(html).toContain('<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">');
+    expect(html).toContain('<meta property="og:title" content="SIS — Next.js Server Action Runtime Verification &amp; Fuzzing">');
+    expect(html).toContain('<meta property="og:image" content="https://aashirzayd.github.io/sis/og-image.svg">');
+    expect(html).toContain('<meta name="twitter:card" content="summary_large_image">');
+    expect(html).toContain('<meta name="twitter:image" content="https://aashirzayd.github.io/sis/og-image.svg">');
+  });
+
+  it("index.html contains valid Schema.org JSON-LD graph", () => {
+    const html = fs.readFileSync(path.join(docsDir, "index.html"), "utf-8");
+
+    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    expect(jsonLdMatch).not.toBeNull();
+    const parsed = JSON.parse(jsonLdMatch![1]);
+    expect(parsed["@context"]).toBe("https://schema.org");
+    expect(Array.isArray(parsed["@graph"])).toBe(true);
+
+    const types = parsed["@graph"].map((node: any) => node["@type"]);
+    expect(types).toContain("SoftwareApplication");
+    expect(types).toContain("WebSite");
+    expect(types).toContain("WebPage");
+    expect(types).toContain("FAQPage");
+
+    const faqNode = parsed["@graph"].find((node: any) => node["@type"] === "FAQPage");
+    expect(faqNode.mainEntity.length).toBeGreaterThanOrEqual(7);
+  });
+
+  it("index.html contains FAQ and GEO quick facts sections", () => {
+    const html = fs.readFileSync(path.join(docsDir, "index.html"), "utf-8");
+
+    expect(html).toContain("What is SIS?");
+    expect(html).toContain("What does SIS test?");
+    expect(html).toContain("How does SIS test Server Actions?");
+    expect(html).toContain("Does SIS replace unit tests?");
+    expect(html).toContain("Does SIS execute the full Next.js runtime?");
+    expect(html).toContain("What is the difference between a Server Action and a Server Function?");
+    expect(html).toContain("What output formats does SIS support?");
+    expect(html).toContain("Machine-Readable Technical Summary");
+  });
+
+  it("robots.txt and sitemap.xml have valid search engine directives", () => {
+    const robots = fs.readFileSync(path.join(docsDir, "robots.txt"), "utf-8");
+    expect(robots).toContain("User-agent: *");
+    expect(robots).toContain("Allow: /");
+    expect(robots).toContain("Sitemap: https://aashirzayd.github.io/sis/sitemap.xml");
+
+    const sitemap = fs.readFileSync(path.join(docsDir, "sitemap.xml"), "utf-8");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/server-actions-testing.md</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/serialization-boundaries.md</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/adversarial-testing.md</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/taint-analysis.md</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/ci-sarif.md</loc>");
+    expect(sitemap).toContain("<loc>https://aashirzayd.github.io/sis/architecture.md</loc>");
+  });
+
+  it("README.md links to guides, use cases, and alternatives", () => {
+    const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
+    expect(readme).toContain("https://aashirzayd.github.io/sis/");
+    expect(readme).toContain("## Use Cases");
+    expect(readme).toContain("## Alternatives & Complementary Tools");
+    expect(readme).toContain("## Documentation & In-Depth Guides");
+    expect(readme).toContain("docs/server-actions-testing.md");
+    expect(readme).toContain("docs/serialization-boundaries.md");
   });
 });

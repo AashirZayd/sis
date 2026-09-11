@@ -1,0 +1,7 @@
+# robots.txt for SIS (Speculative Invariant Synthesis)
+# https://aashirzayd.github.io/sis/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://aashirzayd.github.io/sis/sitemap.xml

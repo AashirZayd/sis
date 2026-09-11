@@ -70,7 +70,7 @@ flowchart TD
 ### Stage 1: Discovery & Deterministic Seeding (`src/discovery/`)
 - Recursively inspects the target directory for `.ts`, `.tsx`, `.js`, and `.jsx` files.
 - Automatically excludes standard build and dependency directories (`node_modules`, `.next`, `dist`, `build`, `coverage`, `.git`) plus user-specified `--ignore` patterns.
-- Sorts discovered files lexicographically to guarantee platform-independent traversal.
+- Sorts discovered files lexicographically to ensure platform-independent traversal.
 - Derives a per-file deterministic 32-bit seed using the FNV-1a hash algorithm combining the base `--seed` and relative file path.
 
 ### Stage 2: AST Parsing & Boundary Discovery (`src/parser/`, `src/boundary/`)
@@ -139,3 +139,15 @@ flowchart TD
 1. **Rule Identifiers**: All finding types map to immutable IDs (`SIS001` - `SIS005`). Never re-use or re-order existing IDs.
 2. **Deterministic Traversal**: All directory and property traversals must be sorted lexicographically before seeding.
 3. **Execution Safety**: Dynamic execution must only occur within `isolated-vm` isolates with explicit timeouts and resource bounds. Never evaluate candidate code on the host Node.js runtime.
+
+---
+
+## 5. Technical Guides & Specifications
+
+- [Testing Next.js Server Actions](./server-actions-testing.md)
+- [React Flight Serialization Boundaries](./serialization-boundaries.md)
+- [Adversarial Testing & Speculative Fuzzing](./adversarial-testing.md)
+- [Static Secret Taint Analysis](./taint-analysis.md)
+- [CI Pipelines & GitHub Code Scanning](./ci-sarif.md)
+- [Frequently Asked Questions & Technical Reference](./faq.md)
+

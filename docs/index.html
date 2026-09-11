@@ -3,22 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIS — Speculative Invariant Synthesis</title>
-  <meta name="description" content="Zero-configuration runtime verification and speculative fuzzing for modern Next.js Server Actions and React Server Component boundaries.">
+  <title>SIS — Next.js Server Action Runtime Verification &amp; Fuzzing</title>
+  <meta name="description" content="SIS is an open-source runtime verification and adversarial testing tool for Next.js Server Actions, React Server Component boundaries, serialization hazards, and secret-tainted data.">
   <meta name="author" content="Aashir Zayd">
-  <meta name="keywords" content="Next.js, React Server Components, Server Actions, Fuzzing, Runtime Verification, Security, Taint Analysis, SARIF">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="theme-color" content="#09090b">
+  <meta name="keywords" content="Next.js, Server Actions, React Server Components, RSC, Fuzzing, Runtime Verification, Serialization, React Flight, Taint Analysis, Property-Based Testing, SARIF">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://aashirzayd.github.io/sis/">
 
   <!-- Open Graph / Social -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://aashirzayd.github.io/sis/">
-  <meta property="og:title" content="SIS — Speculative Invariant Synthesis">
-  <meta property="og:description" content="Find the edge cases you forgot to test. Runtime verification and speculative fuzzing for Next.js boundaries.">
-  <meta property="og:site_name" content="SIS">
+  <meta property="og:title" content="SIS — Next.js Server Action Runtime Verification &amp; Fuzzing">
+  <meta property="og:description" content="Open-source runtime verification and adversarial testing tool for Next.js Server Actions, React Server Component boundaries, serialization hazards, and secret-tainted data.">
+  <meta property="og:site_name" content="SIS (Speculative Invariant Synthesis)">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://aashirzayd.github.io/sis/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="SIS — Speculative Invariant Synthesis for Next.js Boundaries">
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="SIS — Speculative Invariant Synthesis">
-  <meta name="twitter:description" content="Find the edge cases you forgot to test. Zero-configuration runtime verification for Next.js boundaries.">
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SIS — Next.js Server Action Runtime Verification &amp; Fuzzing">
+  <meta name="twitter:description" content="Open-source runtime verification and adversarial testing tool for Next.js Server Actions, React Server Component boundaries, serialization hazards, and secret-tainted data.">
+  <meta name="twitter:image" content="https://aashirzayd.github.io/sis/og-image.svg">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -28,6 +39,119 @@
 
   <!-- Script -->
   <script src="./script.js" defer></script>
+
+  <!-- Schema.org JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://aashirzayd.github.io/sis/#software",
+        "name": "SIS",
+        "alternateName": "Speculative Invariant Synthesis",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Node.js",
+        "softwareVersion": "0.1.0",
+        "description": "Open-source runtime verification and adversarial testing tool for Next.js Server Actions, React Server Component boundaries, serialization hazards, and secret-tainted data.",
+        "license": "https://opensource.org/licenses/MIT",
+        "codeRepository": "https://github.com/AashirZayd/sis",
+        "downloadUrl": "https://www.npmjs.com/package/@aashirzayd/sis",
+        "author": {
+          "@type": "Person",
+          "name": "Aashir Zayd",
+          "url": "https://github.com/AashirZayd"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://aashirzayd.github.io/sis/#website",
+        "url": "https://aashirzayd.github.io/sis/",
+        "name": "SIS — Speculative Invariant Synthesis",
+        "description": "Autonomous runtime verification and speculative fuzzing for Next.js boundaries.",
+        "publisher": {
+          "@type": "Person",
+          "name": "Aashir Zayd"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://aashirzayd.github.io/sis/#webpage",
+        "url": "https://aashirzayd.github.io/sis/",
+        "name": "SIS — Next.js Server Action Runtime Verification &amp; Fuzzing",
+        "isPartOf": {
+          "@id": "https://aashirzayd.github.io/sis/#website"
+        },
+        "about": {
+          "@id": "https://aashirzayd.github.io/sis/#software"
+        },
+        "description": "SIS is an open-source runtime verification and adversarial testing tool for Next.js Server Actions, React Server Component boundaries, serialization hazards, and secret-tainted data."
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://aashirzayd.github.io/sis/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is SIS?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SIS (Speculative Invariant Synthesis) is an open-source CLI runtime verification and speculative fuzzing tool for Next.js App Router and React Server Component boundaries. It discovers Client/Server module boundaries, traces secret data flows, models React Flight serializability contracts, synthesizes targeted adversarial payloads, and dynamically verifies invariants inside an isolated V8 execution sandbox."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does SIS test?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SIS tests Server Action argument edge cases (nullish inputs, numeric extremes, prototype pollution, deep nesting), React Flight serialization boundaries (closures, class instances, unregistered symbols crossing to Client Components), and static secret taint leakage (private server environment variables reaching client JSX sinks)."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does SIS test Server Actions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SIS uses SWC AST parsing to discover exported Server Actions, infers parameter shapes from TypeScript types and destructuring patterns, generates adversarial payloads via fast-check, executes sandbox-compatible actions in zero-privilege isolated-vm isolates under strict CPU budgets (default: 20ms), and delta-debugs failing inputs to minimal reproducible reproducers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does SIS replace unit tests?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. SIS does not replace conventional unit or integration tests like Vitest or Jest. Conventional tests verify developer-written examples and happy paths. SIS complements them by exploring unanticipated boundary edge cases, fuzzing argument envelopes, and verifying unhandled runtime exceptions in an isolated sandbox."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does SIS execute the full Next.js runtime?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Framework-dependent boundaries are classified as static-only when they require live Next.js request context (cookies, headers, redirect, notFound) or external database connections. They are analyzed statically for taint and serializability, but bypassed from isolate execution to prevent artificial crashes."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between a Server Action and a Server Function?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A Server Function is any utility function executing on the server. A Server Action is an asynchronous function explicitly marked with a 'use server' directive prologue, exposing a public network RPC endpoint callable from client components and browser requests. SIS distinguishes between the two, targeting adversarial fuzzing specifically on client-callable Server Actions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What output formats does SIS support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "SIS supports three output formats: high-contrast human-readable terminal output, machine-readable Version 1 JSON schema (--json), and OASIS SARIF 2.1.0 (--sarif) for native integration with GitHub Security Code Scanning and enterprise CI pipelines."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -54,6 +178,8 @@
         <a href="#features">Features</a>
         <a href="#nextjs">Next.js Focus</a>
         <a href="#cli">CLI Reference</a>
+        <a href="#guides">Guides</a>
+        <a href="#faq">FAQ</a>
         <a href="./architecture.md">Architecture</a>
       </nav>
 
@@ -466,7 +592,7 @@
             </div>
             <h3 class="feature-title">Deterministic Audits</h3>
             <p class="feature-desc">
-              Stable lexicographical traversal and FNV-1a deterministic per-file seed derivation guarantee byte-for-byte identical results across CI runs.
+              Stable lexicographical traversal and FNV-1a deterministic per-file seed derivation provide reproducible, byte-for-byte consistent findings across CI runs.
             </p>
           </div>
 
@@ -544,7 +670,7 @@
               Static-only actions are safely analyzed for taint and syntax hazards without being executed in the isolate, eliminating false-positive sandbox crashes while verifying pure logic safely.
             </p>
             <div class="sandbox-callout">
-              <strong>Technical Guarantee:</strong> Dynamic execution is strictly confined to zero-privilege V8 isolates with enforced CPU budgets (default: 20ms).
+              <strong>Isolate Confinement:</strong> Dynamic execution is strictly confined to zero-privilege V8 isolates with enforced CPU budgets (default: 20ms).
             </div>
           </div>
         </div>
@@ -644,16 +770,16 @@ npx @aashirzayd/sis audit app/ --seed 42 --runs 25 --timeout 50</pre>
 
         <div class="oss-metrics-grid">
           <div class="metric-card">
-            <div class="num">215+</div>
-            <div class="label">Passing Tests (16 Suites)</div>
+            <div class="num">230+</div>
+            <div class="label">Passing Tests (17 Suites)</div>
           </div>
           <div class="metric-card">
             <div class="num">Node 24+</div>
             <div class="label">Native Prebuilt Binaries</div>
           </div>
           <div class="metric-card">
-            <div class="num">100%</div>
-            <div class="label">Deterministic Analysis</div>
+            <div class="num">FNV-1a</div>
+            <div class="label">Deterministic Findings with Reproducible Seeds</div>
           </div>
           <div class="metric-card">
             <div class="num">MIT</div>
@@ -675,6 +801,161 @@ npx @aashirzayd/sis audit app/ --seed 42 --runs 25 --timeout 50</pre>
             </svg>
             <span>View package on npm</span>
           </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technical Guides & Deep Dives -->
+    <section class="section" id="guides">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge">Authoritative Guides</div>
+          <h2 class="section-title">Technical documentation &amp; deep dives</h2>
+          <p class="section-desc">
+            In-depth guides on Next.js Server Actions testing, React Flight serialization hazards, static secret taint analysis, and CI/CD automation.
+          </p>
+        </div>
+
+        <div class="guides-grid">
+          <a href="./server-actions-testing.md" class="guide-card">
+            <div class="guide-tag">Deep Dive</div>
+            <div class="guide-title">
+              <span>Next.js Server Actions Testing</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">Why unit tests miss boundary hazards, prototype pollution, destructuring traps, and how to verify action handlers.</p>
+          </a>
+
+          <a href="./serialization-boundaries.md" class="guide-card">
+            <div class="guide-tag">Architecture</div>
+            <div class="guide-title">
+              <span>React Flight Serialization</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">The React Flight wire protocol vs JSON.stringify, non-transferable closures, class instances, and SIS002 diagnostics.</p>
+          </a>
+
+          <a href="./adversarial-testing.md" class="guide-card">
+            <div class="guide-tag">Methodology</div>
+            <div class="guide-title">
+              <span>Adversarial Invariant Synthesis</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">Speculative shape inference, fast-check mutation, zero-privilege V8 execution, and delta-debugging failure shrinking.</p>
+          </a>
+
+          <a href="./taint-analysis.md" class="guide-card">
+            <div class="guide-tag">Security</div>
+            <div class="guide-title">
+              <span>Static Secret Taint Analysis</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">Interprocedural data-flow tracing from sensitive environment variables to Client Component JSX sinks and SIS001.</p>
+          </a>
+
+          <a href="./ci-sarif.md" class="guide-card">
+            <div class="guide-tag">DevOps / CI</div>
+            <div class="guide-title">
+              <span>CI Automation &amp; SARIF Reporting</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">Integrating SIS into GitHub Actions Code Scanning, SARIF 2.1.0 report ingestion, and deterministic exit code gates.</p>
+          </a>
+
+          <a href="./architecture.md" class="guide-card">
+            <div class="guide-tag">Specification</div>
+            <div class="guide-title">
+              <span>SIS Architecture &amp; Boundaries</span>
+              <span class="guide-arrow">→</span>
+            </div>
+            <p class="guide-desc">Complete architectural specification of AST parsing, static taint propagation, isolate runtime, and failure shrinking.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ & AEO Section -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge">Frequently Asked Questions</div>
+          <h2 class="section-title">Common questions &amp; direct answers</h2>
+          <p class="section-desc">
+            Direct, definitive answers about SIS architecture, testing methodology, boundary hazards, and runtime constraints.
+          </p>
+        </div>
+
+        <div class="faq-grid">
+          <article class="faq-item">
+            <h2 class="faq-question">What is SIS?</h2>
+            <div class="faq-answer">
+              <p><strong>SIS (Speculative Invariant Synthesis)</strong> is an open-source CLI runtime verification and speculative fuzzing tool for modern Next.js App Router and React Server Component boundaries. It discovers Client/Server module boundaries, traces secret data flows, models React Flight serializability contracts, synthesizes targeted adversarial payloads, and dynamically verifies invariants inside an isolated V8 execution sandbox.</p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">What does SIS test?</h2>
+            <div class="faq-answer">
+              <p>SIS tests three critical boundary hazard surfaces in modern Next.js applications:</p>
+              <ul style="margin: 0.5rem 0 0 1.25rem; line-height: 1.6;">
+                <li><strong>Server Action argument edge cases:</strong> Unexpected nullish inputs, numeric extremes, prototype pollution keys (<code>__proto__</code>, <code>constructor</code>), and deeply nested objects bypassing simple manual tests.</li>
+                <li><strong>React Flight serialization boundaries:</strong> Non-transferable types (closures, class instances with private methods, unregistered Symbols) returned from Server Actions or passed across RSC boundaries (diagnostic <code>SIS002</code>).</li>
+                <li><strong>Static secret taint leakage:</strong> Private server environment variables (<code>*_SECRET</code>, <code>*_KEY</code>, <code>DATABASE_URL</code>) flowing through multi-hop call graphs into Client Component JSX sinks (diagnostic <code>SIS001</code>).</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">How does SIS test Server Actions?</h2>
+            <div class="faq-answer">
+              <p>SIS parses source code with SWC to extract exported Server Actions (functions marked with <code>"use server"</code>). It infers parameter shapes from TypeScript types and destructuring patterns, synthesizes targeted adversarial payloads using <code>fast-check</code>, executes sandbox-compatible actions in zero-privilege <code>isolated-vm</code> isolates under strict CPU budgets (default: 20ms), and delta-debugs any failing inputs down to minimal reproducible examples.</p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">Does SIS replace unit tests?</h2>
+            <div class="faq-answer">
+              <p><strong>No.</strong> SIS does not replace conventional unit or integration test frameworks like Vitest, Jest, or Playwright. Conventional tests verify developer-written examples, known business logic, and happy paths. SIS complements them by exploring unanticipated boundary edge cases, fuzzing argument envelopes, and verifying unhandled runtime exceptions in an isolated sandbox.</p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">Does SIS execute the full Next.js runtime?</h2>
+            <div class="faq-answer">
+              <p><strong>No.</strong> Framework-dependent boundaries are classified as <code>static-only</code> when they require live Next.js request context (such as <code>cookies()</code>, <code>headers()</code>, <code>redirect()</code>, <code>notFound()</code>) or external database connections. They are analyzed statically for secret taint and return-type serializability, but safely bypassed from isolate execution to prevent artificial runtime crashes.</p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">What is the difference between a Server Action and a Server Function?</h2>
+            <div class="faq-answer">
+              <p>A <em>Server Function</em> is any utility function executing on the server (e.g., database queries or helpers). A <em>Server Action</em> is an asynchronous function explicitly marked with a <code>"use server"</code> directive prologue, exposing a public network RPC endpoint callable from client components and browser HTTP POST requests. SIS distinguishes between the two, targeting adversarial fuzzing specifically on client-callable Server Actions.</p>
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h2 class="faq-question">What output formats does SIS support?</h2>
+            <div class="faq-answer">
+              <p>SIS supports three output formats: high-contrast human-readable terminal output, machine-readable Version 1 JSON schema via <code>--json</code>, and OASIS SARIF 2.1.0 via <code>--sarif</code> for native integration with GitHub Security Code Scanning and enterprise CI pipelines.</p>
+            </div>
+          </article>
+        </div>
+
+        <!-- Machine-Readable Structured Summary -->
+        <div class="geo-facts-box">
+          <div class="geo-facts-title">Machine-Readable Technical Summary</div>
+          <ul class="geo-facts-list">
+            <li><strong>Tool Name:</strong> SIS (Speculative Invariant Synthesis)</li>
+            <li><strong>Package:</strong> <code>@aashirzayd/sis</code> on npm</li>
+            <li><strong>Primary Function:</strong> Runtime verification and speculative fuzzing for Next.js Server Actions</li>
+            <li><strong>Execution Engine:</strong> Isolated V8 environments (isolated-vm) with zero-privilege sandboxing</li>
+            <li><strong>Supported Frameworks:</strong> Next.js 13+, Next.js 14+, Next.js 15+ (App Router)</li>
+            <li><strong>Diagnostic Codes:</strong> SIS001 (Secret Leak), SIS002 (Unserializable RSC Return), SIS003 (Unhandled Exception)</li>
+            <li><strong>Verification Mechanism:</strong> Deterministic property-based payload synthesis + delta-debugging failure shrinking</li>
+            <li><strong>CI Integration:</strong> OASIS SARIF 2.1.0 output for GitHub Code Scanning and GitLab SAST</li>
+            <li><strong>Runtime Requirement:</strong> Node.js &gt;= 24.0.0</li>
+            <li><strong>License:</strong> MIT (Permissive Open Source)</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -729,12 +1010,15 @@ npx @aashirzayd/sis audit app/ --seed 42 --runs 25 --timeout 50</pre>
             <h5>Project</h5>
             <a href="https://github.com/AashirZayd/sis" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://www.npmjs.com/package/@aashirzayd/sis" target="_blank" rel="noopener noreferrer">npm Package</a>
-            <a href="./architecture.md">Architecture Specification</a>
+            <a href="./architecture.md">Architecture</a>
+            <a href="./server-actions-testing.md">Guides</a>
+            <a href="./sitemap.xml">Sitemap</a>
           </div>
 
           <div class="footer-col">
             <h5>Resources</h5>
             <a href="https://github.com/AashirZayd/sis#readme" target="_blank" rel="noopener noreferrer">Documentation</a>
+            <a href="#faq">FAQ</a>
             <a href="https://github.com/AashirZayd/sis/tree/master/examples" target="_blank" rel="noopener noreferrer">Examples</a>
             <a href="https://github.com/AashirZayd/sis/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>
           </div>

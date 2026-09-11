@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <style>
+      .bg { fill: #09090b; }
+      .grid { stroke: #18181b; stroke-width: 1; }
+      .border { fill: none; stroke: #27272a; stroke-width: 2; }
+      .title { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 700; fill: #ffffff; letter-spacing: -0.04em; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-weight: 400; fill: #a1a1aa; }
+      .mono { font-family: "JetBrains Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+      .badge-bg { fill: #18181b; stroke: #27272a; stroke-width: 1; }
+      .badge-text { font-size: 14px; font-weight: 500; fill: #d4d4d8; }
+      .tag { fill: #10b981; }
+      .terminal-box { fill: #0c0c0e; stroke: #27272a; stroke-width: 1.5; }
+      .code-green { fill: #10b981; }
+      .code-red { fill: #ef4444; }
+      .code-cyan { fill: #06b6d4; }
+      .code-amber { fill: #f59e0b; }
+      .code-dim { fill: #71717a; }
+      .code-white { fill: #f4f4f5; }
+    </style>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="1200" height="630" class="bg"/>
+
+  <!-- Subtle Blueprint Grid -->
+  <g class="grid">
+    <line x1="0" y1="90" x2="1200" y2="90"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/>
+    <line x1="0" y1="270" x2="1200" y2="270"/>
+    <line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="450" x2="1200" y2="450"/>
+    <line x1="0" y1="540" x2="1200" y2="540"/>
+    <line x1="120" y1="0" x2="120" y2="630"/>
+    <line x1="240" y1="0" x2="240" y2="630"/>
+    <line x1="360" y1="0" x2="360" y2="630"/>
+    <line x1="480" y1="0" x2="480" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="720" y1="0" x2="720" y2="630"/>
+    <line x1="840" y1="0" x2="840" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/>
+    <line x1="1080" y1="0" x2="1080" y2="630"/>
+  </g>
+
+  <!-- Outer Frame -->
+  <rect x="24" y="24" width="1152" height="582" rx="16" class="border"/>
+
+  <!-- Left Side: Project Identity & Typography -->
+  <g transform="translate(80, 80)">
+    <!-- Badge -->
+    <rect x="0" y="0" width="230" height="34" rx="17" class="badge-bg"/>
+    <circle cx="18" cy="17" r="4" class="tag"/>
+    <text x="32" y="22" class="mono badge-text">Open Source • Node.js 24+</text>
+
+    <!-- Brand Header -->
+    <g transform="translate(0, 70)">
+      <!-- Logo Mark -->
+      <rect x="0" y="0" width="48" height="48" rx="10" fill="#ffffff"/>
+      <path d="M24 10 L38 18 L38 30 L24 38 L10 30 L10 18 Z" fill="none" stroke="#09090b" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="24" cy="24" r="4.5" fill="#09090b"/>
+      <text x="64" y="34" class="title" font-size="34">SIS</text>
+      <text x="135" y="34" class="subtitle mono" font-size="16">v0.1.0</text>
+    </g>
+
+    <!-- Main Headline -->
+    <text x="0" y="195" class="title" font-size="52">Find the edge cases</text>
+    <text x="0" y="255" class="title" font-size="52">you forgot to test.</text>
+
+    <!-- Subtitle -->
+    <text x="0" y="315" class="subtitle" font-size="20">
+      Runtime verification for Next.js Server Actions &amp;
+    </text>
+    <text x="0" y="345" class="subtitle" font-size="20">
+      React Server Component boundaries.
+    </text>
+
+    <!-- CLI Pill -->
+    <g transform="translate(0, 395)">
+      <rect x="0" y="0" width="440" height="52" rx="10" fill="#141417" stroke="#27272a" stroke-width="1.5"/>
+      <text x="20" y="32" class="mono" font-size="18" fill="#71717a">$</text>
+      <text x="40" y="32" class="mono" font-size="18" font-weight="600" fill="#ffffff">npx @aashirzayd/sis audit .</text>
+    </g>
+  </g>
+
+  <!-- Right Side: Mini Terminal Representation -->
+  <g transform="translate(630, 80)">
+    <rect x="0" y="0" width="490" height="470" rx="12" class="terminal-box"/>
+
+    <!-- Terminal Header Bar -->
+    <rect x="0" y="0" width="490" height="42" rx="12" fill="#18181b"/>
+    <path d="M0 30 L0 42 L490 42 L490 30 Z" fill="#18181b"/>
+    <line x1="0" y1="42" x2="490" y2="42" stroke="#27272a" stroke-width="1"/>
+
+    <!-- Window Dots -->
+    <circle cx="22" cy="21" r="5" fill="#ef4444"/>
+    <circle cx="38" cy="21" r="5" fill="#f59e0b"/>
+    <circle cx="54" cy="21" r="5" fill="#10b981"/>
+    <text x="245" y="26" class="mono" font-size="12" fill="#71717a" text-anchor="middle">sis audit — bash</text>
+
+    <!-- Terminal Body Output -->
+    <g transform="translate(24, 70)" class="mono" font-size="13">
+      <text x="0" y="0" class="code-cyan" font-weight="600">◇ DISCOVERY</text>
+      <text x="16" y="22" class="code-dim">Target: . (Next.js App Router)</text>
+      <text x="16" y="42" class="code-dim">Scanning 209 source files...</text>
+
+      <text x="0" y="80" class="code-cyan" font-weight="600">◆ BOUNDARY CLASSIFICATION</text>
+      <text x="16" y="102" class="code-green">✓ 53 server boundaries discovered</text>
+      <text x="16" y="122" class="code-green">✓ 203 candidate Server Actions</text>
+      <text x="16" y="142" class="code-green">✓ 78 prop boundaries mapped</text>
+
+      <text x="0" y="180" class="code-cyan" font-weight="600">◆ STATIC TAINT ANALYSIS</text>
+      <text x="16" y="202" class="code-red">✖ 16 secret leaks (SIS001)</text>
+
+      <text x="0" y="240" class="code-cyan" font-weight="600">◆ RUNTIME VERIFICATION (V8)</text>
+      <text x="16" y="262" class="code-white">✓ 2,030 payloads synthesized</text>
+      <text x="16" y="282" class="code-red">✖ 2,533 failures detected</text>
+
+      <text x="0" y="320" class="code-cyan" font-weight="600">◆ FAILURE SHRINKING</text>
+      <text x="16" y="342" class="code-green">✓ Reduced to minimal reproducers</text>
+
+      <!-- Divider -->
+      <line x1="0" y1="362" x2="442" y2="362" stroke="#27272a" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="0" y="386" class="code-red" font-weight="700">✖ SIS found 2560 verified findings</text>
+    </g>
+  </g>
+</svg>

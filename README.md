@@ -9,9 +9,14 @@ SIS is a zero-configuration analysis and speculative fuzzing tool for modern Nex
 [![npm package](https://img.shields.io/badge/npm-%40aashirzayd%2Fsis-blue.svg)](https://github.com/AashirZayd/sis)
 [![node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-227%20passed-success.svg)](test/)
+[![tests](https://img.shields.io/badge/tests-232%20passed-success.svg)](test/)
 
-[Website](https://aashirzayd.github.io/sis/) · [Get Started](#installation) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
+[Website](https://aashirzayd.github.io/sis/) · [Guides](docs/server-actions-testing.md) · [FAQ](docs/faq.md) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
+
+```bash
+# Verify Server Actions and RSC boundaries across your Next.js project
+npx @aashirzayd/sis audit .
+```
 
 ---
 
@@ -27,6 +32,16 @@ Modern Next.js applications split application logic across Server Components, Cl
 - **Nested Destructuring Failures**: Complex parameter unpacking failing violently when encountering empty objects or scalar values.
 
 Traditional testing validates developer-written examples. **SIS asks:** *What happens when the boundary receives something you did not think to test?*
+
+---
+
+## Use Cases
+
+- **Server Action Input Hardening**: Automatically fuzz public Server Action network endpoints with boundary-directed adversarial inputs (nullish values, prototype pollution keys, numeric extremes, and deep nesting).
+- **React Flight Serializability Audits**: Detect non-transferable closures, custom class instances, and unregistered symbols before they trigger runtime React Flight transfer errors in production (`SIS002`).
+- **Secret Taint & Leak Prevention**: Statically trace multi-hop call graphs from sensitive environment variables (`*_SECRET`, `*_KEY`, `DATABASE_URL`) to Client Component JSX sinks (`SIS001`).
+- **CI/CD Quality Gates & Security Scanning**: Run deterministic audits in GitHub Actions or GitLab CI with native OASIS SARIF 2.1.0 output uploaded directly to GitHub Code Scanning.
+- **Regression Testing with Minimal Repro**: Automatically reduce complex failing fuzz payloads to minimal, human-readable reproducers using delta-debugging.
 
 ---
 
@@ -84,6 +99,33 @@ flowchart TD
 | **SIS** | Unifies boundary discovery, taint, fuzzing, and shrinking | Delivers verified, minimal reproducers for edge cases developers miss. |
 
 > SIS does not replace your test suite or linter. It complements them by exploring boundary behaviors beyond your happy paths.
+
+---
+
+## Alternatives & Complementary Tools
+
+SIS is not an all-in-one testing framework; it is a specialized boundary verification engine designed to complement your existing developer stack:
+
+| Tool Category | Examples | Role & Relationship to SIS |
+| :--- | :--- | :--- |
+| **Unit & Component Testing** | Vitest, Jest, React Testing Library | **Complementary**. Vitest and Jest verify anticipated business logic and known happy paths. SIS complements them by exploring unanticipated boundary inputs and invariant breaks without manual test authoring. |
+| **End-to-End (E2E) Testing** | Playwright, Cypress | **Complementary**. E2E frameworks verify complete full-stack user journeys in real browsers. SIS focuses strictly on the Server/Client module boundary and Server Action RPC surface in zero-privilege V8 isolates. |
+| **Linters & Type Checkers** | ESLint, TypeScript | **Complementary**. TypeScript guarantees compile-time types across trusted internal code, but cannot prevent untrusted network payloads from reaching runtime Server Actions. SIS verifies runtime behavior against adversarial inputs. |
+| **Generic Property-Based Fuzzers** | fast-check, jsverify | **Foundation**. SIS utilizes `fast-check` internally for primitive generation, but adds SWC AST parsing, Next.js boundary discovery, React Flight contract validation, isolated V8 execution sandboxing, and delta-debugging shrinking. |
+
+---
+
+## Documentation & In-Depth Guides
+
+Explore authoritative deep dives on Next.js boundary security, architecture, and verification:
+
+- [**Next.js Server Actions Testing Guide**](docs/server-actions-testing.md): Why unit tests miss boundary hazards, prototype pollution, destructuring traps, and how to verify action handlers.
+- [**React Flight Serialization Hazards**](docs/serialization-boundaries.md): The React Flight wire protocol vs `JSON.stringify`, non-transferable closures, class instances, and `SIS002` diagnostics.
+- [**Adversarial Invariant Synthesis & Fuzzing**](docs/adversarial-testing.md): Speculative shape inference, `fast-check` mutation strategies, zero-privilege V8 execution, and delta-debugging failure shrinking.
+- [**Static Secret Taint Analysis**](docs/taint-analysis.md): Interprocedural data-flow tracing from sensitive environment variables to Client Component JSX sinks (`SIS001`).
+- [**CI/CD Automation & SARIF Guide**](docs/ci-sarif.md): Integrating SIS into GitHub Actions Code Scanning, SARIF 2.1.0 ingestion, and exit code contracts.
+- [**Frequently Asked Questions (FAQ)**](docs/faq.md): Direct answers on architecture, testing methodology, Server Actions vs Functions, and runtime constraints.
+- [**Architecture Specification**](docs/architecture.md): Formal design specification of the 8-stage verification pipeline and boundary models.
 
 ---
 
