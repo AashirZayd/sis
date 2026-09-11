@@ -1,8 +1,8 @@
 # SIS Real-World Benchmark Report
 
-Generated: 2026-09-11T18:52:05.571Z  
+Generated: 2026-09-11T19:44:10.403Z  
 Corpus Version: `1.0.0`  
-SIS Engine: `@aashirzayd/sis@0.1.0` (`14501ad`)
+SIS Engine: `@aashirzayd/sis@0.1.0` (`aee77fd`)
 
 ---
 
@@ -23,12 +23,12 @@ SIS Engine: `@aashirzayd/sis@0.1.0` (`14501ad`)
 
 | Repository | Pinned Commit | Status | Files (Analyzed/Total) | Boundaries | Actions | Sandbox Compatible | Findings (T / S / E / TO) | Errors | Wall Time |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| [**shadcn-ui/taxonomy**](https://github.com/shadcn-ui/taxonomy) | [`298a885`](https://github.com/shadcn-ui/taxonomy/tree/298a8857c7128a0d121e7f699dfd729f23b3966d) | ✓ Completed | 127/248 | 48 | 0 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 4.07s |
-| [**leerob/site**](https://github.com/leerob/site) | [`fd03371`](https://github.com/leerob/site/tree/fd03371e3c90481a8447904e1b548e4c0327b7db) | ✓ Completed | 4/21 | 0 | 0 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 2.36s |
-| [**vercel/commerce**](https://github.com/vercel/commerce) | [`3761e52`](https://github.com/vercel/commerce/tree/3761e52e60df9c6a316e067dbfd7032e494d3634) | ✓ Completed | 65/101 | 17 | 5 | 0 | 9 (T:0 / S:0 / E:9 / TO:0) | 0 | 2.57s |
-| [**dubinc/dub**](https://github.com/dubinc/dub) | [`b8866f4`](https://github.com/dubinc/dub/tree/b8866f413cec065438d6e5faabbd9dac7d1ceea5) | ✓ Completed | 3421/4670 | 1587 | 11 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 29.82s |
-| [**mickasmt/next-saas-stripe-starter**](https://github.com/mickasmt/next-saas-stripe-starter) | [`a78d130`](https://github.com/mickasmt/next-saas-stripe-starter/tree/a78d130af7e04d0250d65c67f217976f7eb3adc2) | ✓ Completed | 187/322 | 78 | 4 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 8.43s |
-| **Total (5 repos)** | — | **5/5 pass** | **3804/5362** | **1730** | **20** | **0** | **9 (T:0 / S:0 / E:9 / TO:0)** | **0** | **47.26s** |
+| [**shadcn-ui/taxonomy**](https://github.com/shadcn-ui/taxonomy) | [`298a885`](https://github.com/shadcn-ui/taxonomy/tree/298a8857c7128a0d121e7f699dfd729f23b3966d) | ✓ Completed | 127/248 | 48 | 0 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 4.60s |
+| [**leerob/site**](https://github.com/leerob/site) | [`fd03371`](https://github.com/leerob/site/tree/fd03371e3c90481a8447904e1b548e4c0327b7db) | ✓ Completed | 4/21 | 0 | 0 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 1.97s |
+| [**vercel/commerce**](https://github.com/vercel/commerce) | [`3761e52`](https://github.com/vercel/commerce/tree/3761e52e60df9c6a316e067dbfd7032e494d3634) | ✓ Completed | 65/101 | 17 | 5 | 0 | 9 (T:0 / S:0 / E:9 / TO:0) | 0 | 2.43s |
+| [**dubinc/dub**](https://github.com/dubinc/dub) | [`b8866f4`](https://github.com/dubinc/dub/tree/b8866f413cec065438d6e5faabbd9dac7d1ceea5) | ✓ Completed | 3421/4670 | 1587 | 11 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 21.76s |
+| [**mickasmt/next-saas-stripe-starter**](https://github.com/mickasmt/next-saas-stripe-starter) | [`a78d130`](https://github.com/mickasmt/next-saas-stripe-starter/tree/a78d130af7e04d0250d65c67f217976f7eb3adc2) | ✓ Completed | 187/322 | 78 | 4 | 0 | 0 (T:0 / S:0 / E:0 / TO:0) | 0 | 4.21s |
+| **Total (5 repos)** | — | **5/5 pass** | **3804/5362** | **1730** | **20** | **0** | **9 (T:0 / S:0 / E:9 / TO:0)** | **0** | **34.96s** |
 
 > **Legend**: **T** = Static Taint Violations (`SIS001`), **S** = React Flight Serialization Violations (`SIS002`), **E** = Runtime Exceptions (`SIS003`), **TO** = Execution Timeouts (`SIS004`).
 
