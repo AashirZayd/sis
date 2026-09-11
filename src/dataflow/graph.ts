@@ -29,8 +29,14 @@ export function buildModuleGraph(
   const modules = new Map<string, ModuleNode>();
 
   for (const [filePath, parsed] of parsedModules.entries()) {
-    const isClientBoundary = parsed.boundaries.some((b) => b.type === "client");
-    const isServerBoundary = parsed.boundaries.some((b) => b.type === "server");
+    const isClientBoundary =
+      parsed.boundaries.some((b) => b.type === "client") ||
+      parsed.boundaryClassification?.kind === "client-component";
+    const isServerBoundary =
+      parsed.boundaries.some((b) => b.type === "server") ||
+      parsed.boundaryClassification?.kind === "server-component" ||
+      parsed.boundaryClassification?.kind === "server-action" ||
+      parsed.boundaryClassification?.kind === "route-handler";
 
     const imports = new Map<string, ImportBinding>();
     const exports = new Map<string, ExportBinding>();
@@ -43,6 +49,7 @@ export function buildModuleGraph(
       locator: parsed.locator,
       isClientBoundary,
       isServerBoundary,
+      boundaryClassification: parsed.boundaryClassification,
       imports,
       exports,
       functions,

@@ -86,7 +86,9 @@ export class AuditEngine {
     }
 
     // Phase 3: Static Taint Analysis
-    const isClientBoundary = parsed.boundaries.some((b) => b.type === "client");
+    const isClientBoundary =
+      parsed.boundaries.some((b) => b.type === "client") ||
+      parsed.boundaryClassification?.kind === "client-component";
     const taintResult = analyzeTaint(
       parsed.ast,
       { file: target, isClientBoundary },
@@ -322,6 +324,7 @@ export class AuditEngine {
   ): Promise<AuditResult> {
     const discovery = await discoverFiles(resolvedPath, {
       ignore: this.options.ignore,
+      excludeTests: this.options.excludeTests,
     });
 
     const displayTarget = toPosixPath(path.relative(process.cwd(), resolvedPath)) || target;
@@ -399,7 +402,9 @@ export class AuditEngine {
         allActions.push(...parsed.actions);
 
         // Static taint analysis
-        const isClientBoundary = parsed.boundaries.some((b) => b.type === "client");
+        const isClientBoundary =
+          parsed.boundaries.some((b) => b.type === "client") ||
+          parsed.boundaryClassification?.kind === "client-component";
         const taintResult = analyzeTaint(
           parsed.ast,
           { file: file.relativePath, isClientBoundary },

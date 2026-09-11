@@ -4,10 +4,22 @@ export type BoundaryKind =
   | "client-module"
   | "server-module"
   | "server-component"
+  | "client-component"
   | "server-action"
+  | "route-handler"
   | "server-function"
   | "candidate-server-function"
-  | "server-to-client-props";
+  | "server-to-client-props"
+  | "unknown";
+
+export type BoundaryConfidence = "HIGH" | "MEDIUM" | "LOW" | "UNKNOWN";
+
+export interface BoundaryClassification {
+  kind: BoundaryKind;
+  confidence: BoundaryConfidence;
+  evidence: string[];
+  reason: string;
+}
 
 export interface SourceLocation {
   file: string;
@@ -18,13 +30,18 @@ export interface SourceLocation {
 export interface Boundary {
   type: BoundaryType;
   kind?: BoundaryKind;
+  classification?: BoundaryClassification;
   location: SourceLocation;
   name?: string;
   metadata?: Record<string, unknown>;
 }
 
 export type ServerActionConfidence = "definite" | "candidate" | "ordinary";
-export type ExecutionCompatibility = "sandbox-compatible" | "static-only";
+export type ExecutionCompatibility =
+  | "sandbox-compatible"
+  | "static-only"
+  | "unsupported-runtime"
+  | "unknown";
 
 export interface ServerAction {
   name: string;
@@ -134,6 +151,7 @@ export interface AuditOptions {
   ignore?: string[];
   format?: OutputFormat;
   maxAnalysisDepth?: number;
+  excludeTests?: boolean;
   debug?: boolean;
   silent?: boolean;
 }

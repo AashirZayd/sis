@@ -37,7 +37,7 @@ describe("Payload Arbitraries - Category Coverage", () => {
   });
 
   it("generates empty primitives, arrays, and objects", () => {
-    const samples = fc.sample(emptyArbitrary, { numRuns: 50 });
+    const samples = fc.sample(emptyArbitrary, { numRuns: 100, seed: 42 });
     const values = samples.map((s) => s.value);
     expect(values.some((v) => v === "")).toBe(true);
     expect(values.some((v) => Array.isArray(v) && v.length === 0)).toBe(true);

@@ -7,15 +7,27 @@ import type {
   ExportNamedDeclaration,
   ExportDefaultDeclaration,
 } from "@swc/core";
-import type { Boundary, ServerAction, SourceLocation } from "../core/types.js";
+import type {
+  Boundary,
+  BoundaryClassification,
+  ServerAction,
+  SourceLocation,
+} from "../core/types.js";
 import type { SourceMapLocator } from "../parser/location.js";
 import { hasFunctionLevelServerDirective } from "./serializability.js";
+import {
+  classifyBoundary,
+  isRouteHandlerPath,
+  isRouteHandlerMethod,
+} from "./classifier.js";
 
 export interface ExtendedBoundaryResult {
   boundaries: Boundary[];
   actions: ServerAction[];
   isClientModule: boolean;
   isServerModule: boolean;
+  isRouteHandler?: boolean;
+  classification?: BoundaryClassification;
 }
 
 /**
@@ -27,6 +39,8 @@ export class NextBoundaryVisitor {
   private readonly actions: ServerAction[] = [];
   private isClientModule = false;
   private isServerModule = false;
+  private isRouteHandler = false;
+  private classification?: BoundaryClassification;
 
   constructor(
     private readonly file: string,
@@ -36,10 +50,32 @@ export class NextBoundaryVisitor {
   visit(module: Module): ExtendedBoundaryResult {
     this.extractModuleDirectives(module.body);
 
+    const classification = classifyBoundary(this.file, module);
+    this.classification = classification;
+
     if (this.isClientModule) {
       this.boundaries.push({
         type: "client",
         kind: "client-module",
+        classification,
+        location: this.locator.getLocation(module.span.start),
+        name: this.file,
+      });
+    } else if (classification.kind === "client-component") {
+      this.isClientModule = true;
+      this.boundaries.push({
+        type: "client",
+        kind: "client-component",
+        classification,
+        location: this.locator.getLocation(module.span.start),
+        name: this.file,
+      });
+    } else if (classification.kind === "route-handler" || isRouteHandlerPath(this.file)) {
+      this.isRouteHandler = true;
+      this.boundaries.push({
+        type: "server",
+        kind: "route-handler",
+        classification,
         location: this.locator.getLocation(module.span.start),
         name: this.file,
       });
@@ -47,14 +83,15 @@ export class NextBoundaryVisitor {
       this.boundaries.push({
         type: "server",
         kind: "server-module",
+        classification,
         location: this.locator.getLocation(module.span.start),
         name: this.file,
       });
     } else {
-      // Default App Router component
       this.boundaries.push({
         type: "server",
-        kind: "server-component",
+        kind: classification.kind === "unknown" ? "server-component" : classification.kind,
+        classification,
         location: this.locator.getLocation(module.span.start),
         name: this.file,
       });
@@ -67,6 +104,8 @@ export class NextBoundaryVisitor {
       actions: this.actions,
       isClientModule: this.isClientModule,
       isServerModule: this.isServerModule,
+      isRouteHandler: this.isRouteHandler,
+      classification: this.classification,
     };
   }
 
@@ -160,7 +199,15 @@ export class NextBoundaryVisitor {
         location: loc,
         name,
       });
-    } else if (!this.isClientModule && isExported && fn.async) {
+    } else if (this.isRouteHandler && isExported && isRouteHandlerMethod(name)) {
+      this.boundaries.push({
+        type: "server",
+        kind: "route-handler",
+        location: loc,
+        name,
+        classification: this.classification,
+      });
+    } else if (!this.isClientModule && !this.isRouteHandler && isExported && fn.async) {
       // Async export in server file without "use server" - candidate
       this.actions.push({
         name,
@@ -230,7 +277,15 @@ export class NextBoundaryVisitor {
               location: loc,
               name,
             });
-          } else if (!this.isClientModule && isExported && init.async) {
+          } else if (this.isRouteHandler && isExported && isRouteHandlerMethod(name)) {
+            this.boundaries.push({
+              type: "server",
+              kind: "route-handler",
+              location: loc,
+              name,
+              classification: this.classification,
+            });
+          } else if (!this.isClientModule && !this.isRouteHandler && isExported && init.async) {
             this.actions.push({
               name,
               location: loc,
@@ -260,6 +315,22 @@ export class NextBoundaryVisitor {
             isInlineDirective: false,
             executionCompatibility: "sandbox-compatible",
           });
+        }
+      }
+    } else if (this.isRouteHandler) {
+      for (const spec of decl.specifiers) {
+        if (spec.type === "ExportSpecifier") {
+          const name = spec.exported ? spec.exported.value : spec.orig.value;
+          if (isRouteHandlerMethod(name)) {
+            const loc = this.locator.getLocation(spec.span.start);
+            this.boundaries.push({
+              type: "server",
+              kind: "route-handler",
+              location: loc,
+              name,
+              classification: this.classification,
+            });
+          }
         }
       }
     }

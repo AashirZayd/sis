@@ -1,0 +1,56 @@
+name: SIS Benchmark Suite
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Target repository from corpus (or 'all')"
+        required: false
+        default: "all"
+      runs:
+        description: "Fuzz runs per candidate action"
+        required: false
+        default: "10"
+      seed:
+        description: "Base random seed"
+        required: false
+        default: "42"
+  schedule:
+    # Run weekly on Mondays at 03:00 UTC
+    - cron: "0 3 * * 1"
+
+jobs:
+  benchmark:
+    name: Run Benchmark Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout SIS
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build SIS
+        run: npm run build
+
+      - name: Run Benchmark Orchestrator
+        run: |
+          if [ "${{ github.event.inputs.repo }}" != "" ] && [ "${{ github.event.inputs.repo }}" != "all" ]; then
+            npm run benchmark -- --repo "${{ github.event.inputs.repo }}" --runs "${{ github.event.inputs.runs || '10' }}" --seed "${{ github.event.inputs.seed || '42' }}"
+          else
+            npm run benchmark -- --all --runs "${{ github.event.inputs.runs || '10' }}" --seed "${{ github.event.inputs.seed || '42' }}"
+          fi
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmarks/results/
+          retention-days: 30

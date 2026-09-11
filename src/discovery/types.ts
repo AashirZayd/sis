@@ -11,7 +11,17 @@ export interface DiscoveryOptions {
    * List of supported file extensions (with leading dot).
    * Default: ['.ts', '.tsx', '.js', '.jsx']
    */
+  /**
+   * List of supported file extensions (with leading dot).
+   * Default: ['.ts', '.tsx', '.js', '.jsx']
+   */
   supportedExtensions?: string[];
+
+  /**
+   * Whether to exclude test infrastructure and test files.
+   * Default: true
+   */
+  excludeTests?: boolean;
 }
 
 /**

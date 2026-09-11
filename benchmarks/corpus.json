@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "description": "Curated benchmark corpus of pinned, public open-source Next.js applications with App Router, Server Actions, and React Server Component boundaries.",
+  "repositories": [
+    {
+      "name": "shadcn-ui/taxonomy",
+      "url": "https://github.com/shadcn-ui/taxonomy.git",
+      "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+      "description": "An open-source Next.js 13/14 App Router reference application with Server Components, Route Handlers, and Server Actions.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^13.4.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Provides standard Next.js App Router idioms, contentlayer markdown pipelines, and server actions."
+    },
+    {
+      "name": "leerob/site",
+      "url": "https://github.com/leerob/site.git",
+      "commit": "fd03371e3c90481a8447904e1b548e4c0327b7db",
+      "description": "Lee Robinson's personal portfolio and blog built with Next.js App Router, Server Actions, Postgres, and RSC.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^15.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "postgres"
+      },
+      "notes": "High-fidelity production site by VP of DevRel with pure App Router patterns, guestbook Server Actions, and Postgres queries."
+    },
+    {
+      "name": "vercel/commerce",
+      "url": "https://github.com/vercel/commerce.git",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "description": "Vercel's official Next.js Commerce architecture template with App Router, Server Actions for cart management, and dynamic RSC.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^15.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      },
+      "notes": "Official modern Next.js commerce template exercising Shopify integration, cookie management, and cart Server Actions."
+    },
+    {
+      "name": "dubinc/dub",
+      "url": "https://github.com/dubinc/dub.git",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "description": "Open-source link management platform with multi-tenant App Router, Server Actions, complex Zod validation, and Prisma ORM.",
+      "targetDir": "apps/web",
+      "framework": {
+        "nextVersion": "^14.2.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma"
+      },
+      "notes": "Large-scale real-world production application with sophisticated Server Action argument schemas, authentication, and multi-tenancy."
+    },
+    {
+      "name": "mickasmt/next-saas-stripe-starter",
+      "url": "https://github.com/mickasmt/next-saas-stripe-starter.git",
+      "commit": "a78d130af7e04d0250d65c67f217976f7eb3adc2",
+      "description": "Open-source SaaS starter featuring Next.js App Router, Server Actions for account management and Stripe billing, and Prisma.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^14.2.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Representative production SaaS foundation with Stripe webhooks, user settings Server Actions, and auth guards."
+    }
+  ]
+}

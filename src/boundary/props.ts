@@ -32,7 +32,7 @@ export function analyzePropBoundaries(graph: ModuleGraph): PropAnalysisResult {
 
   for (const node of graph.modules.values()) {
     // Only Server Components render Client Components across boundaries
-    if (node.isClientBoundary) {
+    if (node.isClientBoundary || node.boundaryClassification?.kind === "client-component") {
       continue;
     }
 
@@ -41,7 +41,11 @@ export function analyzePropBoundaries(graph: ModuleGraph): PropAnalysisResult {
     for (const [localName, binding] of node.imports.entries()) {
       if (binding.resolvedModule) {
         const importedNode = graph.modules.get(binding.resolvedModule);
-        if (importedNode && importedNode.isClientBoundary) {
+        if (
+          importedNode &&
+          (importedNode.isClientBoundary ||
+            importedNode.boundaryClassification?.kind === "client-component")
+        ) {
           clientImports.set(localName, binding.resolvedModule);
         }
       }

@@ -4,6 +4,7 @@ import type { DiscoveryOptions, DiscoveryResult, DiscoveredFile } from "./types.
 import {
   shouldIgnoreDirectory,
   isSupportedSourceFile,
+  isTestPath,
   toPosixPath,
 } from "./filters.js";
 
@@ -16,6 +17,7 @@ export async function discoverFiles(
   options: DiscoveryOptions = {}
 ): Promise<DiscoveryResult> {
   const baseDirectory = path.resolve(process.cwd(), targetDir);
+  const excludeTests = options.excludeTests !== false;
 
   if (!fs.existsSync(baseDirectory)) {
     return {
@@ -30,7 +32,7 @@ export async function discoverFiles(
   if (!stat.isDirectory()) {
     // If target is a single file, return it directly if supported
     const filename = path.basename(baseDirectory);
-    if (isSupportedSourceFile(filename, options.supportedExtensions)) {
+    if (isSupportedSourceFile(filename, options.supportedExtensions, false)) {
       const ext = path.extname(filename).toLowerCase();
       const relativePath = toPosixPath(path.relative(process.cwd(), baseDirectory));
       return {
@@ -83,14 +85,18 @@ export async function discoverFiles(
       const fullPath = path.join(currentDir, entry.name);
 
       if (entry.isDirectory()) {
-        if (shouldIgnoreDirectory(entry.name, options.ignore)) {
+        if (shouldIgnoreDirectory(entry.name, options.ignore, excludeTests)) {
           skippedCount++;
           continue;
         }
         await walk(fullPath);
       } else if (entry.isFile()) {
-        if (isSupportedSourceFile(entry.name, options.supportedExtensions)) {
+        if (isSupportedSourceFile(entry.name, options.supportedExtensions, excludeTests)) {
           const relativePath = toPosixPath(path.relative(baseDirectory, fullPath));
+          if (excludeTests && isTestPath(relativePath)) {
+            skippedCount++;
+            continue;
+          }
           const extension = path.extname(entry.name).toLowerCase();
           files.push({
             relativePath,
@@ -104,14 +110,18 @@ export async function discoverFiles(
         try {
           const targetStat = await fs.promises.stat(fullPath);
           if (targetStat.isDirectory()) {
-            if (shouldIgnoreDirectory(entry.name, options.ignore)) {
+            if (shouldIgnoreDirectory(entry.name, options.ignore, excludeTests)) {
               skippedCount++;
               continue;
             }
             await walk(fullPath);
           } else if (targetStat.isFile()) {
-            if (isSupportedSourceFile(entry.name, options.supportedExtensions)) {
+            if (isSupportedSourceFile(entry.name, options.supportedExtensions, excludeTests)) {
               const relativePath = toPosixPath(path.relative(baseDirectory, fullPath));
+              if (excludeTests && isTestPath(relativePath)) {
+                skippedCount++;
+                continue;
+              }
               const extension = path.extname(entry.name).toLowerCase();
               files.push({
                 relativePath,

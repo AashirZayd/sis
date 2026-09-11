@@ -9,6 +9,7 @@ import type {
 import type { Boundary, ServerAction } from "../core/types.js";
 import type { Directive, ParsedModule } from "./types.js";
 import type { SourceMapLocator } from "./location.js";
+import { classifyBoundary } from "../boundary/classifier.js";
 
 /**
  * AST visitor that analyzes SWC Program (Module) nodes to extract:
@@ -40,6 +41,41 @@ export class BoundaryVisitor {
       this.extractCandidateServerActions(module.body);
     }
 
+    const classification = classifyBoundary(this.file, module);
+
+    if (
+      classification.kind === "client-component" &&
+      !this.boundaries.some((b) => b.type === "client")
+    ) {
+      this.boundaries.push({
+        type: "client",
+        kind: "client-component",
+        classification,
+        location: this.locator.getLocation(module.span.start),
+        name: this.file,
+      });
+    } else if (
+      classification.kind === "route-handler" &&
+      !this.boundaries.some((b) => b.kind === "route-handler")
+    ) {
+      this.boundaries.push({
+        type: "server",
+        kind: "route-handler",
+        classification,
+        location: this.locator.getLocation(module.span.start),
+        name: this.file,
+      });
+    }
+
+    for (const b of this.boundaries) {
+      if (!b.classification) {
+        b.classification = classification;
+      }
+      if (!b.kind) {
+        b.kind = classification.kind;
+      }
+    }
+
     return {
       file: this.file,
       directives: this.directives,
@@ -47,6 +83,7 @@ export class BoundaryVisitor {
       actions: this.actions,
       ast: module,
       locator: this.locator,
+      boundaryClassification: classification,
     };
   }
 

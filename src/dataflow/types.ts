@@ -1,5 +1,5 @@
 import type { Module } from "@swc/core";
-import type { Finding, SourceLocation } from "../core/types.js";
+import type { BoundaryClassification, Finding, SourceLocation } from "../core/types.js";
 import type { SourceMapLocator } from "../parser/location.js";
 import type { TaintSource } from "../taint/types.js";
 
@@ -60,6 +60,7 @@ export interface ModuleNode {
   locator: SourceMapLocator;
   isClientBoundary: boolean;
   isServerBoundary: boolean;
+  boundaryClassification?: BoundaryClassification;
   imports: Map<string, ImportBinding>; // localName -> ImportBinding
   exports: Map<string, ExportBinding>; // exportedName -> ExportBinding
   functions: Map<string, FunctionSummary>; // functionName -> FunctionSummary

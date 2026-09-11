@@ -11,6 +11,7 @@ import type { ModuleGraph, ModuleNode, DataFlowShape } from "../dataflow/types.j
 import { evaluateExpressionShape, applyDestructuring } from "../dataflow/transfer.js";
 import { checkSerializability, hasFunctionLevelServerDirective } from "./serializability.js";
 import { NextBoundaryVisitor } from "./visitor.js";
+import { isRouteHandlerPath } from "./classifier.js";
 
 export interface ReturnAnalysisResult {
   findings: Finding[];
@@ -30,6 +31,15 @@ export function analyzeReturnBoundaries(graph: ModuleGraph): ReturnAnalysisResul
   let unknownReturns = 0;
 
   for (const node of graph.modules.values()) {
+    // Route Handlers communicate via HTTP request/response semantics and must NOT
+    // be evaluated under React Flight Server Action return-value serialization rules.
+    if (
+      node.boundaryClassification?.kind === "route-handler" ||
+      isRouteHandlerPath(node.filePath)
+    ) {
+      continue;
+    }
+
     const visitor = new NextBoundaryVisitor(node.filePath, node.locator);
     const boundaryRes = visitor.visit(node.ast);
 

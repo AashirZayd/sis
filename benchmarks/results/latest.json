@@ -1,0 +1,503 @@
+{
+  "metadata": {
+    "sisVersion": "0.1.0",
+    "sisCommit": "a805cfdfe8e64e95baa371571867c3bfa74ef284",
+    "nodeVersion": "v24.19.0",
+    "platform": "win32",
+    "arch": "x64",
+    "cpuModel": "12th Gen Intel(R) Core(TM) i5-12450HX",
+    "corpusVersion": "1.0.0",
+    "timestamp": "2026-09-11T15:28:13.084Z",
+    "baseSeed": 42,
+    "runs": 10,
+    "timeoutMs": 20
+  },
+  "repositories": [
+    {
+      "repository": "shadcn-ui/taxonomy",
+      "url": "https://github.com/shadcn-ui/taxonomy.git",
+      "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+      "status": "completed",
+      "filesDiscovered": 248,
+      "filesAnalyzed": 127,
+      "filesSkipped": 61,
+      "boundariesFound": 48,
+      "serverActionsFound": 0,
+      "propBoundariesFound": 0,
+      "serializabilityLeaks": 0,
+      "runtimeFailures": 0,
+      "taintViolations": 0,
+      "analysisErrors": 0,
+      "verifiedFindings": 0,
+      "runtimeCompatibleCandidates": 0,
+      "auditWallTimeMs": 3291,
+      "seed": 1487551117,
+      "findingBreakdown": {
+        "taintViolations": 0,
+        "serializationViolations": 0,
+        "runtimeExceptions": 0,
+        "timeouts": 0,
+        "invariantViolations": 0
+      },
+      "rawFindings": []
+    },
+    {
+      "repository": "leerob/site",
+      "url": "https://github.com/leerob/site.git",
+      "commit": "fd03371e3c90481a8447904e1b548e4c0327b7db",
+      "status": "completed",
+      "filesDiscovered": 21,
+      "filesAnalyzed": 4,
+      "filesSkipped": 12,
+      "boundariesFound": 0,
+      "serverActionsFound": 0,
+      "propBoundariesFound": 0,
+      "serializabilityLeaks": 0,
+      "runtimeFailures": 0,
+      "taintViolations": 0,
+      "analysisErrors": 0,
+      "verifiedFindings": 0,
+      "runtimeCompatibleCandidates": 0,
+      "auditWallTimeMs": 2109,
+      "seed": 1510897324,
+      "findingBreakdown": {
+        "taintViolations": 0,
+        "serializationViolations": 0,
+        "runtimeExceptions": 0,
+        "timeouts": 0,
+        "invariantViolations": 0
+      },
+      "rawFindings": []
+    },
+    {
+      "repository": "vercel/commerce",
+      "url": "https://github.com/vercel/commerce.git",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "status": "completed",
+      "filesDiscovered": 101,
+      "filesAnalyzed": 65,
+      "filesSkipped": 13,
+      "boundariesFound": 17,
+      "serverActionsFound": 5,
+      "propBoundariesFound": 4,
+      "serializabilityLeaks": 0,
+      "runtimeFailures": 9,
+      "taintViolations": 0,
+      "analysisErrors": 0,
+      "verifiedFindings": 9,
+      "runtimeCompatibleCandidates": 0,
+      "auditWallTimeMs": 2204,
+      "seed": 1437905706,
+      "findingBreakdown": {
+        "taintViolations": 0,
+        "serializationViolations": 0,
+        "runtimeExceptions": 9,
+        "timeouts": 0,
+        "invariantViolations": 0
+      },
+      "rawFindings": [
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "__proto__": {
+              "polluted": true
+            }
+          },
+          "payloadId": 1,
+          "category": "prototype-sensitive",
+          "payloadDescription": "prototype-sensitive: Object with own __proto__ property",
+          "executionMs": 1,
+          "wallTimeMs": 3,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "prototype-sensitive",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "__proto__": {
+              "polluted": true
+            }
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 93.9,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "a": {
+              "b": {
+                "c": {
+                  "d": {
+                    "e": {
+                      "f": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "payloadId": 3,
+          "category": "deep-nested",
+          "payloadDescription": "serialization-edge: Deeply nested object structure (>5 levels)",
+          "executionMs": 1,
+          "wallTimeMs": 2,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "serialization-edge",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "a": {
+              "b": {
+                "c": {
+                  "d": {
+                    "e": {
+                      "f": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 95.6,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": null,
+          "payloadId": 4,
+          "category": "nullish",
+          "payloadDescription": "nullability: Direct null value",
+          "executionMs": 1,
+          "wallTimeMs": 3,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "nullability",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": null,
+          "minimizedPayload": null,
+          "shrinkAttempts": 0,
+          "shrinkReduction": 0,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {},
+          "payloadId": 5,
+          "category": "empty",
+          "payloadDescription": "structural-deletion: Empty object",
+          "executionMs": 1,
+          "wallTimeMs": 2,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "structural-deletion",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {},
+          "minimizedPayload": {},
+          "shrinkAttempts": 0,
+          "shrinkReduction": 0,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "prototype": {
+              "polluted": true
+            }
+          },
+          "payloadId": 6,
+          "category": "prototype-sensitive",
+          "payloadDescription": "prototype-sensitive: Object with own prototype property",
+          "executionMs": 1,
+          "wallTimeMs": 2,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "prototype-sensitive",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "prototype": {
+              "polluted": true
+            }
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 93.9,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "connection": "postgresql://localhost:5432"
+          },
+          "payloadId": 7,
+          "category": "serialization-trap",
+          "payloadDescription": "serialization-unsupported: Database connection / server-only handle",
+          "executionMs": 1,
+          "wallTimeMs": 3,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "serialization-unsupported",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "connection": "postgresql://localhost:5432"
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 95.6,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "constructor": {
+              "prototype": {
+                "polluted": true
+              }
+            }
+          },
+          "payloadId": 8,
+          "category": "prototype-sensitive",
+          "payloadDescription": "prototype-sensitive: Object with own constructor.prototype property",
+          "executionMs": 1,
+          "wallTimeMs": 2,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "prototype-sensitive",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "constructor": {
+              "prototype": {
+                "polluted": true
+              }
+            }
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 96,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payloadId": 9,
+          "category": "nullish",
+          "payloadDescription": "nullability: Direct undefined value",
+          "executionMs": 1,
+          "wallTimeMs": 3,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "nullability",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "minimizedPayload": null,
+          "shrinkAttempts": 1,
+          "shrinkReduction": 0,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        },
+        {
+          "type": "runtime-exception",
+          "severity": "error",
+          "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+          "location": {
+            "file": "components/cart/actions.ts",
+            "line": 54,
+            "column": 23
+          },
+          "action": "updateItemQuantity",
+          "payload": {
+            "name": "user"
+          },
+          "payloadId": 10,
+          "category": "serialization-trap",
+          "payloadDescription": "serialization-unsupported: Custom class instance",
+          "executionMs": 1,
+          "wallTimeMs": 3,
+          "timeoutMs": 20,
+          "durationMs": 1,
+          "errorName": "TypeError",
+          "fuzzTarget": "server-action-argument",
+          "strategy": "serialization-unsupported",
+          "invariant": "runtime-safety",
+          "parameter": "prevState",
+          "originalPayload": {
+            "name": "user"
+          },
+          "minimizedPayload": {},
+          "shrinkAttempts": 1,
+          "shrinkReduction": 87.5,
+          "minimalReproducerVerified": true,
+          "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined."
+        }
+      ]
+    },
+    {
+      "repository": "dubinc/dub",
+      "url": "https://github.com/dubinc/dub.git",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "status": "completed",
+      "filesDiscovered": 4670,
+      "filesAnalyzed": 3421,
+      "filesSkipped": 105,
+      "boundariesFound": 1587,
+      "serverActionsFound": 11,
+      "propBoundariesFound": 76,
+      "serializabilityLeaks": 0,
+      "runtimeFailures": 0,
+      "taintViolations": 0,
+      "analysisErrors": 0,
+      "verifiedFindings": 0,
+      "runtimeCompatibleCandidates": 0,
+      "auditWallTimeMs": 18698,
+      "seed": 836368802,
+      "findingBreakdown": {
+        "taintViolations": 0,
+        "serializationViolations": 0,
+        "runtimeExceptions": 0,
+        "timeouts": 0,
+        "invariantViolations": 0
+      },
+      "rawFindings": []
+    },
+    {
+      "repository": "mickasmt/next-saas-stripe-starter",
+      "url": "https://github.com/mickasmt/next-saas-stripe-starter.git",
+      "commit": "a78d130af7e04d0250d65c67f217976f7eb3adc2",
+      "status": "completed",
+      "filesDiscovered": 322,
+      "filesAnalyzed": 187,
+      "filesSkipped": 65,
+      "boundariesFound": 78,
+      "serverActionsFound": 4,
+      "propBoundariesFound": 0,
+      "serializabilityLeaks": 0,
+      "runtimeFailures": 0,
+      "taintViolations": 0,
+      "analysisErrors": 0,
+      "verifiedFindings": 0,
+      "runtimeCompatibleCandidates": 0,
+      "auditWallTimeMs": 3442,
+      "seed": 1190668563,
+      "findingBreakdown": {
+        "taintViolations": 0,
+        "serializationViolations": 0,
+        "runtimeExceptions": 0,
+        "timeouts": 0,
+        "invariantViolations": 0
+      },
+      "rawFindings": []
+    }
+  ],
+  "aggregate": {
+    "totalRepositories": 5,
+    "successfulRepositories": 5,
+    "failedRepositories": 0,
+    "totalFilesScanned": 5362,
+    "totalFilesAnalyzed": 3804,
+    "totalBoundariesFound": 1730,
+    "totalServerActionsFound": 20,
+    "totalPropBoundariesFound": 80,
+    "totalSerializabilityLeaks": 0,
+    "totalRuntimeFailures": 9,
+    "totalTaintViolations": 0,
+    "totalAnalysisErrors": 0,
+    "totalVerifiedFindings": 9,
+    "totalRuntimeCompatibleCandidates": 0,
+    "totalWallTimeMs": 29744
+  }
+}

@@ -35,6 +35,7 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
+    "benchmark": "node benchmarks/run.ts",
     "prepack": "npm run build"
   },
   "keywords": [

@@ -1,5 +1,5 @@
 import type { Module } from "@swc/core";
-import type { Boundary, ServerAction, SourceLocation } from "../core/types.js";
+import type { Boundary, BoundaryClassification, ServerAction, SourceLocation } from "../core/types.js";
 import type { SourceMapLocator } from "./location.js";
 
 export type DirectiveKind = "use-client" | "use-server";
@@ -22,4 +22,5 @@ export interface ParsedModule {
   actions: ServerAction[];
   ast: Module;
   locator: SourceMapLocator;
+  boundaryClassification?: BoundaryClassification;
 }

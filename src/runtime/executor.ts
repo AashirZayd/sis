@@ -108,10 +108,10 @@ export function extractCandidateFunction(
     return null;
   }
 
-  // Ensure candidate is sandbox-compatible (does not reference missing host globals)
-  const compat = isActionSandboxCompatible(targetItem);
+  // Ensure candidate is sandbox-compatible (does not reference missing host globals or external cloud SDKs)
+  const compat = isActionSandboxCompatible(targetItem, parsed.ast);
   if (!compat.compatible) {
-    action.executionCompatibility = "static-only";
+    action.executionCompatibility = compat.classification;
     return null;
   }
 
@@ -123,11 +123,6 @@ export function extractCandidateFunction(
       body: [targetItem],
       interpreter: parsed.ast.interpreter,
     };
-    const compat = isActionSandboxCompatible(targetItem);
-    if (!compat.compatible) {
-      action.executionCompatibility = "static-only";
-      return null;
-    }
 
     const printed = swc.printSync(miniModule);
 

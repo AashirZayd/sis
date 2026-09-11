@@ -80,4 +80,60 @@ describe("Documentation & Repository Integrity", () => {
     expect(readme).not.toMatch(/\bfully\s+compatible\s+with\s+all\b/i);
     expect(readme).not.toMatch(/\bprovides\s+a\s+mathematical\s+proof\b/i);
   });
+
+  it("docs/benchmark.md exists and contains empirical evaluation sections", () => {
+    const benchPath = path.join(root, "docs", "benchmark.md");
+    expect(fs.existsSync(benchPath)).toBe(true);
+    const bench = fs.readFileSync(benchPath, "utf-8");
+    expect(bench).toContain("SIS Real-World Benchmark & Empirical Evaluation");
+    expect(bench).toContain("Purpose & Philosophy");
+    expect(bench).toContain("Evaluation Corpus");
+    expect(bench).toContain("Benchmark Methodology");
+    expect(bench).toContain("Multi-Phase Evolution");
+    expect(bench).toContain("Current Benchmark Results");
+    expect(bench).toContain("Ground-Truth Review Classification");
+    expect(bench).toContain("Precision & Recall Calculations");
+    expect(bench).toContain("Reproducing the Benchmark");
+    expect(bench).toContain("Evaluation Disclaimer");
+  });
+
+  it("README.md links to docs/benchmark.md and contains canonical trust callouts", () => {
+    const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
+    expect(readme).toContain("docs/benchmark.md");
+    expect(readme).toContain("43 findings reviewed. 9 confirmed true positives. 9 false positives. 24 framework artifacts. 1 unreachable test utility.");
+    expect(readme).toContain("We publish the misses, not just the hits.");
+    expect(readme).toContain("Current Pinned Benchmark Results");
+    expect(readme).toContain("Ground-Truth Evaluation & Review Store");
+  });
+
+  it("corpus repositories in benchmarks/corpus.json are present in docs", () => {
+    const corpusPath = path.join(root, "benchmarks", "corpus.json");
+    expect(fs.existsSync(corpusPath)).toBe(true);
+    const corpus = JSON.parse(fs.readFileSync(corpusPath, "utf-8"));
+    const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
+    const bench = fs.readFileSync(path.join(root, "docs", "benchmark.md"), "utf-8");
+
+    for (const repo of corpus.repositories) {
+      expect(readme).toContain(repo.name);
+      expect(bench).toContain(repo.name);
+      expect(bench).toContain(repo.commit.slice(0, 7));
+    }
+  });
+
+  it("canonical current benchmark metrics match latest.json", () => {
+    const latestPath = path.join(root, "benchmarks", "results", "latest.json");
+    expect(fs.existsSync(latestPath)).toBe(true);
+    const latest = JSON.parse(fs.readFileSync(latestPath, "utf-8"));
+
+    const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
+    const bench = fs.readFileSync(path.join(root, "docs", "benchmark.md"), "utf-8");
+
+    expect(readme).toContain(latest.aggregate.totalFilesAnalyzed.toLocaleString());
+    expect(readme).toContain(latest.aggregate.totalBoundariesFound.toLocaleString());
+    expect(readme).toContain(latest.aggregate.totalServerActionsFound.toString());
+    expect(readme).toContain(latest.aggregate.totalVerifiedFindings.toString());
+
+    expect(bench).toContain(latest.aggregate.totalFilesAnalyzed.toLocaleString());
+    expect(bench).toContain(latest.aggregate.totalBoundariesFound.toLocaleString());
+  });
 });

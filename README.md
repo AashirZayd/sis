@@ -2,21 +2,44 @@
 
 ### Speculative Invariant Synthesis
 
-> What if your Next.js app could find the edge cases you forgot to test?
+> What if your Next.js application could automatically invent the malformed inputs you forgot to test?
 
-SIS is a zero-configuration analysis and speculative fuzzing tool for modern Next.js App Router and React Server Component boundaries. It discovers Client/Server module boundaries, traces secret data flows, models React Flight serializability contracts, synthesizes targeted adversarial payloads, and dynamically verifies invariants inside an isolated V8 execution sandbox.
+SIS is **Speculative Invariant Synthesis** — autonomous runtime verification and adversarial testing for Next.js Server Actions and React Server Component boundaries.
+
+SIS statically discovers relevant boundaries and uses deterministic adversarial input generation combined with runtime verification inside zero-privilege V8 isolates where the target is compatible with the sandbox.
 
 [![npm package](https://img.shields.io/badge/npm-%40aashirzayd%2Fsis-blue.svg)](https://github.com/AashirZayd/sis)
 [![node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-232%20passed-success.svg)](test/)
+[![tests](https://img.shields.io/badge/tests-284%20passed-success.svg)](test/)
 
-[Website](https://aashirzayd.github.io/sis/) · [Guides](docs/server-actions-testing.md) · [FAQ](docs/faq.md) · [Architecture](docs/architecture.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
+[Website](https://aashirzayd.github.io/sis/) · [Benchmark Methodology](docs/benchmark.md) · [Architecture Specification](docs/architecture.md) · [Known Limitations](benchmarks/KNOWN_LIMITATIONS.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
 
 ```bash
 # Verify Server Actions and RSC boundaries across your Next.js project
 npx @aashirzayd/sis audit .
 ```
+
+---
+
+## Core Philosophy: Proof Over Suspicion
+
+Traditional linters and static analysis tools produce warnings based on pattern suspicion, often burying engineers in unverified false alarms. Generic property-based fuzzers generate untyped noise with no awareness of framework module boundaries.
+
+SIS is built on **proof over suspicion**:
+- **Static Analysis Identifies Candidates**: Discovers Server Action entry points, traces interprocedural data flows, and identifies potential secret leaks or serialization hazards.
+- **Dynamic Verification Confirms Executable Failures**: Where an action is sandbox-compatible, SIS executes candidate inputs in an isolated V8 sandbox (`isolated-vm`). An invariant failure is only confirmed when the function actively throws or violates boundary contracts at runtime.
+- **Unsupported Runtime Dependencies Are Not Treated as Application Failures**: Functions requiring external infrastructure (Next.js request cookies, headers, database connections, or cloud SDKs) are classified as `static-only` and safely bypassed by the runtime sandbox, preventing spurious crash reports.
+
+> **What SIS Is Not**:
+> - SIS is **not** a general-purpose security scanner.
+> - SIS is **not** a vulnerability scanner that guarantees security.
+> - SIS is **not** a replacement for unit, integration, or end-to-end tests.
+> - SIS is **not** a complete Next.js server runtime or React reconciler emulator.
+> - SIS is **not** a complete React Flight implementation.
+> - SIS is **not** a production exploit detector or network penetration tool.
+> - SIS is **not** an AI security tool.
+> - Passing an audit proves that tested invariants held against synthesized inputs; it does not provide a mathematical guarantee that zero latent bugs exist.
 
 ---
 
@@ -45,60 +68,82 @@ Traditional testing validates developer-written examples. **SIS asks:** *What ha
 
 ---
 
+## What SIS Finds
+
+SIS classifies boundary findings under five persistent, stable rule identifiers. **A finding represents an invariant failure or boundary contract violation; it is not automatically an exploitable security vulnerability or CVE.**
+
+| Rule ID | Name | Mode | Category | What the Output Represents & Caveats |
+| :---: | :--- | :---: | :---: | :--- |
+| **`SIS001`** | `taint-violation` | Static | Data Flow | **Private server secret flows to client boundary.** Traces sensitive server environment variables (`*_SECRET`, `*_KEY`, `*_TOKEN`) through local module call graphs to Client Components. *Caveat*: Operates over discoverable AST syntax; dynamic `eval()` or obfuscated property access cannot be tracked. |
+| **`SIS002`** | `serialization-violation` | Static | Wire Protocol | **Non-transferable value crosses React Flight boundary.** Identifies closures without `"use server"`, custom class instances, or unregistered symbols passed across Server $\to$ Client component props. *Caveat*: Modeled against React Flight protocol specifications; HTTP Route Handlers are explicitly excluded. |
+| **`SIS003`** | `runtime-exception` | Runtime | Boundary Crash | **Exported Server Action threw an unhandled runtime exception.** Triggered when synthesized adversarial inputs cause uncaught errors (e.g. `TypeError`, `RangeError`). *Caveat*: Only verified for sandbox-compatible actions in `isolated-vm`; external host dependencies trigger safe static fallback. |
+| **`SIS004`** | `timeout` | Runtime | Execution Budget | **Server Action exceeded its allocated execution budget.** Triggered when an action enters an infinite loop or exceeds its per-execution timeout (default: 20ms). *Caveat*: Bounded specifically to isolate JavaScript execution, not host audit wall time. |
+| **`SIS005`** | `invariant-violation` | Dynamic / Static | Boundary Contract | **Boundary invariant assertion violated during execution.** Custom or synthesized boundary preconditions failed. *Caveat*: Invariants reflect synthesized shape expectations and contracts. |
+
+---
+
 ## What SIS Actually Does
 
-SIS analyzes your Next.js codebase through an integrated static and dynamic verification pipeline:
+SIS analyzes your Next.js codebase through an integrated 12-stage static and dynamic verification pipeline:
 
 ```mermaid
 flowchart TD
-    Source["Source Code (*.ts, *.tsx)"] --> Scanner["Project Discovery & Scanner"]
-    Scanner --> AST["SWC AST & Directive Analysis"]
-    AST --> Boundary["Boundary Model
-(Client / Server / Props / Actions)"]
-    Boundary --> Dataflow["Interprocedural Module Graph
+    Source["Source Code (*.ts, *.tsx)"] --> Scanner["1. File Discovery & Filtering"]
+    Scanner --> AST["2. SWC AST Parsing"]
+    AST --> Boundary["3. Boundary Classification
+(Client / Server / Actions / Route Handlers)"]
+    Boundary --> Dataflow["4. Interprocedural Call Graph
 & Data-Flow Analysis"]
     Dataflow --> Taint["Static Secret Taint Tracking
 (process.env.* -> Sinks)"]
-    Boundary --> Shape["AST Shape & Signature Inference"]
-    Shape --> Fuzz["Boundary-Directed Speculative Fuzzing
-(fast-check + Specialized Mutations)"]
-    Fuzz --> Gate{"Compatibility Gate"}
-    Gate -->|"sandbox-compatible"| Sandbox["isolated-vm Zero-Privilege Sandbox
-(Enforced Execution Budget)"]
+    Boundary --> Candidates["5. Candidate Action Discovery"]
+    Candidates --> Gate{"6. Compatibility Gate"}
+    Gate -->|"sandbox-compatible"| Fuzz["7. Adversarial Payload Synthesis
+(fast-check + Domain Mutations)"]
     Gate -->|"framework-dependent"| StaticOnly["Static-Only Classification
 (Preserves Safety, Bypasses Isolate)"]
-    Sandbox -->|"Execution Error"| Shrinker["Delta-Debugging Shrinking Engine
-(Signature Preservation)"]
-    Shrinker --> Repro["Minimal Reproducible Failure"]
-    Sandbox -->|"Clean / Handled"| Findings["Finding Synthesis"]
-    Taint --> Findings
-    StaticOnly --> Findings
-    Repro --> Findings
-    Findings --> Reporter["Reporters: Terminal · JSON v1 · SARIF 2.1.0"]
+    Fuzz --> Sandbox["8. Isolated Runtime Execution
+(isolated-vm V8 Sandbox)"]
+    Sandbox -->|"Unhandled Exception"| Signature["9. Failure Signature Extraction"]
+    Signature --> Shrinker["10. Delta-Debugging Shrinking Engine
+(Preserves Failure Signature)"]
+    Shrinker --> Fingerprint["11. Deterministic Fingerprinting
+(Stable 16-Hex Hash)"]
+    Sandbox -->|"Passed / Handled"| Clean["Clean Verification"]
+    Taint --> Reporting["12. JSON / SARIF / Terminal Reporting"]
+    StaticOnly --> Reporting
+    Fingerprint --> Reporting
 ```
 
-1. **AST & Boundary Discovery**: Uses `@swc/core` to parse TypeScript and TSX, identifying `"use client"` and `"use server"` directives, exported Server Actions, and component props.
-2. **Interprocedural Data-Flow & Taint**: Constructs a local module call graph to trace sensitive environment variables across helper functions into Client boundaries.
-3. **React Flight Serializability**: Evaluates props passed to Client Components against React Flight serialization specifications.
-4. **Speculative Shape Inference**: Infers parameter shapes from TypeScript types, destructuring patterns, and property accesses.
-5. **Boundary-Directed Fuzzing**: Synthesizes adversarial payloads targeting boundary hazards using `fast-check` and targeted mutation strategies.
-6. **Isolated Runtime Verification**: Executes sandbox-compatible actions in an `isolated-vm` V8 isolate under an execution budget (default: 20ms).
-7. **Failure-Preserving Shrinking**: Automatically delta-debugs failing payloads to the smallest reproducible input that triggers the identical error signature.
-8. **Deterministic Reporting**: Formats results as actionable terminal output, Version 1 JSON, or OASIS SARIF 2.1.0.
+### The 12-Stage Pipeline
+
+1. **File Discovery**: Discovers TypeScript and JavaScript source files while respecting `.gitignore`, build directories (`.next`, `dist`), and non-production test suites (`playwright/`, `e2e/`, `__tests__/`).
+2. **AST Parsing**: Parses source trees into `@swc/core` ASTs, preserving source spans and symbol bindings.
+3. **Boundary Classification**: Classifies modules and components based on `"use client"` and `"use server"` directives, React client hook usage, and Next.js route conventions.
+4. **Interprocedural Call Graph & Data Flow**: Constructs intra-module call graphs to trace data flow through intermediate helper functions and re-exports.
+5. **Candidate Action Discovery**: Identifies exported async functions inside `"use server"` modules or functions with inline `"use server"` prologues.
+6. **Compatibility Classification**: Evaluates candidate actions against host dependencies. Functions using Next.js request context (`cookies()`, `headers()`) or external cloud SDKs are classified as `static-only`.
+7. **Adversarial Payload Synthesis**: Generates targeted boundary edge cases (nullish values, prototype keys, numeric extremes, boundary-crossing shapes) powered by `fast-check` and specialized mutators.
+8. **Isolated Runtime Execution**: Executes sandbox-compatible actions in an `isolated-vm` V8 isolate under an enforced CPU budget (default: 20ms).
+9. **Failure Signature Extraction**: When an execution fails, extracts a normalized failure signature (action name, error constructor, and message pattern).
+10. **Delta Debugging & Shrinking**: Systematically strips extraneous object properties and reduces primitive values while ensuring each intermediate candidate reproduces the identical failure signature.
+11. **Deterministic Fingerprinting**: Computes an immutable 16-character hexadecimal fingerprint using 64-bit FNV-1a hashing over repository, commit, file path, rule ID, line, and normalized failure signature.
+12. **Structured Reporting**: Emits findings formatted for interactive terminal review, machine-readable JSON Schema v1, or OASIS SARIF 2.1.0 for CI/CD ingestion.
 
 ---
 
 ## Why SIS Is Different
 
-| Approach | What It Does | SIS Difference |
-| :--- | :--- | :--- |
-| **Unit tests** | Verify developer-written examples | SIS generates boundary-directed adversarial edge cases automatically. |
-| **Generic fuzzing** | Explores arbitrary, untyped inputs | SIS targets discovered Next.js boundary contracts and inferenced shapes. |
-| **Static analysis** | Identifies suspicious syntax patterns | SIS dynamically executes and verifies sandbox-compatible candidates in an isolate. |
-| **Taint analysis** | Traces sensitive values to sinks | SIS combines interprocedural taint with React Server/Client boundary semantics. |
-| **SIS** | Unifies boundary discovery, taint, fuzzing, and shrinking | Delivers verified, minimal reproducers for edge cases developers miss. |
-
-> SIS does not replace your test suite or linter. It complements them by exploring boundary behaviors beyond your happy paths.
+| Capability | Generic Linters / SAST | Generic Property Fuzzers | SIS Approach |
+| :--- | :--- | :--- | :--- |
+| **Boundary Awareness** | Syntax pattern matching | Untyped random inputs | Understands Next.js App Router, `"use client"`, `"use server"`, and React Flight semantics. |
+| **Verification Model** | Heuristic warnings (high noise) | Generates test cases | **Proof over suspicion**: Static analysis finds candidates; runtime V8 isolate confirms crashes. |
+| **Property Generation** | None | `fast-check` / `jsverify` | Builds Next.js-aware shape inference and domain mutations directly on top of `fast-check`. |
+| **Runtime Isolation** | None (does not execute) | Host Node.js process | Zero-privilege V8 isolate (`isolated-vm`) with strict CPU timeouts and zero host system access. |
+| **Failure Reduction** | None | Generic value shrinking | Failure-preserving delta-debugging that guarantees the shrunk input reproduces the exact failure signature. |
+| **False-Positive Control** | Rule suppressions | None | **Compatibility Gate**: Cloud SDKs and request globals fall back to `static-only` rather than throwing sandbox errors. |
+| **Audit Reproducibility** | Depends on file order | Pseudo-random seeds | 32-bit FNV-1a seed derivation per file ensures identical payloads across runs under equivalent environments. |
+| **CI/CD Integration** | Proprietary formats | Raw test logs | Native OASIS SARIF 2.1.0 output uploaded directly to GitHub Code Scanning. |
 
 ---
 
@@ -125,7 +170,171 @@ Explore authoritative deep dives on Next.js boundary security, architecture, and
 - [**Static Secret Taint Analysis**](docs/taint-analysis.md): Interprocedural data-flow tracing from sensitive environment variables to Client Component JSX sinks (`SIS001`).
 - [**CI/CD Automation & SARIF Guide**](docs/ci-sarif.md): Integrating SIS into GitHub Actions Code Scanning, SARIF 2.1.0 ingestion, and exit code contracts.
 - [**Frequently Asked Questions (FAQ)**](docs/faq.md): Direct answers on architecture, testing methodology, Server Actions vs Functions, and runtime constraints.
-- [**Architecture Specification**](docs/architecture.md): Formal design specification of the 8-stage verification pipeline and boundary models.
+- [**Architecture Specification**](docs/architecture.md): Formal design specification of the 12-stage verification pipeline and boundary models.
+- [**Benchmark & Evaluation Methodology**](docs/benchmark.md): Comprehensive empirical evaluation over 5 pinned open-source Next.js applications, ground-truth review catalog, and precision mathematics.
+
+---
+
+## Trust Model
+
+SIS structures findings across three distinct levels of evidence:
+
+```
+[Level 1: Static Evidence]
+  ↳ SWC AST inspection, interprocedural taint flow, and React Flight prop modeling.
+  ↳ Flags potential secret leaks (SIS001) or non-transferable wire props (SIS002).
+
+[Level 2: Dynamic Evidence]
+  ↳ Zero-privilege isolated-vm V8 execution under strict CPU timeout budgets.
+  ↳ Confirms that a synthesized adversarial input triggers an unhandled runtime crash (SIS003) or timeout (SIS004).
+
+[Level 3: Reproduction Evidence]
+  ↳ Delta-debugging minimizes the payload to its smallest reproducible form.
+  ↳ Computes a deterministic 16-character fingerprint reproducible via `npm run benchmark -- --reproduce <fingerprint>`.
+```
+
+> **The Core Rule of SIS Trust**:
+> A static suspicion is not equivalent to a verified runtime failure. An `isolated-vm` execution failure caused by missing host infrastructure (e.g. un-mocked database connections or cloud SDKs) is treated as a compatibility limit and classified as `static-only` — **never as an application defect**.
+
+---
+
+## Real-World Benchmark
+
+To measure real-world boundary discovery and runtime verification without marketing exaggeration, SIS is evaluated against an automated, pinned benchmark corpus of authentic open-source Next.js applications:
+
+> **43 findings reviewed. 9 confirmed true positives. 9 false positives. 24 framework artifacts. 1 unreachable test utility.**  
+> **We publish the misses, not just the hits.**
+
+For complete methodology, raw benchmark outputs, and reproduction instructions, see [**docs/benchmark.md**](docs/benchmark.md).
+
+### Pinned Evaluation Corpus
+
+The benchmark evaluates 5 authentic Next.js applications pinned at immutable Git commit SHAs:
+
+| Repository | Pinned Commit | Application Type & Architecture | Files Analyzed | Server Boundaries | Server Actions |
+| :--- | :---: | :--- | :---: | :---: | :---: |
+| [**`shadcn-ui/taxonomy`**](https://github.com/shadcn-ui/taxonomy) | [`298a885`](https://github.com/shadcn-ui/taxonomy/tree/298a8857c7128a0d121e7f699dfd729f23b3966d) | Next.js App Router reference app with Contentlayer markdown, Stripe webhooks, and Prisma ORM. | 127 | 48 | 0 |
+| [**`leerob/site`**](https://github.com/leerob/site) | [`fd03371`](https://github.com/leerob/site/tree/fd03371e3c90481a8447904e1b548e4c0327b7db) | High-fidelity personal site built by VP of DevRel with pure App Router patterns and Postgres queries. | 4 | 0 | 0 |
+| [**`vercel/commerce`**](https://github.com/vercel/commerce) | [`3761e52`](https://github.com/vercel/commerce/tree/3761e52e60df9c6a316e067dbfd7032e494d3634) | Official Vercel Next.js Commerce architecture template exercising Shopify cart Server Actions. | 65 | 17 | 5 |
+| [**`dubinc/dub`**](https://github.com/dubinc/dub) | [`b8866f4`](https://github.com/dubinc/dub/tree/b8866f413cec065438d6e5faabbd9dac7d1ceea5) | Enterprise link management platform with multi-tenant App Router, Zod schemas, and Prisma ORM. | 3,421 | 1,587 | 11 |
+| [**`mickasmt/next-saas-stripe-starter`**](https://github.com/mickasmt/next-saas-stripe-starter) | [`a78d130`](https://github.com/mickasmt/next-saas-stripe-starter/tree/a78d130af7e04d0250d65c67f217976f7eb3adc2) | Production SaaS foundation with Stripe webhooks, user settings Server Actions, and NextAuth. | 187 | 78 | 4 |
+| **Corpus Total** | — | **5 Authentic Next.js Codebases** | **3,804** | **1,730** | **20** |
+
+*Note: These five repositories serve as an evaluation corpus exercising diverse Next.js patterns. They are not a universally representative statistical sample of all Next.js applications worldwide.*
+
+---
+
+### Current Pinned Benchmark Results (Phase 24)
+
+Audited with base seed `42`, runs `10`, timeout `20ms`, Node.js `v24.19.0`, Windows `x64`:
+
+| Metric | Result |
+| :--- | :---: |
+| **Target Repositories Evaluated** | **5 / 5 Pass** |
+| **Total Source Files Discovered** | 5,362 |
+| **Production Source Files Analyzed** | 3,804 |
+| **Server Boundaries Discovered** | 1,730 |
+| **Candidate Server Actions Identified** | 20 |
+| **SIS001 (Static Secret Taint)** | 0 |
+| **SIS002 (React Flight Serialization)** | 0 |
+| **SIS003 (Runtime Exceptions)** | 9 |
+| **SIS004 (Execution Timeouts)** | 0 |
+| **SIS005 (Boundary Invariant Breaches)** | 0 |
+| **Total Verified Findings Emitted** | **9** |
+| **Internal Analysis Errors** | **0** |
+| **Total Benchmark Wall Time** | **32.20s** |
+
+---
+
+### Ground-Truth Evaluation & Review Store
+
+To establish empirical precision, every benchmark finding is recorded in an immutable, auditable review catalog ([`benchmarks/reviews/ground-truth.json`](benchmarks/reviews/ground-truth.json)) and classified by human code review against the pinned source code:
+
+| Classification | Records | Percentage | Description |
+| :--- | :---: | :---: | :--- |
+| **`TRUE_POSITIVE`** | **9** | **20.9%** | Genuine boundary robustness defects confirmed by manual inspection. |
+| **`FALSE_POSITIVE`** | **9** | **20.9%** | Precision failures identified and addressed during benchmark hardening. |
+| **`FRAMEWORK_ARTIFACT`** | **24** | **55.8%** | Sandbox execution failures caused by un-mocked cloud singletons. |
+| **`UNREACHABLE`** | **1** | **2.3%** | Non-production test utility helper scanned as production code. |
+| **`EXPECTED_BEHAVIOR`**| **0** | **0.0%** | Expected boundary rejection behavior. |
+| **`NEEDS_REVIEW`** | **0** | **0.0%** | **100% review coverage** across all 43 historical findings. |
+
+---
+
+### Benchmark Evolution: Phases 22 → 23 → 24
+
+The benchmark was not constructed to showcase artificial success. It was used as an empirical instrument to expose engine flaws and measure systematic hardening:
+
+| Evaluation Phase | Emitted Findings | True Positives | False Positives | Framework Artifacts | Active Emitted Precision | Wall Time | Main Milestone |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Phase 22 (Pilot)** | 43 | 2 (pilot sample) | 4 | 3 | 33.3% (pilot sample) | 41.10s | Benchmark exposed systematic boundary and runtime false positives. |
+| **Phase 23 (Hardened)** | 9 | 2 (pilot sample) | 0 | 0 | 100.0% (emitted) | 30.29s | Boundary classification and Compatibility Gate removed systematic noise. |
+| **Phase 24 (Comprehensive)** | 9 | **9 (all confirmed)** | 0 | 0 | **100.0% (emitted)** | 32.20s | Complete ground-truth review confirmed all active findings as genuine bugs. |
+
+---
+
+### Benchmark Precision Mathematics
+
+We report empirical precision using explicit mathematical formulations:
+
+1. **Current Emitted Benchmark Precision**:
+   $$\text{Precision}_{\text{emitted}} = \frac{TP_{\text{emitted}}}{TP_{\text{emitted}} + FP_{\text{emitted}}} = \frac{9}{9 + 0} = \mathbf{100.0\%}$$
+   *On the current pinned benchmark output, all 9 emitted findings were manually confirmed as true positives on `vercel/commerce`. This is benchmark-sample precision only and is not a universal production accuracy guarantee.*
+
+2. **Lifetime Binary Review Precision**:
+   $$\text{Precision}_{\text{lifetime}} = \frac{TP}{TP + FP} = \frac{9}{9 + 9} = \mathbf{50.0\%}$$
+   *Across the lifetime review store, 9 of 18 binary TP/FP classifications were true positives, while the remaining 25 historical records were framework artifacts or unreachable test code.*
+
+3. **Recall Is Intentionally Not Calculated**:
+   $$\text{Recall} = \frac{TP}{TP + FN}$$
+   *Recall is not calculated because the complete ground-truth denominator of all latent boundary bugs across third-party codebases is unknown. Claiming a recall percentage on third-party software without an omniscient oracle is mathematically unsound.*
+
+---
+
+### Confirmed Findings: `vercel/commerce`
+
+All 9 active benchmark findings reside in `vercel/commerce` (`components/cart/actions.ts#L54`) on the `updateItemQuantity` Server Action:
+
+```typescript
+// components/cart/actions.ts in vercel/commerce (commit 3761e52)
+'use server';
+
+export async function updateItemQuantity(
+  prevState: any,
+  payload: {
+    merchandiseId: string;
+    quantity: number;
+  }
+) {
+  const { merchandiseId, quantity } = payload; // Line 54: Unsafe destructuring
+  ...
+}
+```
+
+- **Defect Mechanism**: Declaring `"use server"` causes Next.js to expose `updateItemQuantity` as an unauthenticated public HTTP POST RPC endpoint. TypeScript types are erased at compile-time. The function unconditionally destructures `payload` outside of any runtime schema checks (e.g. Zod) or `try/catch` blocks.
+- **Observed Runtime Failure**: Invocations with empty objects (`{}`), nullish values (`null`, `undefined`), or omitted arguments trigger an unhandled `TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.`, crashing the Server Action with an HTTP 500 error.
+- **Minimized Reproductions**: Across 9 distinct fuzzing strategies (prototype mutation, numeric extremes, structural mutation, nullish primitives), delta-debugging systematically shrunk all payloads to `{}` or `null`.
+- **Deterministic Fingerprints**: `b6bbfce3dbe171b5`, `84e693a7f37f6a9b`, `0300c0d145de1a6b`, `78387966d81c3cd4`, `caac0d7e2642c4fa`, `0cc2c4b41331b1de`, `a93666a2ceea9d6e`, `e37b49b0bbe4aef3`, `2129b19876f7f31a`.
+- *Context*: This finding represents an input-validation and boundary-robustness defect, not an exploitable remote code execution vulnerability.
+
+---
+
+### What SIS Got Wrong: Discovered False Positives & Artifacts
+
+We publish our misses openly. The Phase 22 benchmark pilot exposed four systematic precision failures that were directly addressed in Phase 23:
+
+1. **Route Handler HTTP Response Semantics (`SIS002`, 6 cases)**:
+   - *Problem*: Route Handlers (`app/**/route.ts`) returning Web API `Response` or `ImageResponse` objects were evaluated under React Flight RPC serialization rules.
+   - *Resolution*: Added AST route classification (`src/boundary/classifier.ts`). Route Handlers are HTTP endpoints and are now explicitly exempted from React Flight checks.
+2. **Implicit Client Component Hook Inference (`SIS002`, 3 cases)**:
+   - *Problem*: Modal components calling React client hooks (`useRouter`, `useState`) without explicit `"use client"` string directives were misclassified as Server Components passing non-transferable callbacks.
+   - *Resolution*: Implemented AST hook inference to classify components containing client hooks as client components.
+3. **External Cloud SDK Sandbox Artifacts (`SIS003`, 24 cases)**:
+   - *Problem*: Actions importing Upstash Redis or AI SDK (`@ai-sdk/rsc`) crashed inside `isolated-vm` with `ReferenceError: redis is not defined`. These crashes reflected missing cloud infrastructure, not application bugs.
+   - *Resolution*: Hardened the Compatibility Gate to classify actions with external cloud singletons as `static-only`.
+4. **Non-Production Test Utilities (`SIS002`, 1 case)**:
+   - *Problem*: Playwright test fixture helpers (`playwright/api/fixtures.ts`) were scanned as production Server Actions.
+   - *Resolution*: Added standard test directory exclusions (`playwright/`, `e2e/`, `cypress/`, `__tests__/`).
 
 ---
 
@@ -321,7 +530,8 @@ Specifying a seed produces deterministic results across runs:
 - **Deterministic Payload Generation**: The underlying `fast-check` PRNG produces identical payloads.
 - **Reproducible Repro Payloads**: Failure signatures and minimal reproducers match across runs.
 
-*(Note: While findings and payloads are deterministic, execution timing measurements naturally vary depending on system hardware).*
+> **Careful Reproducibility Statement**:
+> Deterministic seed derivation makes generated inputs reproducible under equivalent SIS, Node.js, and execution environments. Execution timing measurements naturally vary depending on host hardware.
 
 ---
 
@@ -340,8 +550,6 @@ The `--runs` option defines the quota **per candidate target**, rather than a gl
 - **100 targets** $\times$ `--runs 100` = 10,000 synthesized payloads.
 
 This per-target allocation prevents combinatorial explosion ($O(T \cdot N)$ rather than $O(T \cdot N \cdot S)$), ensuring predictable memory and execution time across large projects.
-
-*(Example benchmark on local developer hardware: 20 targets audit in ~0.8s; 100 targets audit in ~3.5s. Exact timings depend on host machine specifications).*
 
 ---
 
@@ -539,13 +747,15 @@ jobs:
 
 ## Limitations
 
-To maintain technical precision and credibility, SIS explicitly identifies its architectural boundaries:
+To maintain technical precision and credibility, SIS explicitly identifies its architectural boundaries. For a full analysis of conservative filtering trade-offs and recall risks, see [**benchmarks/KNOWN_LIMITATIONS.md**](benchmarks/KNOWN_LIMITATIONS.md):
 
 1. **Not a Full Next.js Runtime**: SIS uses `isolated-vm` to execute JavaScript in a clean V8 isolate. It does not run a mock Next.js server, emulate the React reconciler, or provide Next.js routing infrastructure.
 2. **Static-Only for Framework Globals**: Actions requiring live Next.js request context (`cookies()`, `headers()`, `redirect()`, `notFound()`) or external database connections are classified as `static-only` and safely skipped from isolate execution.
 3. **Flight Modeling vs Bundler Emulation**: React Flight serializability is modeled against published protocol specifications; it does not invoke React's internal webpack flight client/server plugin.
 4. **Targeted Fuzzing vs Formal Proof**: Speculative invariant synthesis generates targeted boundary payloads. Passing an audit verifies that tested invariants held against synthesized inputs; it is not a mathematical proof of absolute security.
 5. **Static Taint Reach**: Static analysis operates over discoverable local module graphs. Dynamic evaluation (`eval()`, dynamically constructed `import()`, or obfuscated property access) cannot be tracked.
+6. **Conservative Filters & Recall Risks**: Test directory exclusions, Route Handler exemptions, and cloud SDK gating protect precision but introduce potential recall blind spots where un-validated logic precedes external dependencies.
+7. **Five Repositories Are Not Universal**: The benchmark corpus exercises authentic Next.js patterns, but is an evaluation corpus, not a universal sample. Findings require human engineering review.
 
 ---
 
@@ -568,7 +778,57 @@ SIS is developed in rigorous, phased milestones:
 - [x] **Phase 13 — Performance & Determinism**: Linear $O(T \cdot N)$ scaling, byte-for-byte seed reproducibility.
 - [x] **Phase 14 — CLI/UX & Error Handling Polish**: Input validation, flag aliases, signal handling.
 - [x] **Phase 15 — Documentation & GitHub Excellence**: Authoritative technical documentation, architecture specs, and curated examples.
-- [ ] **Phase 16 — Automated Invariant Remediation**: Automated boundary decorators and patch generation.
+- [x] **Phase 20 — Real-World Benchmark Infrastructure**: Automated runner over 5 pinned open-source Next.js apps.
+- [x] **Phase 21 — Finding Ground-Truth Validation**: Stable 16-hex fingerprinting and review catalog.
+- [x] **Phase 22 — Ground-Truth Review Pilot**: Discovered systematic precision failure modes via manual audit.
+- [x] **Phase 23 — Boundary Precision & Filter Hardening**: Route handler classification, hook inference, cloud SDK gating.
+- [x] **Phase 24 — Ground-Truth Expansion & Quality**: 100% review coverage across 43 lifetime benchmark records.
+- [x] **Phase 24.5 — Documentation, Benchmark Transparency & Trust**: Authoritative empirical evaluation, trust model, and transparent limitation reporting.
+- [ ] **Phase 25 — Prelude Runtime Execution**: Mock stubs and safe runtime preambles for framework globals.
+
+---
+
+## Reproducibility
+
+Anyone can reproduce the benchmark results independently:
+
+```bash
+# Clone the repository
+git clone https://github.com/AashirZayd/sis.git
+cd sis
+
+# Install dependencies and build TypeScript
+npm install
+npm run build
+
+# Run the complete 5-repository benchmark
+npm run benchmark -- --all
+
+# Inspect the ground-truth review catalog
+npm run benchmark -- --review
+
+# Reproduce a specific confirmed finding using its fingerprint
+npm run benchmark -- --reproduce b6bbfce3dbe171b5
+```
+
+> **Reproducibility Guarantee**:
+> Deterministic seed derivation makes generated inputs reproducible under equivalent SIS, Node.js, and execution environments. Target repositories are cloned ephemerally at immutable commit SHAs and findings receive stable 16-hex fingerprints.
+
+---
+
+## Open Source & Community
+
+SIS is free and open-source software under the MIT License. We believe security and verification tools should be auditable, transparent, and reproducible.
+
+- **Repository**: [github.com/AashirZayd/sis](https://github.com/AashirZayd/sis)
+- **Empirical Benchmark**: [docs/benchmark.md](docs/benchmark.md)
+- **Architecture**: [docs/architecture.md](docs/architecture.md)
+- **Known Limitations**: [benchmarks/KNOWN_LIMITATIONS.md](benchmarks/KNOWN_LIMITATIONS.md)
+- **Issue Tracker**: [github.com/AashirZayd/sis/issues](https://github.com/AashirZayd/sis/issues)
+- **NPM Package**: [@aashirzayd/sis](https://www.npmjs.com/package/@aashirzayd/sis)
+- **Landing Page**: [aashirzayd.github.io/sis](https://aashirzayd.github.io/sis/)
+
+Contributions, bug reports, and discussion on Next.js boundary contracts are welcome.
 
 ---
 
@@ -581,7 +841,7 @@ npm install
 # Build TypeScript
 npm run build
 
-# Run test suite (205 tests across 14 suites)
+# Run test suite (284 tests across 21 suites)
 npm test
 
 # Run tests in watch mode

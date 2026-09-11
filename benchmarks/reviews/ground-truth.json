@@ -1,0 +1,1193 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-09-11T15:28:43.974Z",
+  "description": "SIS Ground-Truth Benchmark Finding Reviews",
+  "reviews": [
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "app/api/og/analytics/route.tsx",
+      "line": 121,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "29e87e4da896d3bd",
+      "message": "Server Action \"GET\" returns non-serializable value: Class instance \"new ImageResponse()\" cannot be passed to a Client Component",
+      "actionName": "GET",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Next.js App Router Open Graph image Route Handler returning ImageResponse (image/png HTTP stream). Misclassified as React Flight Server Action.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "app/api/og/avatar/[[...seed]]/route.tsx",
+      "line": 27,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "b73f6de8c1a5b106",
+      "message": "Server Action \"GET\" returns non-serializable value: Class instance \"new ImageResponse()\" cannot be passed to a Client Component",
+      "actionName": "GET",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Next.js App Router Open Graph image Route Handler returning ImageResponse (Web API HTTP stream). Misclassified as React Flight Server Action in Phase 20/22; suppressed by Phase 23 Route Handler boundary classifier.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "app/api/og/program/categories/route.tsx",
+      "line": 36,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "d20d51f0b62aa1ab",
+      "message": "Server Action \"GET\" returns non-serializable value: Class instance \"new ImageResponse()\" cannot be passed to a Client Component",
+      "actionName": "GET",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Next.js App Router Open Graph image Route Handler returning ImageResponse (Web API HTTP stream). Misclassified as React Flight Server Action in Phase 20/22; suppressed by Phase 23 Route Handler boundary classifier.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "app/api/og/program/route.tsx",
+      "line": 72,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "20da1af9bd2b796c",
+      "message": "Server Action \"GET\" returns non-serializable value: Class instance \"new ImageResponse()\" cannot be passed to a Client Component",
+      "actionName": "GET",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Next.js App Router Open Graph image Route Handler returning ImageResponse (Web API HTTP stream). Misclassified as React Flight Server Action in Phase 20/22; suppressed by Phase 23 Route Handler boundary classifier.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "4f58291a683dc090",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": {},
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "prototype-sensitive",
+        "parameter": "partner",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "93.9%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "0498adc078cfc131",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": {},
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "structural-deletion",
+        "parameter": "partner",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "041dc01e271a362b",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": {},
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-edge",
+        "parameter": "partner",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "9dfd8199ba270441",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": {},
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "prototype-sensitive",
+        "parameter": "partner",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "96%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "ba9ad4d3f2e2fcec",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": "",
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "string-hazard",
+        "parameter": "partner",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "External Upstash Redis client import (@/lib/upstash) is not resolved inside isolated-vm isolate, causing an artificial ReferenceError when invoking redis.set.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "98cf7b44aa871465",
+      "message": "forceWithdrawal threw ReferenceError: redis is not defined",
+      "actionName": "forceWithdrawal",
+      "generatedInput": {},
+      "failureSignature": "forceWithdrawal|failed|ReferenceError|redis is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "partner",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "87.5%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "69467cae947cf138",
+      "message": "forceWithdrawal threw TypeError: Cannot read properties of undefined (reading 'id')",
+      "actionName": "forceWithdrawal",
+      "failureSignature": "forceWithdrawal|failed|TypeError|cannot read properties of undefined (reading 'id')",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "partner",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Exported in use server file. When invoked with {}, partner.id is undefined, and execution reaches await redis.set(...). Because @/lib/upstash Redis client is not mocked inside isolated-vm, execution throws ReferenceError: redis is not defined.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/actions/partners/force-withdrawal.ts",
+      "line": 41,
+      "column": 14,
+      "ruleId": "SIS003",
+      "fingerprint": "ea694390957092a6",
+      "message": "forceWithdrawal threw TypeError: Cannot read properties of null (reading 'id')",
+      "actionName": "forceWithdrawal",
+      "generatedInput": null,
+      "failureSignature": "forceWithdrawal|failed|TypeError|cannot read properties of null (reading 'id')",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "partner",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action depends on external Upstash Redis client (@/lib/upstash). In isolated-vm isolate without Upstash runtime connection, redis is undefined or partner object cannot be evaluated. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "b03911739869bf77",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": {},
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "primitive-mismatch",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "External import createStreamableValue from @ai-sdk/rsc (Vercel AI SDK) is not resolved inside isolated-vm sandbox, causing artificial ReferenceError: createStreamableValue is not defined. The action is a legitimate streaming action; failure is an isolate emulation artifact.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "ca2554f3a851ae43",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": {},
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-edge",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "16a5f4e3985dd6db",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": {},
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "87.5%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "bcf7912c6e26654a",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": [],
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "66.7%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "95075c22ed62edf9",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": "",
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "primitive-mismatch",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "75%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "afa309c009e3bc9d",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": [],
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "81.8%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "8ab9c40648516a9c",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": null,
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "f10552c3f1e153be",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": null,
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-csv-mapping.ts",
+      "line": 8,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "4489a1f17b56a0f4",
+      "message": "generateCsvMapping threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateCsvMapping",
+      "generatedInput": {},
+      "failureSignature": "generateCsvMapping|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "fieldColumns",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "4eddf10b415658f7",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": null,
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "prompt",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "b9605c70201af887",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": false,
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "primitive-mismatch",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "d4efad50d4184b49",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": {},
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-edge",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "e89b5143f6e2194d",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": "",
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "string-hazard",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "33.3%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "f8d5fc2a1d474f95",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": {},
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "88e7171585915289",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": "",
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "string-hazard",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "100%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "lib/ai/generate-filters.ts",
+      "line": 40,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "bf339bdda47bd579",
+      "message": "generateFilters threw ReferenceError: createStreamableValue is not defined",
+      "actionName": "generateFilters",
+      "generatedInput": "",
+      "failureSignature": "generateFilters|failed|ReferenceError|createstreamablevalue is not defined",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "ReferenceError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "string-hazard",
+        "parameter": "prompt",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "33.3%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "FRAMEWORK_ARTIFACT",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Action imports @ai-sdk/rsc createStreamableValue. AI streaming SDK cannot be bound inside isolated-vm isolate, producing artificial ReferenceError. Classified as static-only by Phase 23 Compatibility Gate.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "playwright/api/fixtures.ts",
+      "line": 78,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "3d7a805fc6c00f5c",
+      "message": "Server Action \"createBearerApiClient\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "actionName": "createBearerApiClient",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "UNREACHABLE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Playwright end-to-end test fixture utility (playwright/api/fixtures.ts). Not a Server Action and completely unreachable from client network requests in production.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "ui/modals/add-workspace-modal.tsx",
+      "line": 57,
+      "column": 9,
+      "ruleId": "SIS002",
+      "fingerprint": "a3d2599493cc79a3",
+      "message": "Non-serializable value passed as prop \"onSuccess\" to Client Component <CreateWorkspaceForm />: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "staticEvidence": {
+        "boundaryKind": "server-to-client-props",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Client Component passing callback prop onSuccess to child Client Component <CreateWorkspaceForm />. File uses React client hooks (useState, useRouter) but lacked top-level use client directive, causing SIS to misclassify it as a Server Component.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "ui/modals/invite-workspace-user-modal.tsx",
+      "line": 41,
+      "column": 9,
+      "ruleId": "SIS002",
+      "fingerprint": "65d34db6b2bda7b0",
+      "message": "Non-serializable value passed as prop \"onSuccess\" to Client Component <InviteTeammatesForm />: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "staticEvidence": {
+        "boundaryKind": "server-to-client-props",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Client Component modal utilizing React client hooks (useState, useRouter) passing callback props to another Client Component. Suppressed by Phase 23 AST client hook inference.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "dubinc/dub",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "file": "ui/modals/link-builder/utm-modal.tsx",
+      "line": 235,
+      "column": 15,
+      "ruleId": "SIS002",
+      "fingerprint": "81c82997df3671ef",
+      "message": "Non-serializable value passed as prop \"onLoad\" to Client Component <UTMTemplatesCombo />: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "staticEvidence": {
+        "boundaryKind": "server-to-client-props",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Client Component modal utilizing React client hooks (useState, useRouter) passing callback props to another Client Component. Suppressed by Phase 23 AST client hook inference.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "mickasmt/next-saas-stripe-starter",
+      "commit": "a78d130af7e04d0250d65c67f217976f7eb3adc2",
+      "file": "app/api/webhooks/stripe/route.ts",
+      "line": 76,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "0f4dc5c476d30776",
+      "message": "Server Action \"POST\" returns non-serializable value: Class instance \"new Response()\" cannot be passed to a Client Component",
+      "actionName": "POST",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Next.js App Router HTTP Route Handler for Stripe webhooks returning Web API Response(null, { status: 200 }). Erroneously evaluated under React Flight Server Action return serialization rules.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "shadcn-ui/taxonomy",
+      "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+      "file": "app/api/webhooks/stripe/route.ts",
+      "line": 70,
+      "column": 10,
+      "ruleId": "SIS002",
+      "fingerprint": "c39ca66764d41da4",
+      "message": "Server Action \"POST\" returns non-serializable value: Class instance \"new Response()\" cannot be passed to a Client Component",
+      "actionName": "POST",
+      "staticEvidence": {
+        "boundaryKind": "server-action",
+        "direction": "server-to-client"
+      },
+      "classification": "FALSE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Next.js App Router HTTP Route Handler (app/api/webhooks/stripe/route.ts) returning Web API Response. Route Handlers communicate via standard HTTP and do not cross a React Flight RPC serialization boundary.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "b6bbfce3dbe171b5",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "prototype-sensitive",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "93.9%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Authentic Server Action with top-level use server. The function unconditionally destructures payload outside try/catch (const { merchandiseId, quantity } = payload;). Invoking without arguments or with undefined payload triggers an uncaught TypeError at the server network boundary.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "0300c0d145de1a6b",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-edge",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "84e693a7f37f6a9b",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": null,
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "prevState",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-pilot",
+      "reviewNotes": "Authentic Server Action with top-level use server. Passing nullish second parameter throws uncaught TypeError outside try/catch due to un-guarded object destructuring.",
+      "reviewedAt": "2026-09-11T11:15:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "78387966d81c3cd4",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "structural-deletion",
+        "parameter": "prevState",
+        "shrinkAttempts": 0,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "caac0d7e2642c4fa",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "prototype-sensitive",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "93.9%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "0cc2c4b41331b1de",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "95.6%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "a93666a2ceea9d6e",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "prototype-sensitive",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "96%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "e37b49b0bbe4aef3",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": null,
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "nullability",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "0%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    },
+    {
+      "repository": "vercel/commerce",
+      "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "file": "components/cart/actions.ts",
+      "line": 54,
+      "column": 23,
+      "ruleId": "SIS003",
+      "fingerprint": "2129b19876f7f31a",
+      "message": "updateItemQuantity threw TypeError: Cannot destructure property 'merchandiseId' of 'payload' as it is undefined.",
+      "actionName": "updateItemQuantity",
+      "generatedInput": {},
+      "failureSignature": "updateItemQuantity|failed|TypeError|cannot destructure property 'merchandiseid' of 'payload' as it is undefined.",
+      "staticEvidence": {
+        "invariant": "runtime-safety"
+      },
+      "runtimeEvidence": {
+        "errorName": "TypeError",
+        "fuzzTarget": "server-action-argument",
+        "strategy": "serialization-unsupported",
+        "parameter": "prevState",
+        "shrinkAttempts": 1,
+        "shrinkReduction": "87.5%",
+        "minimalReproducerVerified": true
+      },
+      "classification": "TRUE_POSITIVE",
+      "confidence": "HIGH",
+      "reviewer": "ground-truth-phase-24",
+      "reviewNotes": "Missing defensive validation on public Server Action boundary. Unconditionally destructuring payload ({ merchandiseId, quantity }) without nullish/type guards causes uncaught TypeError when called with empty/nullish arguments.",
+      "reviewedAt": "2026-09-11T15:00:00.000Z"
+    }
+  ]
+}
