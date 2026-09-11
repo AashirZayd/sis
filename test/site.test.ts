@@ -160,6 +160,11 @@ describe("Landing Page & Static Site Validation", () => {
     expect(html).toContain('<meta name="twitter:image" content="https://aashirzayd.github.io/sis/og-image.svg">');
   });
 
+  it("index.html contains exact Google Search Console verification meta tag", () => {
+    const html = fs.readFileSync(path.join(docsDir, "index.html"), "utf-8");
+    expect(html).toContain('<meta name="google-site-verification" content="lCFz3D335B7O1OgRz4kxPNXXO0ffUyL0HNE3a6cKjO8" />');
+  });
+
   it("index.html contains valid Schema.org JSON-LD graph", () => {
     const html = fs.readFileSync(path.join(docsDir, "index.html"), "utf-8");
 
