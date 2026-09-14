@@ -26,7 +26,11 @@ program
   .description("SIS Real-World Benchmark & Evaluation Runner")
   .version("0.1.0")
   .option("--repo <name>", "Filter or run benchmark against a specific repository name")
-  .option("--all", "Run benchmark against all repositories in the corpus (default)")
+  .option("--core", "Run or validate only CORE baseline repositories")
+  .option("--extended", "Run or validate only EXTENDED candidate repositories")
+  .option("--adversarial", "Run or validate only ADVERSARIAL candidate repositories")
+  .option("--all", "Run benchmark or validate across all repositories in the corpus")
+  .option("--validate-corpus", "Validate repository metadata, pins, and shallow acquisition without running SIS analysis")
   .option("--json", "Output benchmark results as JSON to stdout")
   .option("-s, --seed <number>", "Deterministic base random seed (default: 42)", (v) => parseInt(v, 10), 42)
   .option("-r, --runs <number>", "Number of fuzzing runs per candidate action (default: 10)", (v) => parseInt(v, 10), 10)
@@ -42,6 +46,10 @@ program
 program.action(async (opts: {
   repo?: string;
   all?: boolean;
+  core?: boolean;
+  extended?: boolean;
+  adversarial?: boolean;
+  validateCorpus?: boolean;
   json?: boolean;
   seed: number;
   runs: number;
@@ -194,10 +202,49 @@ program.action(async (opts: {
     }
   }
 
-  // 3. STANDARD BENCHMARK EXECUTION MODE
+  // 3. VALIDATE CORPUS MODE
+  if (opts.validateCorpus) {
+    try {
+      const benchmarkOptions: BenchmarkOptions = {
+        repo: opts.repo,
+        core: opts.core,
+        extended: opts.extended,
+        adversarial: opts.adversarial,
+        all: opts.all,
+        validateCorpus: true,
+        json: opts.json,
+        seed: opts.seed,
+        runs: opts.runs,
+        timeoutMs: opts.timeout,
+        outDir: opts.outDir,
+        dryRun: opts.dryRun,
+        keepTemp: opts.keepTemp,
+        silent: opts.json,
+      };
+
+      const { validateCorpus } = await import("./validator.ts");
+      const summary = await validateCorpus(corpus, benchmarkOptions);
+      if (opts.json) {
+        process.stdout.write(JSON.stringify(summary, null, 2) + "\n");
+      }
+      if (summary.failed > 0) {
+        process.exit(1);
+      }
+      process.exit(0);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`\n[benchmark] Validation error: ${msg}\n`);
+      process.exit(1);
+    }
+  }
+
+  // 4. STANDARD BENCHMARK EXECUTION MODE
   const benchmarkOptions: BenchmarkOptions = {
     repo: opts.repo,
-    all: opts.all ?? true,
+    core: opts.core,
+    extended: opts.extended,
+    adversarial: opts.adversarial,
+    all: opts.all,
     json: opts.json,
     seed: opts.seed,
     runs: opts.runs,

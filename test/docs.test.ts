@@ -113,7 +113,9 @@ describe("Documentation & Repository Integrity", () => {
     const readme = fs.readFileSync(path.join(root, "README.md"), "utf-8");
     const bench = fs.readFileSync(path.join(root, "docs", "benchmark.md"), "utf-8");
 
-    for (const repo of corpus.repositories) {
+    const coreRepos = corpus.repositories.filter((r: { tier?: string }) => !r.tier || r.tier === "CORE");
+    expect(coreRepos.length).toBe(5);
+    for (const repo of coreRepos) {
       expect(readme).toContain(repo.name);
       expect(bench).toContain(repo.name);
       expect(bench).toContain(repo.commit.slice(0, 7));

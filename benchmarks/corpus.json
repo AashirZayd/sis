@@ -1,11 +1,13 @@
 {
-  "version": "1.0.0",
-  "description": "Curated benchmark corpus of pinned, public open-source Next.js applications with App Router, Server Actions, and React Server Component boundaries.",
+  "version": "2.0.0",
+  "description": "Expanded benchmark corpus of pinned, public open-source Next.js applications with App Router, Server Actions, and React Server Component boundaries.",
   "repositories": [
     {
       "name": "shadcn-ui/taxonomy",
       "url": "https://github.com/shadcn-ui/taxonomy.git",
       "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+      "tier": "CORE",
+      "status": "active",
       "description": "An open-source Next.js 13/14 App Router reference application with Server Components, Route Handlers, and Server Actions.",
       "targetDir": ".",
       "framework": {
@@ -22,6 +24,8 @@
       "name": "leerob/site",
       "url": "https://github.com/leerob/site.git",
       "commit": "fd03371e3c90481a8447904e1b548e4c0327b7db",
+      "tier": "CORE",
+      "status": "active",
       "description": "Lee Robinson's personal portfolio and blog built with Next.js App Router, Server Actions, Postgres, and RSC.",
       "targetDir": ".",
       "framework": {
@@ -37,6 +41,8 @@
       "name": "vercel/commerce",
       "url": "https://github.com/vercel/commerce.git",
       "commit": "3761e52e60df9c6a316e067dbfd7032e494d3634",
+      "tier": "CORE",
+      "status": "active",
       "description": "Vercel's official Next.js Commerce architecture template with App Router, Server Actions for cart management, and dynamic RSC.",
       "targetDir": ".",
       "framework": {
@@ -51,23 +57,10 @@
       "name": "dubinc/dub",
       "url": "https://github.com/dubinc/dub.git",
       "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "tier": "CORE",
+      "status": "active",
       "description": "Open-source link management platform with multi-tenant App Router, Server Actions, complex Zod validation, and Prisma ORM.",
       "targetDir": "apps/web",
-      "framework": {
-        "nextVersion": "^14.2.0",
-        "appRouter": true,
-        "serverActions": true,
-        "rsc": true,
-        "orm": "prisma"
-      },
-      "notes": "Large-scale real-world production application with sophisticated Server Action argument schemas, authentication, and multi-tenancy."
-    },
-    {
-      "name": "mickasmt/next-saas-stripe-starter",
-      "url": "https://github.com/mickasmt/next-saas-stripe-starter.git",
-      "commit": "a78d130af7e04d0250d65c67f217976f7eb3adc2",
-      "description": "Open-source SaaS starter featuring Next.js App Router, Server Actions for account management and Stripe billing, and Prisma.",
-      "targetDir": ".",
       "framework": {
         "nextVersion": "^14.2.0",
         "appRouter": true,
@@ -76,7 +69,292 @@
         "orm": "prisma",
         "auth": "next-auth"
       },
-      "notes": "Representative production SaaS foundation with Stripe webhooks, user settings Server Actions, and auth guards."
+      "notes": "Multi-tenant monorepo with high-volume Server Actions, rate limiting, and edge functions."
+    },
+    {
+      "name": "mickasmt/next-saas-stripe-starter",
+      "url": "https://github.com/mickasmt/next-saas-stripe-starter.git",
+      "commit": "a78d130af7e04d0250d65c67f217976f7eb3adc2",
+      "tier": "CORE",
+      "status": "active",
+      "description": "Open-source SaaS boilerplate built with Next.js 14, Stripe, Prisma, and server actions.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Modern SaaS template exercising Stripe subscriptions, webhook handlers, and server mutations."
+    },
+    {
+      "name": "calcom/cal.com",
+      "url": "https://github.com/calcom/cal.com.git",
+      "commit": "6a75ef86b011665081706ba7f905b05559ac474b",
+      "originalCommit": "696c21e6be3f07a70514101e4ec9d929312b9c3e",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Enterprise scheduling platform with complex organizational logic, bookings, calendar synchronizations, and webhooks.",
+      "targetDir": "apps/web",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Pin corrected from unresolvable 696c21e to official immutable v4.0.0 release tag 6a75ef8."
+    },
+    {
+      "name": "formbricks/formbricks",
+      "url": "https://github.com/formbricks/formbricks.git",
+      "commit": "a1d83ac7b993ba85c5bb5ec193b99ab9e77b0baf",
+      "originalCommit": "29e0a0d4c1b920dcfb681f2bb8b6f38dbda18d6e",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Open-source survey management and user experience toolkit with high-frequency form submissions and multi-tenant telemetry.",
+      "targetDir": "apps/web",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma"
+      },
+      "notes": "Pin corrected from unresolvable 29e0a0d to official immutable v2.5.0 release tag a1d83ac."
+    },
+    {
+      "name": "documenso/documenso",
+      "url": "https://github.com/documenso/documenso.git",
+      "commit": "e95e13021d7f17139b8d848ea6761e5479b25560",
+      "originalCommit": "7e2d7e48b8120ec08d4b3c7b2a95c89839eb7e04",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Open-source electronic signature platform with strict security, document signing flows, signature verification, and audit trails.",
+      "targetDir": "apps/web",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma"
+      },
+      "notes": "Pin corrected to official immutable v1.9.1 release tag e95e130 which contains Next.js App Router in apps/web/src/app."
+    },
+    {
+      "name": "openstatusHQ/openstatus",
+      "url": "https://github.com/openstatusHQ/openstatus.git",
+      "commit": "3a6efd1f91726de14f490035d4b178aabc1e1eac",
+      "originalCommit": "982f6e91da5a1b32607e3bcba89196b054238e55",
+      "tier": "EXTENDED",
+      "status": "excluded",
+      "exclusionReason": "clone-timeout: Repository snapshot transfer exceeds bounded acquisition budget under network constraints",
+      "description": "Open-source status page and synthetic monitoring service exercising modern lightweight Drizzle ORM and Turso SQLite integration.",
+      "targetDir": "apps/web",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "drizzle"
+      },
+      "notes": "Pin identified as commit 3a6efd1, but snapshot transfer exceeds bounded budget under network constraints; excluded for acquisition reliability."
+    },
+    {
+      "name": "midday-ai/midday",
+      "url": "https://github.com/midday-ai/midday.git",
+      "commit": "e27b7040efdea2b3d1cca2553a4def7aaf11a053",
+      "originalCommit": "a38c2084c7e65129994c924bc01c0b31dd8752c0",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Modern financial dashboard for businesses, handling invoice generation, transactions, and banking reconciliation.",
+      "targetDir": "apps/dashboard",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "supabase"
+      },
+      "notes": "Pin corrected from unresolvable a38c208 to official immutable midday-v0.5.0 release tag e27b704."
+    },
+    {
+      "name": "vercel/platforms",
+      "url": "https://github.com/vercel/platforms.git",
+      "commit": "ec12e65709c8263dd3462c4d33261851b8a3157d",
+      "originalCommit": "e680a6b4122d64f26b5ce53434ea32356c9d7be1",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Vercel multi-tenant platform architecture template with wildcard subdomains and custom domain mapping.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Pin corrected from unresolvable e680a6b to verified advertised branch tip commit ec12e65."
+    },
+    {
+      "name": "steven-tey/precedent",
+      "url": "https://github.com/steven-tey/precedent.git",
+      "commit": "3be40205d7cdf56082cd284f07f12251b9208f79",
+      "originalCommit": "b6f5d886477e7776b6e4e89f81640a3f892c5719",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Next.js starter with Framer Motion, Postgres, and Server Actions.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "prisma",
+        "auth": "next-auth"
+      },
+      "notes": "Pin corrected from unresolvable b6f5d88 to verified advertised branch tip commit 3be4020."
+    },
+    {
+      "name": "infisical/infisical",
+      "url": "https://github.com/infisical/infisical.git",
+      "commit": "e1b25f9f6a8d81bbe6ce31513a5f17ad596984de",
+      "originalCommit": "a53b2111cbb9eb5c48b29f04ca44d47f9f30e012",
+      "tier": "EXTENDED",
+      "status": "excluded",
+      "exclusionReason": "clone-timeout: Repository single-commit snapshot exceeds 880MB, exceeding the 45s non-interactive acquisition budget",
+      "description": "Secrets management platform with security-critical frontend handling API keys, environment secrets, and access control.",
+      "targetDir": "frontend",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      },
+      "notes": "Infisical repo snapshot exceeds 880MB of binary objects, causing timeout under bounded benchmark acquisition."
+    },
+    {
+      "name": "charlie-tango/next-starter",
+      "url": "https://github.com/charlie-tango/next-starter.git",
+      "commit": "e8f49a781b0a88df88319ad08eb6758416035cb2",
+      "tier": "EXTENDED",
+      "status": "excluded",
+      "exclusionReason": "repository-unreachable: Repository not found on GitHub (HTTP 404)",
+      "description": "Enterprise Next.js template with clean architecture and strict schema validation.",
+      "targetDir": ".",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      }
+    },
+    {
+      "name": "shadcn-ui/ui",
+      "url": "https://github.com/shadcn-ui/ui.git",
+      "commit": "460ad60d84617836762a8800755fafef37f662df",
+      "originalCommit": "d8521a64b971a8bc84ef937e19ec7a731efc1b71",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Official site and component registry for shadcn/ui. Evaluates complex RSC serialization of code blocks.",
+      "targetDir": "apps/v4",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      },
+      "notes": "Pin corrected to peeled commit 460ad60 for official immutable shadcn@4.9.0 release tag with docs app in apps/v4."
+    },
+    {
+      "name": "typebot/typebot",
+      "url": "https://github.com/typebot/typebot.git",
+      "commit": "1081b9cf3a5fa2b79e708c4e402eb06a928e08d5",
+      "tier": "EXTENDED",
+      "status": "excluded",
+      "exclusionReason": "repository-unreachable: Repository not found on GitHub under typebot/typebot (HTTP 404)",
+      "description": "Visual chatbot and conversational form builder with App Router action runners.",
+      "targetDir": "apps/viewer",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      }
+    },
+    {
+      "name": "payloadcms/payload",
+      "url": "https://github.com/payloadcms/payload.git",
+      "commit": "6407e577d30d2e04a4aac8a5787416e67fd146c2",
+      "originalCommit": "c8734289bb68d3744be6503f192b153b82dfc74e",
+      "tier": "EXTENDED",
+      "status": "active",
+      "description": "Headless CMS running natively inside Next.js App Router, unifying CMS and frontend in a single tree.",
+      "targetDir": "templates/blank",
+      "framework": {
+        "nextVersion": "^15.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true
+      },
+      "notes": "Pin corrected to peeled commit 6407e57 for official immutable v3.0.0 release tag with Next.js App Router template in templates/blank."
+    },
+    {
+      "name": "t3-oss/create-t3-app",
+      "url": "https://github.com/t3-oss/create-t3-app.git",
+      "commit": "22d01d2e93fc3a16c2001413ef2d54ac2ce84a5d",
+      "originalCommit": "5265e31efefdbb6c6b414f5298f657a82c4ee9ff",
+      "tier": "ADVERSARIAL",
+      "status": "active",
+      "description": "Benchmark template for full T3 stack. Discriminates between tRPC endpoints and native React Flight Server Actions.",
+      "targetDir": "cli/template/extras/src/app",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "orm": "drizzle",
+        "auth": "next-auth"
+      },
+      "notes": "Pin corrected to peeled commit 22d01d2 for official immutable create-t3-app@7.36.0 release tag."
+    },
+    {
+      "name": "clerk/javascript",
+      "url": "https://github.com/clerk/javascript.git",
+      "commit": "d79852e4cabe9bb0681084a6e9653874cf5aa378",
+      "originalCommit": "b6f5285e68ba9cf41d279cf3275210e7b1a20684",
+      "tier": "ADVERSARIAL",
+      "status": "active",
+      "description": "Authentication provider showcasing auth middleware, cookie tokens, and protected server actions.",
+      "targetDir": "packages/nextjs",
+      "framework": {
+        "nextVersion": "^14.0.0",
+        "appRouter": true,
+        "serverActions": true,
+        "rsc": true,
+        "auth": "clerk"
+      },
+      "notes": "Pin corrected to peeled commit d79852e for official immutable @clerk/nextjs@7.5.8 release tag."
+    },
+    {
+      "name": "dubinc/dub-api",
+      "url": "https://github.com/dubinc/dub.git",
+      "commit": "b8866f413cec065438d6e5faabbd9dac7d1ceea5",
+      "tier": "ADVERSARIAL",
+      "status": "active",
+      "description": "Adversarial route handlers, webhook handlers, and dynamic OG ImageResponse slice of dubinc/dub.",
+      "targetDir": "apps/web/app/api",
+      "framework": {
+        "nextVersion": "^14.2.0",
+        "appRouter": true,
+        "serverActions": false,
+        "rsc": false
+      },
+      "notes": "Targeted slice of route handlers to verify negative control filters against HTTP streaming."
     }
   ]
 }

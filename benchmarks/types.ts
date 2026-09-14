@@ -9,14 +9,44 @@ export interface FrameworkMetadata {
   auth?: string;
 }
 
+export type CorpusTier = "CORE" | "EXTENDED" | "ADVERSARIAL";
+
+export type CorpusCandidateStatus = "active" | "excluded" | "candidate";
+
+export type GitFailureReason =
+  | "repository-unreachable"
+  | "commit-unresolvable"
+  | "target-directory-missing"
+  | "clone-timeout"
+  | "checkout-failed"
+  | "authentication-required"
+  | "network-error"
+  | "unknown";
+
 export interface BenchmarkCorpusEntry {
   name: string;
   url: string;
   commit: string;
   description: string;
+  tier?: CorpusTier;
+  status?: CorpusCandidateStatus;
+  exclusionReason?: string;
+  replacementCommit?: string;
+  originalCommit?: string;
   targetDir?: string;
   framework?: FrameworkMetadata;
   notes?: string;
+}
+
+export interface ValidationResult {
+  repository: string;
+  tier: CorpusTier;
+  commit: string;
+  status: "PASS" | "FAIL" | "EXCLUDED";
+  failureStage?: "metadata" | "clone" | "checkout" | "targetDir" | "structure" | "cleanup";
+  failureReason?: GitFailureReason;
+  reason?: string;
+  wallTimeMs: number;
 }
 
 export interface BenchmarkCorpus {
@@ -98,6 +128,10 @@ export interface BenchmarkRunResult {
 export interface BenchmarkOptions {
   repo?: string;
   all?: boolean;
+  core?: boolean;
+  extended?: boolean;
+  adversarial?: boolean;
+  validateCorpus?: boolean;
   json?: boolean;
   seed?: number;
   runs?: number;

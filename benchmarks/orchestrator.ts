@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import { performance } from "node:perf_hooks";
 import { AuditEngine, deriveFileSeed, type AuditResult } from "../dist/index.js";
 import { checkoutPinnedRepository, getSisGitCommit } from "./git.ts";
+import { selectAndSortCorpusEntries } from "./validator.ts";
 import type {
   BenchmarkCorpus,
   BenchmarkCorpusEntry,
@@ -248,22 +249,19 @@ export async function runBenchmark(
   const runs = options.runs ?? 10;
   const timeoutMs = options.timeoutMs ?? 20;
 
-  // Filter repositories if --repo specified
-  let targets = corpus.repositories;
-  if (options.repo) {
-    const query = options.repo.toLowerCase();
-    targets = corpus.repositories.filter(
-      (r) =>
-        r.name.toLowerCase() === query ||
-        r.name.toLowerCase().endsWith(`/${query}`) ||
-        r.name.toLowerCase().includes(query)
-    );
-    if (targets.length === 0) {
-      const available = corpus.repositories.map((r) => r.name).join(", ");
-      throw new Error(
-        `Repository '${options.repo}' not found in corpus. Available repositories: ${available}`
-      );
+  // Filter repositories according to tier options and active status
+  let targets = selectAndSortCorpusEntries(corpus, options);
+  // Never execute analysis on repositories marked as excluded in the manifest
+  targets = targets.filter((t) => t.status !== "excluded");
+
+  if (targets.length === 0) {
+    if (options.repo) {
+      throw new Error(`Repository '${options.repo}' not found in corpus`);
     }
+    const available = corpus.repositories.map((r) => r.name).join(", ");
+    throw new Error(
+      `No active repositories matched the selection criteria. Available repositories: ${available}`
+    );
   }
 
   const sisCommit = await getSisGitCommit();
