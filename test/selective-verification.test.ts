@@ -17,6 +17,7 @@ import {
 } from "../src/runtime/preludes/index.js";
 import { extractCandidateFunction } from "../src/runtime/executor.js";
 import { runInIsolate } from "../src/runtime/worker.js";
+import { SUCCESS_PATH_BUDGET_MS, SUCCESS_PATH_RUNTIME_OPTIONS } from "./helpers/budgets.js";
 
 describe("Phase 25 — Selective Runtime Verification & Deterministic Preludes", () => {
   describe("1. Deterministic Prelude Contracts", () => {
@@ -183,9 +184,9 @@ describe("Phase 25 — Selective Runtime Verification & Deterministic Preludes",
       };
 
       const runs = await Promise.all([
-        runInIsolate(candidate, { val: "abc" }),
-        runInIsolate(candidate, { val: "abc" }),
-        runInIsolate(candidate, { val: "abc" }),
+        runInIsolate(candidate, { val: "abc" }, SUCCESS_PATH_RUNTIME_OPTIONS),
+        runInIsolate(candidate, { val: "abc" }, SUCCESS_PATH_RUNTIME_OPTIONS),
+        runInIsolate(candidate, { val: "abc" }, SUCCESS_PATH_RUNTIME_OPTIONS),
       ]);
 
       expect(runs[0].status).toBe("passed");
@@ -314,7 +315,7 @@ describe("Phase 25 — Selective Runtime Verification & Deterministic Preludes",
         const filePath = path.join(tempDir, "profile.ts");
         fs.writeFileSync(filePath, code, "utf8");
 
-        const engine = new AuditEngine({ runs: 10, seed: 42, silent: true });
+        const engine = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, runs: 10, seed: 42, silent: true });
         const result = await engine.run(filePath);
 
         expect(result.actions.length).toBe(1);
@@ -357,7 +358,7 @@ describe("Phase 25 — Selective Runtime Verification & Deterministic Preludes",
         const filePath = path.join(tempDir, "actions.ts");
         fs.writeFileSync(filePath, code, "utf8");
 
-        const engine = new AuditEngine({ runs: 10, seed: 42, silent: true });
+        const engine = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, runs: 10, seed: 42, silent: true });
         const result = await engine.run(filePath);
 
         expect(result.actions.length).toBe(1);

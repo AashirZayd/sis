@@ -1,4 +1,4 @@
-import { AuditEngine, type AuditResult, type AuditOptions } from "../../dist/index.js";
+import { AuditEngine, type AuditResult, type AuditOptions } from "../../src/index.js";
 
 export interface PerfMetrics {
   target: string;

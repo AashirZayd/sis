@@ -1,0 +1,439 @@
+# golden: next-boundaries.json
+# command: sis audit test/fixtures/next-boundaries --format json --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/next-boundaries",
+  "summary": {
+    "filesScanned": 11,
+    "filesAnalyzed": 7,
+    "filesSkipped": 0,
+    "boundariesFound": 2,
+    "serverActionsFound": 4,
+    "verifiedFindings": 15,
+    "runtimeFailures": 5,
+    "taintViolations": 5,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 5
+  },
+  "statistics": {
+    "filesScanned": 11,
+    "filesAnalyzed": 7,
+    "filesSkipped": 0,
+    "analysisErrors": 0,
+    "boundariesFound": 2,
+    "actionsFound": 4,
+    "taintSourcesFound": 5,
+    "taintViolations": 5,
+    "propBoundariesFound": 10,
+    "verifiedSafeProps": 10,
+    "serializabilityViolations": 8,
+    "unknownSerializability": 1,
+    "payloadsGenerated": 24,
+    "executions": 10,
+    "passedExecutions": 5,
+    "failedExecutions": 5,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 4,
+    "shrinkAttempts": 4,
+    "verifiedReproCount": 5,
+    "fuzzTargetsDiscovered": 8,
+    "fuzzStrategiesApplied": 5,
+    "boundaryDirectedPayloads": 24,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 12,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 2,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "app/actions.ts",
+    "app/inline-actions.tsx",
+    "app/page.tsx",
+    "components/ClientCard.tsx",
+    "lib/db.ts",
+    "negative/fake-strings.ts",
+    "negative/misplaced-directive.ts"
+  ],
+  "findings": [
+    {
+      "id": "SIS003-1",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned.",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "returnCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "serialization-unsupported",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "returnCallback|failed|TypeError|()=>{",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "connection": "postgresql://localhost:5432"
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 95.6,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-2",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned.",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "returnCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "prototype-sensitive",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "returnCallback|failed|TypeError|()=>{",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 93.9,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-3",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned.",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "returnCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-deletion",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "returnCallback|failed|TypeError|()=>{",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-4",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned.",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "returnCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "returnCallback|failed|TypeError|()=>{",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-5",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned.",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "returnCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "serialization-edge",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "returnCallback|failed|TypeError|()=>{",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "a": {
+            "b": {
+              "c": {
+                "d": {
+                  "e": {
+                    "f": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 95.6,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS001-6",
+      "ruleId": "SIS001",
+      "ruleName": "taint-violation",
+      "type": "taint-violation",
+      "severity": "error",
+      "message": "Sensitive environment value DATABASE_URL reaches client-side code",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 13,
+        "column": 23
+      },
+      "trace": [
+        "process.env.DATABASE_URL",
+        "app/actions.ts:Server Action return: leakSecret()"
+      ]
+    },
+    {
+      "id": "SIS001-7",
+      "ruleId": "SIS001",
+      "ruleName": "taint-violation",
+      "type": "taint-violation",
+      "severity": "error",
+      "message": "Sensitive environment value AUTH_SECRET reaches client-side code",
+      "file": "app/inline-actions.tsx",
+      "location": {
+        "line": 11,
+        "column": 23
+      },
+      "trace": [
+        "process.env.AUTH_SECRET",
+        "app/inline-actions.tsx:Server Action return: leakyInlineAction()"
+      ]
+    },
+    {
+      "id": "SIS002-8",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Non-serializable value passed as prop \"onClick\" to Client Component <ClientCard />: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "file": "app/page.tsx",
+      "location": {
+        "line": 21,
+        "column": 9
+      }
+    },
+    {
+      "id": "SIS002-9",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Non-serializable value passed as prop \"db\" to Client Component <ClientCard />: Database connection / server-only instance \"dbInstance\" cannot be passed to a Client Component",
+      "file": "app/page.tsx",
+      "location": {
+        "line": 29,
+        "column": 9
+      }
+    },
+    {
+      "id": "SIS001-10",
+      "ruleId": "SIS001",
+      "ruleName": "taint-violation",
+      "type": "taint-violation",
+      "severity": "error",
+      "message": "Sensitive environment secret passed as prop \"token\" to Client Component <ClientCard />",
+      "file": "app/page.tsx",
+      "location": {
+        "line": 35,
+        "column": 9
+      },
+      "trace": [
+        "process.env.SESSION_SECRET",
+        "app/page.tsx:<ClientCard token={...} />"
+      ]
+    },
+    {
+      "id": "SIS001-11",
+      "ruleId": "SIS001",
+      "ruleName": "taint-violation",
+      "type": "taint-violation",
+      "severity": "error",
+      "message": "Server Action \"leakSecret\" returns sensitive secret \"process.env.DATABASE_URL\" across client boundary",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 14,
+        "column": 10
+      },
+      "actionName": "leakSecret",
+      "trace": [
+        "process.env.DATABASE_URL",
+        "app/actions.ts:leakSecret() return"
+      ]
+    },
+    {
+      "id": "SIS002-12",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Server Action \"returnDatabase\" returns non-serializable value: Class instance \"new DatabaseConnection()\" cannot be passed to a Client Component",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 18,
+        "column": 10
+      },
+      "actionName": "returnDatabase"
+    },
+    {
+      "id": "SIS002-13",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Server Action \"returnCallback\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "file": "app/actions.ts",
+      "location": {
+        "line": 22,
+        "column": 10
+      },
+      "actionName": "returnCallback"
+    },
+    {
+      "id": "SIS001-14",
+      "ruleId": "SIS001",
+      "ruleName": "taint-violation",
+      "type": "taint-violation",
+      "severity": "error",
+      "message": "Server Action \"leakyInlineAction\" returns sensitive secret \"process.env.AUTH_SECRET\" across client boundary",
+      "file": "app/inline-actions.tsx",
+      "location": {
+        "line": 13,
+        "column": 10
+      },
+      "actionName": "leakyInlineAction",
+      "trace": [
+        "process.env.AUTH_SECRET",
+        "app/inline-actions.tsx:leakyInlineAction() return"
+      ]
+    },
+    {
+      "id": "SIS002-15",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Server Action \"invalidReturnInlineAction\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "file": "app/inline-actions.tsx",
+      "location": {
+        "line": 18,
+        "column": 10
+      },
+      "actionName": "invalidReturnInlineAction"
+    }
+  ],
+  "actions": [
+    {
+      "name": "getSafeProfile",
+      "file": "app/actions.ts",
+      "line": 5,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "leakSecret",
+      "file": "app/actions.ts",
+      "line": 13,
+      "column": 23,
+      "executionCompatibility": "static-only",
+      "executionMode": "STATIC_ONLY",
+      "stoppedAt": {
+        "dependency": "process",
+        "reason": "unsupported-runtime",
+        "line": 14
+      }
+    },
+    {
+      "name": "returnDatabase",
+      "file": "app/actions.ts",
+      "line": 17,
+      "column": 23,
+      "executionCompatibility": "static-only",
+      "executionMode": "STATIC_ONLY",
+      "stoppedAt": {
+        "dependency": "DatabaseConnection",
+        "reason": "cloud-sdk",
+        "line": 18
+      }
+    },
+    {
+      "name": "returnCallback",
+      "file": "app/actions.ts",
+      "line": 21,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---

@@ -1,0 +1,43 @@
+# golden: unicode-prefix.terminal
+# command: sis audit test/fixtures/golden/unicode-prefix --format terminal --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+
+SIS  Speculative Invariant Synthesis
+Autonomous runtime verification for Next.js boundaries
+
+◇ DISCOVERY
+  Target: test/fixtures/golden/unicode-prefix (Directory)
+
+Scanning 1 source files...
+
+◆ DISCOVERY
+  ✓ 1 server boundary
+  ✓ 1 candidate Server Action
+
+◆ TAINT ANALYSIS
+  ✓ No high-confidence secret flows detected
+
+◆ SPECULATIVE FUZZING
+  ◇ 2 boundary targets discovered
+  ⟳ 5 fuzz strategies applied
+  ✓ 6 boundary-directed payloads
+
+◆ PAYLOAD SYNTHESIS
+  ✓ 6 adversarial payloads
+
+◆ RUNTIME VERIFICATION
+  ✓ 0 passed
+  ⊘ 6 unsupported
+
+────────────────────────────────────────
+AUDIT COMPLETE
+  Files analyzed:        1
+  Server boundaries:     1
+  Candidate actions:     1
+  Runtime failures:      0
+  Taint violations:      0
+
+✓ SIS found 0 verified findings
+────────────────────────────────────────
+# --- stderr ---

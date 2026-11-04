@@ -11,7 +11,7 @@ SIS statically discovers relevant boundaries and uses deterministic adversarial 
 [![npm package](https://img.shields.io/badge/npm-%40aashirzayd%2Fsis-blue.svg)](https://github.com/AashirZayd/sis)
 [![node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 [![license](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-284%20passed-success.svg)](test/)
+[![ci](https://github.com/AashirZayd/sis/actions/workflows/ci.yml/badge.svg)](https://github.com/AashirZayd/sis/actions/workflows/ci.yml)
 
 [Website](https://aashirzayd.github.io/sis/) · [Benchmark Methodology](docs/benchmark.md) · [Architecture Specification](docs/architecture.md) · [Known Limitations](benchmarks/KNOWN_LIMITATIONS.md) · [CLI Reference](#cli-reference) · [Examples](examples/) · [GitHub](https://github.com/AashirZayd/sis)
 
@@ -19,6 +19,16 @@ SIS statically discovers relevant boundaries and uses deterministic adversarial 
 # Verify Server Actions and RSC boundaries across your Next.js project
 npx @aashirzayd/sis audit .
 ```
+
+> [!WARNING]
+> **Reliability reset in progress — read before relying on SIS results.**
+> An independent audit (2026-11, [`audit/PHASE-2-FINDINGS-VALIDATION.md`](audit/PHASE-2-FINDINGS-VALIDATION.md)) found limitations that affect how SIS results should be interpreted:
+>
+> - **The published package lags the repository.** `npx @aashirzayd/sis` installs npm `0.1.0`, built from commit `71d78a1`. It does **not** include Selective Runtime Verification (prefix execution and framework preludes) or the route-handler / test-directory classification fixes described below, which exist only on `main`.
+> - **Runtime verification is incomplete.** Only the first parameter of a Server Action receives generated input; later parameters are `undefined`. Actions that depend on module-level helpers, constants or classes, and actions exported by alias or as a default export, can be labeled `FULL` without actually executing. Return values that cannot be copied out of the sandbox, dynamic `import()`, and sandbox memory exhaustion can be reported as `SIS003` runtime exceptions even though SIS caused them. An audit in which no action executes still exits `0`.
+> - **Benchmark figures are historical and pre-correction.** The 9 `TRUE_POSITIVE` records are 9 payload variants of a single action (`vercel/commerce` `updateItemQuantity`), and its crash is induced by SIS omitting the action's second argument. No independently confirmed application defect is currently established. The historical review records are preserved unchanged; their correction is pending maintainer review.
+>
+> Fixes are being implemented in small, tested batches; see [`audit/PHASE-4-IMPLEMENTATION-READINESS.md`](audit/PHASE-4-IMPLEMENTATION-READINESS.md) for the plan.
 
 ---
 
@@ -117,17 +127,17 @@ flowchart TD
 
 ### The 12-Stage Pipeline
 
-1. **File Discovery**: Discovers TypeScript and JavaScript source files while respecting `.gitignore`, build directories (`.next`, `dist`), and non-production test suites (`playwright/`, `e2e/`, `__tests__/`).
+1. **File Discovery**: Discovers TypeScript and JavaScript source files, skipping a built-in list of build directories (`.next`, `dist`, `build`, `out`, …), dot-directories, and non-production test suites (`playwright/`, `e2e/`, `__tests__/`, `test/`, `tests/`). `.gitignore` is not read.
 2. **AST Parsing**: Parses source trees into `@swc/core` ASTs, preserving source spans and symbol bindings.
 3. **Boundary Classification**: Classifies modules and components based on `"use client"` and `"use server"` directives, React client hook usage, and Next.js route conventions.
 4. **Interprocedural Call Graph & Data Flow**: Constructs intra-module call graphs to trace data flow through intermediate helper functions and re-exports.
 5. **Candidate Action Discovery**: Identifies exported async functions inside `"use server"` modules or functions with inline `"use server"` prologues.
-6. **Compatibility Classification**: Evaluates candidate actions against host dependencies. Functions using Next.js request context (`cookies()`, `headers()`) or external cloud SDKs are classified as `static-only`.
+6. **Compatibility Classification**: Evaluates candidate actions against host dependencies. On `main`, Next.js request primitives (`cookies()`, `headers()`, `redirect()`, …) are replaced by deterministic preludes (see [Selective Runtime Verification](#selective-runtime-verification)); in the published `0.1.0` they cause the action to be classified `static-only`. External cloud SDKs are classified `static-only` or truncated to a verifiable prefix. The classification is a static prediction; it does not by itself prove that the action executed (see the notice above).
 7. **Adversarial Payload Synthesis**: Generates targeted boundary edge cases (nullish values, prototype keys, numeric extremes, boundary-crossing shapes) powered by `fast-check` and specialized mutators.
 8. **Isolated Runtime Execution**: Executes sandbox-compatible actions in an `isolated-vm` V8 isolate under an enforced CPU budget (default: 20ms).
 9. **Failure Signature Extraction**: When an execution fails, extracts a normalized failure signature (action name, error constructor, and message pattern).
 10. **Delta Debugging & Shrinking**: Systematically strips extraneous object properties and reduces primitive values while ensuring each intermediate candidate reproduces the identical failure signature.
-11. **Deterministic Fingerprinting**: Computes an immutable 16-character hexadecimal fingerprint using 64-bit FNV-1a hashing over repository, commit, file path, rule ID, line, and normalized failure signature.
+11. **Deterministic Fingerprinting** (benchmark tooling only): `benchmarks/reviews.ts` computes a 16-character fingerprint (truncated SHA-256) over repository, commit, file path, rule ID, line, action, failure signature, payload ID, strategy and category. Because payload fields are included, each failing payload of the same bug receives its own fingerprint. CLI, JSON and SARIF output do not include fingerprints.
 12. **Structured Reporting**: Emits findings formatted for interactive terminal review, machine-readable JSON Schema v1, or OASIS SARIF 2.1.0 for CI/CD ingestion.
 
 ---
@@ -200,6 +210,9 @@ SIS structures findings across three distinct levels of evidence:
 
 ## Selective Runtime Verification
 
+> [!NOTE]
+> Available on `main` only; **not included in the published npm `0.1.0`**. `FULL` and `PREFIX` are static predictions: an action that depends on module-level helpers or constants can be labeled `FULL` yet never execute inside the sandbox (audit finding V-03).
+
 Real Next.js Server Actions frequently execute input-dependent validation logic before interacting with databases, caches, or cloud SDKs. Because full execution of unbundled Server Actions inside a zero-privilege V8 sandbox would otherwise crash when encountering missing host infrastructure or Next.js server context, SIS employs **Selective Runtime Verification**:
 
 1. **Deterministic Preludes**: In-memory, non-mutating implementations of framework primitives (`cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`, `revalidateTag()`, `unstable_noStore()`) are bound into the sandbox context.
@@ -215,6 +228,9 @@ To measure real-world boundary discovery and runtime verification without market
 
 > **43 findings reviewed. 9 confirmed true positives. 9 false positives. 24 framework artifacts. 1 unreachable test utility.**  
 > **We publish the misses, not just the hits.**
+
+> [!IMPORTANT]
+> **Historical, pre-correction figures.** The counts above are payload-level finding records from the Phase 24 benchmark and are preserved unchanged as historical evidence. The independent audit ([`audit/PHASE-2-FINDINGS-VALIDATION.md`](audit/PHASE-2-FINDINGS-VALIDATION.md), V-01 and V-05) found that the 9 "confirmed true positives" are 9 payloads of one action whose crash is caused by SIS passing only the first argument, and that the 43 records collapse to 16 root-cause clusters. **SIS currently has no independently confirmed application defect in this corpus.** The precision figures below are computed over duplicated records with framework artifacts excluded, and should not be cited. A corrected, cluster-based review is pending.
 
 For complete methodology, raw benchmark outputs, and reproduction instructions, see [**docs/benchmark.md**](docs/benchmark.md).
 
@@ -236,6 +252,8 @@ The benchmark evaluates 5 authentic Next.js applications pinned at immutable Git
 ---
 
 ### Current Pinned Benchmark Results (Phase 24)
+
+*Historical, pre-correction run (see the notice above). "Verified findings" in this table counts payload-level records, not independent defects.*
 
 Audited with base seed `42`, runs `10`, timeout `20ms`, Node.js `v24.19.0`, Windows `x64`:
 
@@ -263,7 +281,7 @@ To establish empirical precision, every benchmark finding is recorded in an immu
 
 | Classification | Records | Percentage | Description |
 | :--- | :---: | :---: | :--- |
-| **`TRUE_POSITIVE`** | **9** | **20.9%** | Genuine boundary robustness defects confirmed by manual inspection. |
+| **`TRUE_POSITIVE`** | **9** | **20.9%** | Historical classification. All 9 records are payload variants of one action whose crash is induced by SIS omitting its second argument; reclassification is pending (audit V-01). |
 | **`FALSE_POSITIVE`** | **9** | **20.9%** | Precision failures identified and addressed during benchmark hardening. |
 | **`FRAMEWORK_ARTIFACT`** | **24** | **55.8%** | Sandbox execution failures caused by un-mocked cloud singletons. |
 | **`UNREACHABLE`** | **1** | **2.3%** | Non-production test utility helper scanned as production code. |
@@ -280,11 +298,14 @@ The benchmark was not constructed to showcase artificial success. It was used as
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
 | **Phase 22 (Pilot)** | 43 | 2 (pilot sample) | 4 | 3 | 33.3% (pilot sample) | 41.10s | Benchmark exposed systematic boundary and runtime false positives. |
 | **Phase 23 (Hardened)** | 9 | 2 (pilot sample) | 0 | 0 | 100.0% (emitted) | 30.29s | Boundary classification and Compatibility Gate removed systematic noise. |
-| **Phase 24 (Comprehensive)** | 9 | **9 (all confirmed)** | 0 | 0 | **100.0% (emitted)** | 32.20s | Complete ground-truth review confirmed all active findings as genuine bugs. |
+| **Phase 24 (Comprehensive)** | 9 | **9 (all confirmed)** | 0 | 0 | **100.0% (emitted)** | 32.20s | Historical review labeled all active findings as genuine bugs; the 2026-11 audit found they are one SIS-induced cluster (V-01). |
 
 ---
 
 ### Benchmark Precision Mathematics
+
+> [!CAUTION]
+> The formulas below are preserved as historical documentation. They are computed over payload-level records (one bug can count many times) and exclude framework artifacts from the denominator, so they overstate the evidence (audit V-05). Do not cite them as SIS precision.
 
 We report empirical precision using explicit mathematical formulations:
 
@@ -303,6 +324,9 @@ We report empirical precision using explicit mathematical formulations:
 ---
 
 ### Confirmed Findings: `vercel/commerce`
+
+> [!IMPORTANT]
+> **Under re-review.** SIS supplies only the first argument (`prevState`) to Server Actions, so `payload` is always `undefined` during fuzzing and every generated input crashes identically. The 9 findings below were attributed to `prevState` payloads that played no part in the crash. Whether a real client can trigger the same failure (for example by calling the action with one argument) has not been established. Treat this section as historical until the corrected review lands.
 
 All 9 active benchmark findings reside in `vercel/commerce` (`components/cart/actions.ts#L54`) on the `updateItemQuantity` Server Action:
 
@@ -634,11 +658,11 @@ npx @aashirzayd/sis audit . --runs 25 --seed 42 --timeout 50
 | | `--json` | Emit output as machine-readable JSON (alias for `--format json`). | `false` |
 | | `--sarif` | Emit output as OASIS SARIF 2.1.0 (alias for `--format sarif`). | `false` |
 | | `--silent` | Suppress human-readable terminal progress and output. | `false` |
-| **Execution** | `-r, --runs <n>` | Number of synthesized payloads allocated per candidate target. | `10` |
+| **Execution** | `-r, --runs <n>` | Number of synthesized payloads per candidate Server Action. | `25` when omitted (the CLI help text currently says 10; known mismatch) |
 | | `-t, --timeout <ms>` | Candidate JavaScript execution budget inside the isolate in ms. | `20` |
 | | `--no-shrink` | Disable automatic failure shrinking. | `false` |
 | | `--max-shrink-attempts <n>` | Maximum shrinking iterations per failing payload. | `30` |
-| **Reproducibility** | `-s, --seed <n>` | Explicit seed for deterministic synthesis and file ordering. | `Date.now()` |
+| **Reproducibility** | `-s, --seed <n>` | Explicit seed for deterministic payload synthesis. File ordering is always deterministic. | Unseeded: without `--seed`, generic payload generation is not reproducible |
 | **Global** | `--debug` | Display verbose diagnostics and error stack traces. | `false` |
 | | `-v, --version` | Display current SIS version. | |
 | | `-h, --help` | Display command help. | |
@@ -761,12 +785,13 @@ jobs:
 To maintain technical precision and credibility, SIS explicitly identifies its architectural boundaries. For a full analysis of conservative filtering trade-offs and recall risks, see [**benchmarks/KNOWN_LIMITATIONS.md**](benchmarks/KNOWN_LIMITATIONS.md):
 
 1. **Not a Full Next.js Runtime**: SIS uses `isolated-vm` to execute JavaScript in a clean V8 isolate. It does not run a mock Next.js server, emulate the React reconciler, or provide Next.js routing infrastructure.
-2. **Static-Only for Framework Globals**: Actions requiring live Next.js request context (`cookies()`, `headers()`, `redirect()`, `notFound()`) or external database connections are classified as `static-only` and safely skipped from isolate execution.
+2. **Framework Globals and External Dependencies**: On `main`, `cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`, `revalidateTag()` and `unstable_noStore()` are replaced by deterministic in-memory preludes; in the published `0.1.0` such actions are classified `static-only`. External database connections and cloud SDKs are classified `static-only` or truncated to a verifiable prefix.
 3. **Flight Modeling vs Bundler Emulation**: React Flight serializability is modeled against published protocol specifications; it does not invoke React's internal webpack flight client/server plugin.
 4. **Targeted Fuzzing vs Formal Proof**: Speculative invariant synthesis generates targeted boundary payloads. Passing an audit verifies that tested invariants held against synthesized inputs; it is not a mathematical proof of absolute security.
 5. **Static Taint Reach**: Static analysis operates over discoverable local module graphs. Dynamic evaluation (`eval()`, dynamically constructed `import()`, or obfuscated property access) cannot be tracked.
 6. **Conservative Filters & Recall Risks**: Test directory exclusions, Route Handler exemptions, and cloud SDK gating protect precision but introduce potential recall blind spots where un-validated logic precedes external dependencies.
 7. **Five Repositories Are Not Universal**: The benchmark corpus exercises authentic Next.js patterns, but is an evaluation corpus, not a universal sample. Findings require human engineering review.
+8. **Known Runtime Verification Defects (under remediation)**: Only the first Server Action parameter receives generated input. Module-level helpers, constants and classes are not available inside the sandbox, so dependent actions may be labeled `FULL` without executing. Non-copyable return values, dynamic `import()` and sandbox memory exhaustion can surface as `SIS003`. See [`audit/PHASE-2-FINDINGS-VALIDATION.md`](audit/PHASE-2-FINDINGS-VALIDATION.md).
 
 ---
 
@@ -846,14 +871,15 @@ Contributions, bug reports, and discussion on Next.js boundary contracts are wel
 ## Development & Testing
 
 ```bash
-# Install dependencies
-npm install
+# Install dependencies (reproducible, from package-lock.json)
+npm ci
 
-# Build TypeScript
-npm run build
-
-# Run test suite (284 tests across 21 suites)
+# Run the test suite. Works on a fresh clone: the test run compiles src/
+# into node_modules/.cache/sis-test-build itself and never reads dist/.
 npm test
+
+# Build dist/ (needed to run the CLI locally or `npm run benchmark`)
+npm run build
 
 # Run tests in watch mode
 npm run test:watch

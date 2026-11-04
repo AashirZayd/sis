@@ -60,6 +60,14 @@ export interface RuntimeExecutionOptions {
    * Default: 128MB
    */
   memoryLimitMb?: number;
+
+  /**
+   * Host-side wall-clock deadline in milliseconds covering the whole execution
+   * lifecycle (setup, execution, promise settlement, result transfer).
+   * Default: max(10 × timeoutMs, 1000ms). A value below timeoutMs makes CPU-bound
+   * loops end as infrastructure outcomes (`execution-error`) instead of timeouts.
+   */
+  wallTimeoutMs?: number;
 }
 
 /**

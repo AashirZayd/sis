@@ -32,12 +32,14 @@ SIS deliberately executes pure logic inside zero-privilege V8 isolates via `isol
 | **Execution Isolation** | Pure V8 isolate; no `process`, `fs`, `fetch`, or host memory | Full Node.js host process with system access |
 | **Execution Speed** | Sub-millisecond execution and delta-debugging | Multiple seconds per request, high memory overhead |
 | **Host Safety** | Immune to host tampering or side-effects during fuzzing | Potentially executes destructive operations against host |
-| **Framework Globals** | **Static-Only**: skips live `cookies()`, `headers()`, `redirect()` | Provides full Next.js request context and cookies |
+| **Framework Globals** | **Deterministic preludes** on `main` (empty in-memory `cookies()`/`headers()`, signalling `redirect()`/`notFound()`); **static-only** in the published `0.1.0` | Provides full Next.js request context and cookies |
 | **Database Connections** | **Static-Only**: skips live Prisma, Drizzle, or raw SQL queries | Connects to live database or requires complex mocks |
 
 ### The Compatibility Gate
 Because SIS does not connect to live databases or emulate live Next.js request headers:
-- Actions that call `cookies()`, `headers()`, `redirect()`, `notFound()`, or external database ORMs are classified as **`static-only`**.
+- Actions that call external database ORMs or cloud SDKs are classified as **`static-only`**, or truncated to the statement prefix before the first such call (`PREFIX`).
+- On `main`, `cookies()`, `headers()`, `redirect()`, `notFound()`, `revalidatePath()`, `revalidateTag()` and `unstable_noStore()` are replaced by deterministic preludes instead of forcing `static-only`. The published npm `0.1.0` predates this and still classifies such actions as `static-only`.
+- `FULL` and `PREFIX` are static predictions. An action that depends on module-level helpers, constants or classes is not given those bindings inside the isolate, so it can be labeled `FULL` while every execution ends as `unsupported` (audit V-03, `audit/PHASE-2-FINDINGS-VALIDATION.md`).
 - `static-only` actions are inspected statically for secret taint and return-type serializability, but **bypassed from isolate fuzzing** to eliminate artificial crashes.
 - Therefore, in real-world codebases with heavy database calls directly inside Server Actions, the number of `sandbox-compatible` actions is naturally a subset of all discovered actions.
 

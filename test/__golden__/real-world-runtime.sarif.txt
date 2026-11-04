@@ -1,0 +1,457 @@
+# golden: real-world-runtime.sarif
+# command: sis audit test/fixtures/real-world/runtime --format sarif --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "SIS",
+          "version": "0.1.0",
+          "informationUri": "https://github.com/AashirZayd/sis",
+          "rules": [
+            {
+              "id": "SIS001",
+              "name": "taint-violation",
+              "shortDescription": {
+                "text": "High-confidence secret flow into client boundary"
+              },
+              "fullDescription": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage."
+              },
+              "help": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.",
+                "markdown": "**High-confidence secret flow into client boundary**\n\nA sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.\n\nRule ID: `SIS001`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS002",
+              "name": "serialization-violation",
+              "shortDescription": {
+                "text": "Non-transferable payload boundary violation"
+              },
+              "fullDescription": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure."
+              },
+              "help": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure.",
+                "markdown": "**Non-transferable payload boundary violation**\n\nA non-transferable value across the Server/Client boundary caused a serialization failure.\n\nRule ID: `SIS002`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS003",
+              "name": "runtime-exception",
+              "shortDescription": {
+                "text": "Server Action uncaught runtime exception"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input."
+              },
+              "help": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.",
+                "markdown": "**Server Action uncaught runtime exception**\n\nA candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.\n\nRule ID: `SIS003`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS004",
+              "name": "timeout",
+              "shortDescription": {
+                "text": "Server Action execution timed out"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop."
+              },
+              "help": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.",
+                "markdown": "**Server Action execution timed out**\n\nA candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.\n\nRule ID: `SIS004`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS005",
+              "name": "invariant-violation",
+              "shortDescription": {
+                "text": "General invariant assertion failure"
+              },
+              "fullDescription": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation."
+              },
+              "help": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation.",
+                "markdown": "**General invariant assertion failure**\n\nA synthesized invariant condition was violated during execution or boundary evaluation.\n\nRule ID: `SIS005`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "throwAction threw TypeError: Cannot read properties of null (reading 'code')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "throwAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "nullability",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "throwAction|failed|TypeError|cannot read properties of null (reading 'code')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": null
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "typeErrorAction threw TypeError: Cannot read properties of undefined (reading 'toFixed')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "typeErrorAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "structural-deletion",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of undefined (reading 'tofixed')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "typeErrorAction threw TypeError: Cannot read properties of null (reading 'amount')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "typeErrorAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "nullability",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of null (reading 'amount')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": null
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "typeErrorAction threw TypeError: Cannot read properties of undefined (reading 'toFixed')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "typeErrorAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "serialization-unsupported",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of undefined (reading 'tofixed')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 1,
+            "shrinkReduction": 87.5,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "typeErrorAction threw TypeError: payload.amount.toFixed is not a function"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 10,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "typeErrorAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "primitive-mismatch",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "typeErrorAction|failed|TypeError|payload.amount.tofixed is not a function",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 2,
+            "shrinkReduction": 46.2,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {
+              "amount": ""
+            }
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "infiniteLoopAction threw TypeError: Cannot read properties of null (reading 'loop')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "infiniteLoopAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "nullability",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "infiniteLoopAction|failed|TypeError|cannot read properties of null (reading 'loop')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": null
+          }
+        },
+        {
+          "ruleId": "SIS004",
+          "ruleIndex": 3,
+          "level": "error",
+          "message": {
+            "text": "infiniteLoopAction timed out after 500ms execution budget"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "infiniteLoopAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "prototype-sensitive",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "infiniteLoopAction|timeout|TimeoutError|script execution timed out execution budget",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 2,
+            "shrinkReduction": 66.7,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {
+              "loop": true
+            }
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "recursiveAction threw TypeError: Cannot read properties of null (reading 'depth')"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "recursiveAction",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "nullability",
+            "invariant": "runtime-safety",
+            "parameter": "payload",
+            "executionMode": "FULL",
+            "failureSignature": "recursiveAction|failed|TypeError|cannot read properties of null (reading 'depth')",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": null
+          }
+        }
+      ]
+    }
+  ]
+}
+# --- stderr ---

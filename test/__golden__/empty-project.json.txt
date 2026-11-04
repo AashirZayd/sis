@@ -1,0 +1,49 @@
+# golden: empty-project.json
+# command: sis audit test/fixtures/empty-project --format json --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/empty-project",
+  "summary": {
+    "filesScanned": 1,
+    "filesAnalyzed": 0,
+    "filesSkipped": 1,
+    "boundariesFound": 0,
+    "serverActionsFound": 0,
+    "verifiedFindings": 0,
+    "runtimeFailures": 0,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 0
+  },
+  "statistics": {
+    "filesScanned": 1,
+    "filesAnalyzed": 0,
+    "filesSkipped": 1,
+    "analysisErrors": 0,
+    "boundariesFound": 0,
+    "actionsFound": 0,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "payloadsGenerated": 0,
+    "executions": 0,
+    "passedExecutions": 0,
+    "failedExecutions": 0,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 0,
+    "shrinkAttempts": 0,
+    "verifiedReproCount": 0
+  },
+  "files": [
+    "<ROOT>/test/fixtures/empty-project"
+  ],
+  "findings": [],
+  "actions": [],
+  "errors": []
+}
+# --- stderr ---

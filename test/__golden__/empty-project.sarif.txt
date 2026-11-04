@@ -1,0 +1,148 @@
+# golden: empty-project.sarif
+# command: sis audit test/fixtures/empty-project --format sarif --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "SIS",
+          "version": "0.1.0",
+          "informationUri": "https://github.com/AashirZayd/sis",
+          "rules": [
+            {
+              "id": "SIS001",
+              "name": "taint-violation",
+              "shortDescription": {
+                "text": "High-confidence secret flow into client boundary"
+              },
+              "fullDescription": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage."
+              },
+              "help": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.",
+                "markdown": "**High-confidence secret flow into client boundary**\n\nA sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.\n\nRule ID: `SIS001`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS002",
+              "name": "serialization-violation",
+              "shortDescription": {
+                "text": "Non-transferable payload boundary violation"
+              },
+              "fullDescription": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure."
+              },
+              "help": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure.",
+                "markdown": "**Non-transferable payload boundary violation**\n\nA non-transferable value across the Server/Client boundary caused a serialization failure.\n\nRule ID: `SIS002`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS003",
+              "name": "runtime-exception",
+              "shortDescription": {
+                "text": "Server Action uncaught runtime exception"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input."
+              },
+              "help": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.",
+                "markdown": "**Server Action uncaught runtime exception**\n\nA candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.\n\nRule ID: `SIS003`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS004",
+              "name": "timeout",
+              "shortDescription": {
+                "text": "Server Action execution timed out"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop."
+              },
+              "help": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.",
+                "markdown": "**Server Action execution timed out**\n\nA candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.\n\nRule ID: `SIS004`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS005",
+              "name": "invariant-violation",
+              "shortDescription": {
+                "text": "General invariant assertion failure"
+              },
+              "fullDescription": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation."
+              },
+              "help": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation.",
+                "markdown": "**General invariant assertion failure**\n\nA synthesized invariant condition was violated during execution or boundary evaluation.\n\nRule ID: `SIS005`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": []
+    }
+  ]
+}
+# --- stderr ---

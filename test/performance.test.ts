@@ -4,6 +4,7 @@ import { AuditEngine } from "../src/index.js";
 import { formatJson, formatSarif } from "../src/output/index.js";
 import { measureAudit } from "./helpers/perf-harness.js";
 import { toPosixPath } from "../src/discovery/filters.js";
+import { SUCCESS_PATH_BUDGET_MS } from "./helpers/budgets.js";
 
 function stripTimings(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj, (k, v) => {
@@ -76,10 +77,10 @@ describe("Phase 13: Performance, Determinism & Scalability Hardening", () => {
 
     it("guarantees deterministic, lexicographical ordering of analyzed files and actions", async () => {
       const targetDir = path.resolve(process.cwd(), "test/fixtures/performance/medium");
-      const e1 = new AuditEngine({ silent: true, seed: 42, runs: 5 });
+      const e1 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 5 });
       const r1 = await e1.run(targetDir);
 
-      const e2 = new AuditEngine({ silent: true, seed: 42, runs: 5 });
+      const e2 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 5 });
       const r2 = await e2.run(targetDir);
 
       expect(r1.filesAnalyzed).toEqual(r2.filesAnalyzed);
@@ -92,13 +93,13 @@ describe("Phase 13: Performance, Determinism & Scalability Hardening", () => {
     it("produces identical payloads, failure signatures, and minimal reproducers for identical seeds", async () => {
       const targetDir = path.resolve(process.cwd(), "test/fixtures/performance/heavy-fuzzing");
 
-      const e1 = new AuditEngine({ silent: true, seed: 42, runs: 10 });
+      const e1 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 10 });
       const r1 = await e1.run(targetDir);
 
-      const e2 = new AuditEngine({ silent: true, seed: 42, runs: 10 });
+      const e2 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 10 });
       const r2 = await e2.run(targetDir);
 
-      const e3 = new AuditEngine({ silent: true, seed: 99, runs: 10 });
+      const e3 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 99, runs: 10 });
       const r3 = await e3.run(targetDir);
 
       const extractRepros = (r: typeof r1) =>
@@ -122,10 +123,10 @@ describe("Phase 13: Performance, Determinism & Scalability Hardening", () => {
     it("produces identical JSON and SARIF structures (sans runtime wall-clock timings) across repeated runs", async () => {
       const targetDir = path.resolve(process.cwd(), "test/fixtures/performance/mixed-real-world");
 
-      const e1 = new AuditEngine({ silent: true, seed: 42, runs: 5 });
+      const e1 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 5 });
       const r1 = await e1.run(targetDir);
 
-      const e2 = new AuditEngine({ silent: true, seed: 42, runs: 5 });
+      const e2 = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 5 });
       const r2 = await e2.run(targetDir);
 
       const json1 = stripTimings(JSON.parse(formatJson(r1)));
@@ -172,7 +173,7 @@ describe("Phase 13: Performance, Determinism & Scalability Hardening", () => {
   describe("8. Shrinker & Runtime Execution Bounds", () => {
     it("enforces shrink attempt budgets without runaway iteration", async () => {
       const targetDir = path.resolve(process.cwd(), "test/fixtures/performance/heavy-fuzzing");
-      const { metrics } = await measureAudit(targetDir, { runs: 5, seed: 42, maxShrinkAttempts: 15 });
+      const { metrics } = await measureAudit(targetDir, { timeoutMs: SUCCESS_PATH_BUDGET_MS, runs: 5, seed: 42, maxShrinkAttempts: 15 });
 
       // Max shrink attempts per candidate is bounded by 15
       expect(metrics.shrinkAttempts).toBeLessThanOrEqual(15 * metrics.failedExecutions);

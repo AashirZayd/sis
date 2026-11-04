@@ -20,3 +20,9 @@ Thumbs.db
 
 # Package tarballs
 *.tgz
+
+# Test fixtures that intentionally contain build/dependency directories, used to
+# verify SIS's default ignore rules. Without these exceptions the fixture files are
+# never committed and the ignore tests are vacuous on fresh clones and in CI.
+!test/fixtures/project/dist/
+!test/fixtures/project/node_modules/

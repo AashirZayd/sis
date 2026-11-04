@@ -1,11 +1,15 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
+import { TEST_BUILD_ROOT } from "./helpers/test-build.js";
 
 describe("Release & Packaging Validation", () => {
   const root = path.resolve(__dirname, "..");
   const pkgPath = path.join(root, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+  // Entrypoints are checked against a fresh build of src/ laid out like the
+  // packed tarball, not against whatever dist/ happens to exist locally.
+  const buildRoot = TEST_BUILD_ROOT;
 
   it("package.json contains all required release metadata", () => {
     expect(pkg.name).toBe("@aashirzayd/sis");
@@ -22,26 +26,46 @@ describe("Release & Packaging Validation", () => {
 
   it("package entrypoints and binary targets exist on disk", () => {
     // Check main entry
-    const mainPath = path.join(root, pkg.main);
+    const mainPath = path.join(buildRoot, pkg.main);
     expect(fs.existsSync(mainPath)).toBe(true);
 
     // Check types entry
-    const typesPath = path.join(root, pkg.types);
+    const typesPath = path.join(buildRoot, pkg.types);
     expect(fs.existsSync(typesPath)).toBe(true);
 
     // Check bin executable
-    const binPath = path.join(root, pkg.bin.sis);
+    const binPath = path.join(buildRoot, pkg.bin.sis);
     expect(fs.existsSync(binPath)).toBe(true);
 
     // Check exports
-    const exportTypes = path.join(root, pkg.exports["."].types);
-    const exportImport = path.join(root, pkg.exports["."].import);
+    const exportTypes = path.join(buildRoot, pkg.exports["."].types);
+    const exportImport = path.join(buildRoot, pkg.exports["."].import);
     expect(fs.existsSync(exportTypes)).toBe(true);
     expect(fs.existsSync(exportImport)).toBe(true);
   });
 
+  it("CLI --version, JSON/SARIF tool version and package.json agree (single version source)", async () => {
+    const { execFileSync } = await import("node:child_process");
+    const cliVersion = execFileSync(process.execPath, [path.join(buildRoot, pkg.bin.sis), "--version"], {
+      encoding: "utf-8",
+    }).trim();
+    const { TOOL_VERSION } = await import("../src/output/schema.js");
+    const { SIS_VERSION } = await import("../src/version.js");
+
+    expect(cliVersion).toBe(pkg.version);
+    expect(TOOL_VERSION).toBe(pkg.version);
+    expect(SIS_VERSION).toBe(pkg.version);
+  });
+
+  it("published file list excludes placeholder modules and source maps", () => {
+    expect(pkg.files).toEqual(
+      expect.arrayContaining(["dist", "!dist/analyzer", "!dist/fuzzer", "!dist/sandbox", "!dist/**/*.map"])
+    );
+    expect(pkg.dependencies).not.toHaveProperty("ora");
+  });
+
   it("CLI executable contains proper node shebang", () => {
-    const binPath = path.join(root, pkg.bin.sis);
+    const binPath = path.join(buildRoot, pkg.bin.sis);
     const content = fs.readFileSync(binPath, "utf-8");
     expect(content.startsWith("#!/usr/bin/env node")).toBe(true);
   });

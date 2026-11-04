@@ -1,0 +1,7 @@
+# golden: error-invalid-runs.json
+# command: sis audit test/fixtures/project --runs 0 --json
+# exit: 2
+# --- stdout ---
+
+# --- stderr ---
+Error: Invalid --runs value: "0". Must be a positive integer (> 0).

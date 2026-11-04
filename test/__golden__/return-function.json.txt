@@ -1,0 +1,280 @@
+# golden: return-function.json
+# command: sis audit test/fixtures/golden/return-function --format json --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/golden/return-function",
+  "summary": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "boundariesFound": 1,
+    "serverActionsFound": 1,
+    "verifiedFindings": 7,
+    "runtimeFailures": 6,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 6
+  },
+  "statistics": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "analysisErrors": 0,
+    "boundariesFound": 1,
+    "actionsFound": 1,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "propBoundariesFound": 0,
+    "verifiedSafeProps": 0,
+    "serializabilityViolations": 1,
+    "unknownSerializability": 0,
+    "payloadsGenerated": 6,
+    "executions": 6,
+    "passedExecutions": 0,
+    "failedExecutions": 6,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 0,
+    "shrinkAttempts": 3,
+    "verifiedReproCount": 6,
+    "fuzzTargetsDiscovered": 2,
+    "fuzzStrategiesApplied": 5,
+    "boundaryDirectedPayloads": 6,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 6,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 0,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "actions.ts"
+  ],
+  "findings": [
+    {
+      "id": "SIS003-1",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "prototype-sensitive",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "label": "test"
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 95.6,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-2",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-3",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-deletion",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-4",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-5",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-replacement",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": []
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": []
+      }
+    },
+    {
+      "id": "SIS003-6",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "makeCallback threw TypeError: ()=>input could not be cloned.",
+      "file": "actions.ts",
+      "location": {
+        "line": 4,
+        "column": 23
+      },
+      "actionName": "makeCallback",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "serialization-unsupported",
+      "invariant": "runtime-safety",
+      "parameter": "input",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "makeCallback|failed|TypeError|()=>input could not be cloned.",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "name": "user"
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 87.5,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS002-7",
+      "ruleId": "SIS002",
+      "ruleName": "serialization-violation",
+      "type": "serialization-violation",
+      "severity": "error",
+      "message": "Server Action \"makeCallback\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'",
+      "file": "actions.ts",
+      "location": {
+        "line": 5,
+        "column": 10
+      },
+      "actionName": "makeCallback"
+    }
+  ],
+  "actions": [
+    {
+      "name": "makeCallback",
+      "file": "actions.ts",
+      "line": 4,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---

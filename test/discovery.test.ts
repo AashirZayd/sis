@@ -8,6 +8,7 @@ import {
   isSupportedSourceFile,
 } from "../src/discovery/index.js";
 import { AuditEngine, audit } from "../src/index.js";
+import { SUCCESS_PATH_BUDGET_MS } from "./helpers/budgets.js";
 
 describe("Discovery Subsystem (Phase 7)", () => {
   describe("Path Normalization & Filters (filters.ts)", () => {
@@ -132,6 +133,7 @@ describe("Discovery Subsystem (Phase 7)", () => {
   describe("Directory Audit Aggregation (AuditEngine)", () => {
     it("audits fixture project and aggregates boundaries, actions, executions, and shrinks", async () => {
       const result = await audit("./test/fixtures/project", {
+        timeoutMs: SUCCESS_PATH_BUDGET_MS,
         runs: 5,
         seed: 42,
         silent: true,

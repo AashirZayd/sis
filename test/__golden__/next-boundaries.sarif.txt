@@ -1,0 +1,600 @@
+# golden: next-boundaries.sarif
+# command: sis audit test/fixtures/next-boundaries --format sarif --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "SIS",
+          "version": "0.1.0",
+          "informationUri": "https://github.com/AashirZayd/sis",
+          "rules": [
+            {
+              "id": "SIS001",
+              "name": "taint-violation",
+              "shortDescription": {
+                "text": "High-confidence secret flow into client boundary"
+              },
+              "fullDescription": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage."
+              },
+              "help": {
+                "text": "A sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.",
+                "markdown": "**High-confidence secret flow into client boundary**\n\nA sensitive server-side environment value or secret flows directly into a Client Component boundary, risking secret leakage.\n\nRule ID: `SIS001`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS002",
+              "name": "serialization-violation",
+              "shortDescription": {
+                "text": "Non-transferable payload boundary violation"
+              },
+              "fullDescription": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure."
+              },
+              "help": {
+                "text": "A non-transferable value across the Server/Client boundary caused a serialization failure.",
+                "markdown": "**Non-transferable payload boundary violation**\n\nA non-transferable value across the Server/Client boundary caused a serialization failure.\n\nRule ID: `SIS002`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS003",
+              "name": "runtime-exception",
+              "shortDescription": {
+                "text": "Server Action uncaught runtime exception"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input."
+              },
+              "help": {
+                "text": "A candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.",
+                "markdown": "**Server Action uncaught runtime exception**\n\nA candidate Server Action threw an uncaught runtime exception when invoked with adversarial or speculative input.\n\nRule ID: `SIS003`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS004",
+              "name": "timeout",
+              "shortDescription": {
+                "text": "Server Action execution timed out"
+              },
+              "fullDescription": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop."
+              },
+              "help": {
+                "text": "A candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.",
+                "markdown": "**Server Action execution timed out**\n\nA candidate Server Action exceeded its allocated isolated JavaScript execution budget, indicating potential denial of service or infinite loop.\n\nRule ID: `SIS004`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            },
+            {
+              "id": "SIS005",
+              "name": "invariant-violation",
+              "shortDescription": {
+                "text": "General invariant assertion failure"
+              },
+              "fullDescription": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation."
+              },
+              "help": {
+                "text": "A synthesized invariant condition was violated during execution or boundary evaluation.",
+                "markdown": "**General invariant assertion failure**\n\nA synthesized invariant condition was violated during execution or boundary evaluation.\n\nRule ID: `SIS005`"
+              },
+              "defaultConfiguration": {
+                "defaultLevel": "error"
+              },
+              "properties": {
+                "tags": [
+                  "security",
+                  "nextjs",
+                  "react-server-components",
+                  "runtime-verification"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "serialization-unsupported",
+            "invariant": "runtime-safety",
+            "parameter": "input",
+            "executionMode": "FULL",
+            "failureSignature": "returnCallback|failed|TypeError|()=>{",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 1,
+            "shrinkReduction": 95.6,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "prototype-sensitive",
+            "invariant": "runtime-safety",
+            "parameter": "input",
+            "executionMode": "FULL",
+            "failureSignature": "returnCallback|failed|TypeError|()=>{",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 1,
+            "shrinkReduction": 93.9,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "structural-deletion",
+            "invariant": "runtime-safety",
+            "parameter": "input",
+            "executionMode": "FULL",
+            "failureSignature": "returnCallback|failed|TypeError|()=>{",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 0,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "nullability",
+            "invariant": "runtime-safety",
+            "parameter": "input",
+            "executionMode": "FULL",
+            "failureSignature": "returnCallback|failed|TypeError|()=>{",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 1,
+            "shrinkReduction": 0,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": null
+          }
+        },
+        {
+          "ruleId": "SIS003",
+          "ruleIndex": 2,
+          "level": "error",
+          "message": {
+            "text": "returnCallback threw TypeError: ()=>{\n        return \"unsupported callback\";\n    } could not be cloned."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback",
+            "fuzzTarget": "server-action-argument",
+            "strategy": "serialization-edge",
+            "invariant": "runtime-safety",
+            "parameter": "input",
+            "executionMode": "FULL",
+            "failureSignature": "returnCallback|failed|TypeError|()=>{",
+            "executionMs": "<T>",
+            "wallTimeMs": "<T>",
+            "timeoutMs": 500,
+            "shrinkAttempts": 1,
+            "shrinkReduction": 95.6,
+            "minimalReproducerVerified": true,
+            "minimizedPayload": {}
+          }
+        },
+        {
+          "ruleId": "SIS001",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Sensitive environment value DATABASE_URL reaches client-side code"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "trace": [
+              "process.env.DATABASE_URL",
+              "app/actions.ts:Server Action return: leakSecret()"
+            ]
+          }
+        },
+        {
+          "ruleId": "SIS001",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Sensitive environment value AUTH_SECRET reaches client-side code"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/inline-actions.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 11,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "trace": [
+              "process.env.AUTH_SECRET",
+              "app/inline-actions.tsx:Server Action return: leakyInlineAction()"
+            ]
+          }
+        },
+        {
+          "ruleId": "SIS002",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Non-serializable value passed as prop \"onClick\" to Client Component <ClientCard />: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/page.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 9
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "SIS002",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Non-serializable value passed as prop \"db\" to Client Component <ClientCard />: Database connection / server-only instance \"dbInstance\" cannot be passed to a Client Component"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/page.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 29,
+                  "startColumn": 9
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "SIS001",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Sensitive environment secret passed as prop \"token\" to Client Component <ClientCard />"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/page.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 35,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "trace": [
+              "process.env.SESSION_SECRET",
+              "app/page.tsx:<ClientCard token={...} />"
+            ]
+          }
+        },
+        {
+          "ruleId": "SIS001",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Server Action \"leakSecret\" returns sensitive secret \"process.env.DATABASE_URL\" across client boundary"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 14,
+                  "startColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "leakSecret",
+            "trace": [
+              "process.env.DATABASE_URL",
+              "app/actions.ts:leakSecret() return"
+            ]
+          }
+        },
+        {
+          "ruleId": "SIS002",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Server Action \"returnDatabase\" returns non-serializable value: Class instance \"new DatabaseConnection()\" cannot be passed to a Client Component"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnDatabase"
+          }
+        },
+        {
+          "ruleId": "SIS002",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Server Action \"returnCallback\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/actions.ts",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "returnCallback"
+          }
+        },
+        {
+          "ruleId": "SIS001",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Server Action \"leakyInlineAction\" returns sensitive secret \"process.env.AUTH_SECRET\" across client boundary"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/inline-actions.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "leakyInlineAction",
+            "trace": [
+              "process.env.AUTH_SECRET",
+              "app/inline-actions.tsx:leakyInlineAction() return"
+            ]
+          }
+        },
+        {
+          "ruleId": "SIS002",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Server Action \"invalidReturnInlineAction\" returns non-serializable value: Functions cannot be passed directly to Client Components unless explicitly exposed with 'use server'"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "app/inline-actions.tsx",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 10
+                }
+              }
+            }
+          ],
+          "properties": {
+            "actionName": "invalidReturnInlineAction"
+          }
+        }
+      ]
+    }
+  ]
+}
+# --- stderr ---

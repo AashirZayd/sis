@@ -1,0 +1,34 @@
+# golden: empty-project.terminal
+# command: sis audit test/fixtures/empty-project --format terminal --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+
+SIS  Speculative Invariant Synthesis
+Autonomous runtime verification for Next.js boundaries
+
+◇ DISCOVERY
+  Target: test/fixtures/empty-project (Directory)
+
+Scanning 0 source files...
+
+◆ DISCOVERY
+  ✓ 0 server boundaries
+  ✓ 0 candidate Server Actions
+
+◆ TAINT ANALYSIS
+  ✓ No high-confidence secret flows detected
+
+◆ RUNTIME VERIFICATION
+  No candidate actions to execute.
+
+────────────────────────────────────────
+AUDIT COMPLETE
+  Files analyzed:        0
+  Server boundaries:     0
+  Candidate actions:     0
+  Runtime failures:      0
+  Taint violations:      0
+
+✓ SIS found 0 verified findings
+────────────────────────────────────────
+# --- stderr ---

@@ -1,0 +1,7 @@
+# golden: error-target-not-found.json
+# command: sis audit test/fixtures/does-not-exist --json
+# exit: 2
+# --- stdout ---
+
+# --- stderr ---
+Error: Audit target does not exist: test/fixtures/does-not-exist

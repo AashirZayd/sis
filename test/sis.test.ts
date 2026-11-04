@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import path from "node:path";
+import { SUCCESS_PATH_BUDGET_MS } from "./helpers/budgets.js";
 import {
   AuditEngine,
   audit,
@@ -120,7 +121,7 @@ describe("AuditEngine Contract & Phase 2 Integration", () => {
   });
 
   it("should not flag safe server secret usage in taint-safe-server.ts", async () => {
-    const result = await audit("./test/fixtures/taint-safe-server.ts", { silent: true });
+    const result = await audit("./test/fixtures/taint-safe-server.ts", { timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true });
     expect(result.findings).toHaveLength(0);
     expect(result.statistics.taintViolations).toBe(0);
   });
@@ -135,6 +136,7 @@ describe("AuditEngine Contract & Phase 2 Integration", () => {
 
   it("should synthesize payloads and execute runtime verification for payload-fragile-action.ts", async () => {
     const result = await audit("./test/fixtures/payload-fragile-action.ts", {
+      timeoutMs: SUCCESS_PATH_BUDGET_MS,
       runs: 25,
       seed: 123,
       silent: true,
@@ -159,6 +161,7 @@ describe("AuditEngine Contract & Phase 2 Integration", () => {
 
   it("should verify runtime-safe-action.ts with 0 runtime failures", async () => {
     const result = await audit("./test/fixtures/runtime-safe-action.ts", {
+      timeoutMs: SUCCESS_PATH_BUDGET_MS,
       runs: 25,
       seed: 42,
       silent: true,
@@ -185,6 +188,7 @@ describe("AuditEngine Contract & Phase 2 Integration", () => {
 
   it("should shrink failing payloads and populate shrinkResults for payload-fragile-action.ts", async () => {
     const result = await audit("./test/fixtures/payload-fragile-action.ts", {
+      timeoutMs: SUCCESS_PATH_BUDGET_MS,
       runs: 10,
       seed: 42,
       silent: true,
@@ -209,6 +213,7 @@ describe("AuditEngine Contract & Phase 2 Integration", () => {
 
   it("should shrink complex nested payload in shrink-complex-action.ts", async () => {
     const result = await audit("./test/fixtures/shrink-complex-action.ts", {
+      timeoutMs: SUCCESS_PATH_BUDGET_MS,
       runs: 10,
       seed: 42,
       silent: true,

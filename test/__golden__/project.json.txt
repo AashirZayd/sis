@@ -1,0 +1,222 @@
+# golden: project.json
+# command: sis audit test/fixtures/project --format json --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/project",
+  "summary": {
+    "filesScanned": 10,
+    "filesAnalyzed": 4,
+    "filesSkipped": 3,
+    "boundariesFound": 4,
+    "serverActionsFound": 3,
+    "verifiedFindings": 4,
+    "runtimeFailures": 4,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 4
+  },
+  "statistics": {
+    "filesScanned": 10,
+    "filesAnalyzed": 4,
+    "filesSkipped": 3,
+    "analysisErrors": 0,
+    "boundariesFound": 4,
+    "actionsFound": 3,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "propBoundariesFound": 0,
+    "verifiedSafeProps": 1,
+    "serializabilityViolations": 0,
+    "unknownSerializability": 2,
+    "payloadsGenerated": 18,
+    "executions": 14,
+    "passedExecutions": 10,
+    "failedExecutions": 4,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 4,
+    "shrinkAttempts": 1,
+    "verifiedReproCount": 4,
+    "fuzzTargetsDiscovered": 6,
+    "fuzzStrategiesApplied": 7,
+    "boundaryDirectedPayloads": 18,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 18,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 0,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "app/actions.ts",
+    "app/nested/fragile-action.ts",
+    "app/safe-action.ts",
+    "components/client.tsx"
+  ],
+  "findings": [
+    {
+      "id": "SIS003-1",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "riskyCompute threw TypeError: Cannot read properties of undefined (reading 'options')",
+      "file": "app/nested/fragile-action.ts",
+      "location": {
+        "line": 3,
+        "column": 23
+      },
+      "actionName": "riskyCompute",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "riskyCompute|failed|TypeError|cannot read properties of undefined (reading 'options')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "config": {
+            "$sis_type": "undefined"
+          }
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 90.5,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-2",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "riskyCompute threw TypeError: Cannot read properties of undefined (reading 'options')",
+      "file": "app/nested/fragile-action.ts",
+      "location": {
+        "line": 3,
+        "column": 23
+      },
+      "actionName": "riskyCompute",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-deletion",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "riskyCompute|failed|TypeError|cannot read properties of undefined (reading 'options')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-3",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "riskyCompute threw TypeError: Cannot read properties of null (reading 'config')",
+      "file": "app/nested/fragile-action.ts",
+      "location": {
+        "line": 3,
+        "column": 23
+      },
+      "actionName": "riskyCompute",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "riskyCompute|failed|TypeError|cannot read properties of null (reading 'config')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-4",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "riskyCompute threw TypeError: Cannot read properties of undefined (reading 'options')",
+      "file": "app/nested/fragile-action.ts",
+      "location": {
+        "line": 3,
+        "column": 23
+      },
+      "actionName": "riskyCompute",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-deletion",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "riskyCompute|failed|TypeError|cannot read properties of undefined (reading 'options')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "processOrder",
+      "file": "app/actions.ts",
+      "line": 3,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "riskyCompute",
+      "file": "app/nested/fragile-action.ts",
+      "line": 3,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "validateToken",
+      "file": "app/safe-action.ts",
+      "line": 3,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---

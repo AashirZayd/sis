@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Note on Package Identity**: The unscoped npm package name `sis` was historically registered by an unrelated legacy library published in 2014–2015. Speculative Invariant Synthesis is prepared for its initial release under the scoped package name `@aashirzayd/sis`.
 
+## [Unreleased]
+
+Reliability Reset, implementation batch 1 (see `audit/PHASE-5-BATCH-1-IMPLEMENTATION-REPORT.md`). Nothing in this section has been published to npm; the published package remains `0.1.0`.
+
+### Fixed
+- **Sandbox executions can no longer hang the audit.** A host-side wall-clock deadline (default `max(10 × --timeout, 1000ms)`) now bounds every sandbox execution, including actions awaiting promises that never settle, which V8's CPU timeout does not cover. Expired executions are terminated and counted as `unsupported`; they are never reported as findings. (audit V-26)
+- **Source locations after non-ASCII text.** SWC reports UTF-8 byte offsets; SIS previously indexed them as UTF-16 positions, so columns (and sometimes lines) were wrong after accented, CJK or emoji characters, and columns were off by one in files starting with a byte-order mark. Locations in terminal, JSON and SARIF output are now exact (1-based lines, UTF-16 code-unit columns). (audit V-12)
+
+### Changed
+- The CLI `--version`, JSON `tool.version` and SARIF `driver.version` are read from `package.json` instead of three hard-coded copies.
+- The npm package no longer ships source maps or the empty `analyzer`, `fuzzer` and `sandbox` placeholder modules (299 → 147 files).
+- Removed the unused `ora` dependency.
+- Added `.gitattributes` so every checkout uses LF; builds are now byte-identical across platforms regardless of `core.autocrlf`.
+
+### Development
+- `npm test` no longer depends on a prebuilt `dist/`: the test run compiles `src/` into `node_modules/.cache/sis-test-build`. A fresh clone can run `npm ci && npm test`.
+- Golden output snapshots (`test/__golden__/`) pin terminal, JSON and SARIF output and exit codes, including fixtures that capture known defects still under remediation.
+- New CI workflow on push and pull request (Linux and Windows, Node 24), with non-blocking Node 26 and `--no-node-snapshot` observation jobs and `actionlint`.
+- The benchmark workflow now passes `workflow_dispatch` inputs through environment variables, validates them before use, runs with read-only permissions and uses SHA-pinned actions. (audit V-18)
+- Fixture files `test/fixtures/project/dist/ignored.ts` and `test/fixtures/project/node_modules/ignored.ts` are now tracked; they had been excluded by `.gitignore`, leaving the default-ignore tests vacuous on fresh clones.
+
+### Documentation
+- README, `docs/benchmark.md` and `benchmarks/KNOWN_LIMITATIONS.md` now state the known verification and release limitations, mark the published-package gap, and label the benchmark figures as historical and pre-correction. Historical benchmark data is unchanged.
+
 ## [0.1.0] - Preparation for Initial Scoped Release
 
 ### Added

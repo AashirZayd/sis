@@ -5,6 +5,16 @@
 **Evaluator**: SIS Engine (`@aashirzayd/sis@0.1.0`)  
 **Evaluation Environment**: Node.js `v24.19.0`, Windows `x64`, Base Seed `42`, Runs `10`, Timeout `20ms`
 
+> [!WARNING]
+> **Historical, pre-correction evaluation.** This document describes the Phase 20–25 benchmark as it was recorded. The figures are preserved unchanged as historical evidence, but an independent audit ([`audit/PHASE-2-FINDINGS-VALIDATION.md`](../audit/PHASE-2-FINDINGS-VALIDATION.md)) found that they overstate the evidence:
+>
+> - The 9 `TRUE_POSITIVE` records are 9 payload variants of a single action (`vercel/commerce` `updateItemQuantity`). SIS passes only the first argument to Server Actions, so the second argument (`payload`) was always `undefined` and every input crashed identically (V-01). **No independently confirmed application defect is currently established.**
+> - Records are counted per failing payload, not per root cause; the 43 records collapse to 16 clusters (V-05).
+> - The precision formulas exclude `FRAMEWORK_ARTIFACT` records (SIS-caused failures) from the denominator (V-05).
+> - The published npm `0.1.0` predates the Phase 23 and Phase 25 engine changes evaluated here (V-04).
+>
+> Do not cite the precision percentages below. A cluster-based re-review is pending; the historical review store (`benchmarks/reviews/ground-truth.json`) is not modified.
+
 ---
 
 ## 1. Purpose & Philosophy
@@ -129,6 +139,8 @@ Total Reviewed Findings: 43
 ```
 
 ### Confirmed True Positives (9 Findings)
+*Historical classification, under re-review: these 9 records are one SIS-induced cluster (see the notice at the top).*
+
 All 9 confirmed `TRUE_POSITIVE` findings reside in `vercel/commerce` (`components/cart/actions.ts#L54`) on the `updateItemQuantity` Server Action:
 
 ```typescript
@@ -173,6 +185,9 @@ We publish the misses alongside the hits. Phase 22 exposed four systematic preci
 ---
 
 ## 7. Precision & Recall Calculations
+
+> [!CAUTION]
+> Historical formulas, preserved for the record. They are computed over payload-level records and exclude framework artifacts from the denominator; do not cite them as SIS precision (see the notice at the top).
 
 ### A. Current Emitted Benchmark Output Precision
 Evaluates the precision of findings emitted by the hardened engine in the active benchmark run:

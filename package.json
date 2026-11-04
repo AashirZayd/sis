@@ -36,7 +36,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "benchmark": "node benchmarks/run.ts",
-    "prepack": "npm run build"
+    "clean": "node scripts/clean-dist.mjs",
+    "prepack": "npm run clean && npm run build"
   },
   "keywords": [
     "nextjs",
@@ -48,15 +49,18 @@
   "author": "Aashir Zayd",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "!dist/analyzer",
+    "!dist/fuzzer",
+    "!dist/sandbox",
+    "!dist/**/*.map"
   ],
   "dependencies": {
     "@swc/core": "^1.16.2",
     "chalk": "^6.0.0",
     "commander": "^15.0.0",
     "fast-check": "^4.9.0",
-    "isolated-vm": "^7.0.1",
-    "ora": "^9.4.1"
+    "isolated-vm": "^7.0.1"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

@@ -9,6 +9,7 @@ import {
 import { parseModule } from "../src/parser/index.js";
 import type { CandidateFunctionSource } from "../src/runtime/types.js";
 import type { GeneratedPayload } from "../src/payload/types.js";
+import { SUCCESS_PATH_RUNTIME_OPTIONS } from "./helpers/budgets.js";
 
 describe("Runtime Subsystem", () => {
   describe("Payload Compatibility (src/runtime/compatibility.ts)", () => {
@@ -160,10 +161,10 @@ describe("Runtime Subsystem", () => {
         location: { file: "state.ts", line: 1, column: 1 },
       };
 
-      const res1 = await runInIsolate(counterCandidate, { val: 1 });
+      const res1 = await runInIsolate(counterCandidate, { val: 1 }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res1.status).toBe("passed");
 
-      const res2 = await runInIsolate(counterCandidate, { val: 2 });
+      const res2 = await runInIsolate(counterCandidate, { val: 2 }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res2.status).toBe("passed");
     });
   });
@@ -223,7 +224,14 @@ describe("Runtime Subsystem", () => {
       const result = await runInIsolate(fastCandidate, {}, { timeoutMs: 20 });
       expect(result.status).toBe("passed");
       expect(result.timeoutMs).toBe(20);
-      expect(result.executionMs).toBeLessThanOrEqual(20);
+      // executionMs is measured on the host with Date.now() (1ms resolution) around
+      // `await script.run(...)`, so it also includes the hand-off back to the host event loop
+      // after the isolate has finished. The isolate's budget is enforced separately by
+      // isolated-vm, so a run that passed within budget can be reported slightly over it
+      // (observed: 21ms for a 20ms budget, Phase 5.9 §2, run 7). The tolerance covers only
+      // that measurement overhead; production timing is unchanged.
+      const MEASUREMENT_TOLERANCE_MS = 5;
+      expect(result.executionMs).toBeLessThanOrEqual(20 + MEASUREMENT_TOLERANCE_MS);
       expect(result.wallTimeMs).toBeGreaterThanOrEqual(result.executionMs);
     });
 
