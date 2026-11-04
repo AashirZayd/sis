@@ -60,7 +60,12 @@ describe("resolveWallDeadlineMs", () => {
 describe("Wall-clock execution deadline", () => {
   it("terminates a never-settling promise as an infrastructure outcome, not a finding status", async () => {
     const started = Date.now();
-    const result = await runInIsolate(candidate(NEVER_SETTLES), null, { timeoutMs: 20, wallTimeoutMs: 300 });
+    // The isolate budget (timeoutMs) is incidental here: it must not fire before the 300ms
+    // deadline under test. isolated-vm measures it in wall-clock time while the isolate runs,
+    // so a 20ms budget could expire during a scheduler stall in the synchronous prologue and
+    // report `timeout` instead (Phase 5.9 §2, run 6). 200ms still leaves the 300ms deadline
+    // as the only mechanism that can end a promise that never settles.
+    const result = await runInIsolate(candidate(NEVER_SETTLES), null, { timeoutMs: 200, wallTimeoutMs: 300 });
     const elapsed = Date.now() - started;
 
     expect(result.status).toBe("execution-error");
