@@ -19,6 +19,10 @@ on:
     # Run weekly on Mondays at 03:00 UTC
     - cron: "0 3 * * 1"
 
+# Least privilege: the benchmark only reads the repository and uploads an artifact.
+permissions:
+  contents: read
+
 jobs:
   benchmark:
     name: Run Benchmark Suite
@@ -27,12 +31,24 @@ jobs:
 
     steps:
       - name: Checkout SIS
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
+
+      # Inputs are passed only through environment variables and validated before
+      # any shell command uses them; they are never interpolated into scripts.
+      - name: Validate inputs
+        id: inputs
+        env:
+          IN_REPO: ${{ github.event.inputs.repo }}
+          IN_RUNS: ${{ github.event.inputs.runs }}
+          IN_SEED: ${{ github.event.inputs.seed }}
+        run: node scripts/validate-benchmark-inputs.mjs
 
       - name: Install Dependencies
         run: npm ci
@@ -41,15 +57,19 @@ jobs:
         run: npm run build
 
       - name: Run Benchmark Orchestrator
+        env:
+          BENCH_REPO: ${{ steps.inputs.outputs.repo }}
+          BENCH_RUNS: ${{ steps.inputs.outputs.runs }}
+          BENCH_SEED: ${{ steps.inputs.outputs.seed }}
         run: |
-          if [ "${{ github.event.inputs.repo }}" != "" ] && [ "${{ github.event.inputs.repo }}" != "all" ]; then
-            npm run benchmark -- --repo "${{ github.event.inputs.repo }}" --runs "${{ github.event.inputs.runs || '10' }}" --seed "${{ github.event.inputs.seed || '42' }}"
+          if [ "$BENCH_REPO" != "all" ]; then
+            npm run benchmark -- --repo "$BENCH_REPO" --runs "$BENCH_RUNS" --seed "$BENCH_SEED"
           else
-            npm run benchmark -- --all --runs "${{ github.event.inputs.runs || '10' }}" --seed "${{ github.event.inputs.seed || '42' }}"
+            npm run benchmark -- --all --runs "$BENCH_RUNS" --seed "$BENCH_SEED"
           fi
 
       - name: Upload Benchmark Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: benchmark-results
           path: benchmarks/results/

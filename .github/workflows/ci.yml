@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: CI only needs to read the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Node ${{ matrix.node }}${{ matrix.label }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    # Observation entries (experimental: true) are reported but do not block merges
+    # and do not establish platform support.
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, node: 24, experimental: false, label: "", node-options: "" }
+          - { os: windows-latest, node: 24, experimental: false, label: "", node-options: "" }
+          - { os: ubuntu-latest, node: 26, experimental: true, label: " (observation)", node-options: "" }
+          - { os: ubuntu-latest, node: 24, experimental: true, label: ", --no-node-snapshot (observation)", node-options: "--no-node-snapshot" }
+    env:
+      NODE_OPTIONS: ${{ matrix.node-options }}
+    defaults:
+      run:
+        # Same shell on Linux and Windows (Git Bash), so quoting behaves identically.
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Report runtime
+        run: node -e "console.log(process.version, process.platform, process.arch, 'ABI', process.versions.modules, 'NODE_OPTIONS=' + (process.env.NODE_OPTIONS || ''))"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Load native isolated-vm
+        run: node scripts/ci/check-native.mjs
+
+      - name: Type-check
+        run: npx tsc --noEmit -p .
+
+      - name: Assert clean checkout has no dist/
+        run: |
+          if [ -e dist ]; then
+            echo "dist/ exists before the test run; the test suite must not depend on it." >&2
+            exit 1
+          fi
+
+      - name: Test suite (before any build)
+        run: npm test
+
+      - name: Timeout and Unicode location regression tests
+        run: npx vitest run test/runtime-deadline.test.ts test/location.test.ts
+
+      - name: Production build
+        run: npm run build
+
+      - name: CLI runtime smoke test
+        run: node scripts/ci/smoke.mjs
+
+      - name: Package contents
+        run: npm pack --dry-run --ignore-scripts
+
+  workflow-lint:
+    name: Lint workflows (actionlint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Run actionlint (pinned release, checksum-verified)
+        shell: bash
+        env:
+          ACTIONLINT_VERSION: 1.7.12
+        run: |
+          set -euo pipefail
+          base="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          archive="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          workdir="$(mktemp -d)"
+          curl -fsSL -o "${workdir}/${archive}" "${base}/${archive}"
+          curl -fsSL -o "${workdir}/checksums.txt" "${base}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          (cd "${workdir}" && grep " ${archive}\$" checksums.txt | sha256sum -c -)
+          tar -xzf "${workdir}/${archive}" -C "${workdir}" actionlint
+          "${workdir}/actionlint" -color
