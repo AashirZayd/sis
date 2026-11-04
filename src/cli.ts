@@ -11,6 +11,7 @@ import {
 } from "./core/errors.js";
 import { terminal } from "./reporter/terminal.js";
 import { formatJson, formatSarif, type OutputFormat } from "./output/index.js";
+import { SIS_VERSION } from "./version.js";
 
 // Graceful SIGINT / SIGTERM interruption handling
 let activeFormat: OutputFormat = "terminal";
@@ -34,7 +35,7 @@ const program = new Command();
 program
   .name("sis")
   .description("Autonomous runtime verification for Next.js boundaries")
-  .version("0.1.0", "-v, --version", "Output the current version of SIS")
+  .version(SIS_VERSION, "-v, --version", "Output the current version of SIS")
   .option("--debug", "Enable verbose diagnostic stack traces");
 
 const auditCmd = program

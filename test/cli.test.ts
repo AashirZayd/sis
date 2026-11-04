@@ -1,10 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { execFile } from "node:child_process";
-import path from "node:path";
 import { promisify } from "node:util";
 
+import { TEST_CLI } from "./helpers/test-build.js";
+
 const execFileAsync = promisify(execFile);
-const cliPath = path.resolve(process.cwd(), "dist/cli.js");
+// Built from src/ by test/setup/build-dist.ts; never the working-tree dist/.
+const cliPath = TEST_CLI;
 
 describe("CLI Executable End-to-End", () => {
   it("should output version with --version", async () => {

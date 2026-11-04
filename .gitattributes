@@ -1,0 +1,9 @@
+# Normalize text files to LF in every checkout so builds are byte-identical
+# across platforms regardless of core.autocrlf (audit Phase 2, section 7).
+* text=auto eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.ico binary
+*.tgz binary
