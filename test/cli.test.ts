@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 import { TEST_CLI } from "./helpers/test-build.js";
+import { SUCCESS_PATH_CLI_ARGS } from "./helpers/budgets.js";
 
 const execFileAsync = promisify(execFile);
 // Built from src/ by test/setup/build-dist.ts; never the working-tree dist/.
@@ -52,6 +53,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/fragile-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
       ]);
       expect.fail("Should have exited with code 1 due to runtime failures");
     } catch (err: unknown) {
@@ -76,6 +78,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/payload-fragile-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--runs",
         "25",
         "--seed",
@@ -123,6 +126,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/shrink-complex-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--runs",
         "10",
         "--seed",
@@ -144,6 +148,7 @@ describe("CLI Executable End-to-End", () => {
       cliPath,
       "audit",
       "./test/fixtures/runtime-safe-action.ts",
+      ...SUCCESS_PATH_CLI_ARGS,
       "--runs",
       "25",
       "--seed",
@@ -199,6 +204,7 @@ describe("CLI Executable End-to-End", () => {
       cliPath,
       "audit",
       "./test/fixtures/taint-safe-server.ts",
+      ...SUCCESS_PATH_CLI_ARGS,
     ]);
     expect(stdout).toContain("TAINT ANALYSIS");
     expect(stdout).toContain("No high-confidence secret flows detected");
@@ -253,6 +259,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/fragile-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--format",
         "json",
       ]);
@@ -281,6 +288,7 @@ describe("CLI Executable End-to-End", () => {
       cliPath,
       "audit",
       "./test/fixtures/runtime-safe-action.ts",
+      ...SUCCESS_PATH_CLI_ARGS,
       "--format",
       "json",
     ]);
@@ -298,6 +306,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/fragile-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--format",
         "sarif",
       ]);
@@ -511,6 +520,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/runtime-safe-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--json",
       ]);
 
@@ -525,6 +535,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/runtime-safe-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--sarif",
       ]);
 
@@ -538,6 +549,7 @@ describe("CLI Executable End-to-End", () => {
         cliPath,
         "audit",
         "./test/fixtures/runtime-safe-action.ts",
+        ...SUCCESS_PATH_CLI_ARGS,
         "--silent",
       ]);
 

@@ -8,6 +8,7 @@ import { analyzeActionPrefix } from "../src/runtime/prefix.js";
 import { extractCandidateFunction } from "../src/runtime/executor.js";
 import { runInIsolate } from "../src/runtime/worker.js";
 import { isActionSandboxCompatible } from "../src/runtime/compatibility.js";
+import { SUCCESS_PATH_BUDGET_MS, SUCCESS_PATH_RUNTIME_OPTIONS } from "./helpers/budgets.js";
 import {
   isPreludeSupported,
   getPreludesCode,
@@ -50,7 +51,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(candidate?.code).not.toContain("db.save");
       expect(candidate?.code).toContain("__sis_prefix_complete");
 
-      const res = await runInIsolate(candidate!, { a: "test" });
+      const res = await runInIsolate(candidate!, { a: "test" }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
     });
 
@@ -70,7 +71,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(candidate?.code).toContain("localC");
       expect(candidate?.code).not.toContain("db.save");
 
-      const res = await runInIsolate(candidate!, { a: 1, b: { c: 2 }, d: 3 });
+      const res = await runInIsolate(candidate!, { a: 1, b: { c: 2 }, d: 3 }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
     });
 
@@ -87,10 +88,10 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(analysis.prefixStatementsCount).toBe(1);
       expect(candidate).toBeDefined();
 
-      const validRes = await runInIsolate(candidate!, { value: " HELLO " });
+      const validRes = await runInIsolate(candidate!, { value: " HELLO " }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(validRes.status).toBe("passed");
 
-      const invalidRes = await runInIsolate(candidate!, null);
+      const invalidRes = await runInIsolate(candidate!, null, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(invalidRes.status).toBe("failed");
       expect(invalidRes.error?.name).toBe("TypeError");
     });
@@ -200,7 +201,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(analysis.prefixStatementsCount).toBe(0);
       expect(candidate).toBeDefined();
 
-      const res = await runInIsolate(candidate!, {});
+      const res = await runInIsolate(candidate!, {}, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
     });
 
@@ -238,7 +239,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(candidate?.code).not.toContain("Promise<");
       expect(candidate?.code).not.toContain("id: string");
 
-      const res = await runInIsolate(candidate!, { id: "item-123" });
+      const res = await runInIsolate(candidate!, { id: "item-123" }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
     });
   });
@@ -266,7 +267,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(candidate?.code).toContain("__sis_prefix_complete");
 
       // Post-boundary throw CANNOT execute
-      const res = await runInIsolate(candidate!, { value: "valid" });
+      const res = await runInIsolate(candidate!, { value: "valid" }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
       expect(res.error).toBeUndefined();
     });
@@ -286,7 +287,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(candidate).toBeDefined();
       expect(candidate?.code).not.toContain("__POST_BOUNDARY");
 
-      const res = await runInIsolate(candidate!, { value: "test" });
+      const res = await runInIsolate(candidate!, { value: "test" }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
       expect(res.error).toBeUndefined();
     });
@@ -376,7 +377,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
         const filePath = path.join(tempDir, "register.ts");
         fs.writeFileSync(filePath, code, "utf8");
 
-        const engine = new AuditEngine({ runs: 10, seed: 42, silent: true });
+        const engine = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, runs: 10, seed: 42, silent: true });
         const result = await engine.run(filePath);
 
         expect(result.actions.length).toBe(1);
@@ -418,7 +419,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
         preludesUsed: ["redirect"],
       };
 
-      const res = await runInIsolate(candidate, { target: "/login" });
+      const res = await runInIsolate(candidate, { target: "/login" }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
       expect(res.error).toBeUndefined();
     });
@@ -439,7 +440,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
         preludesUsed: ["notFound"],
       };
 
-      const res = await runInIsolate(candidate, {});
+      const res = await runInIsolate(candidate, {}, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
       expect(res.error).toBeUndefined();
     });
@@ -456,7 +457,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
         preludesUsed: [],
       };
 
-      const res = await runInIsolate(candidate, {});
+      const res = await runInIsolate(candidate, {}, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("failed");
       expect(res.error?.message).toContain("GENUINE_APPLICATION_ERROR");
     });
@@ -493,7 +494,7 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
         preludesUsed: [],
       };
 
-      const res = await runInIsolate(candidate, originalPayload);
+      const res = await runInIsolate(candidate, originalPayload, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res.status).toBe("passed");
 
       // Host-side payload must be 100% identical and unmutated
@@ -521,14 +522,14 @@ describe("Phase 25.5B — Adversarial Runtime Verification & Semantic Hardening"
       expect(run1.analysis.stoppedAt).toEqual(run2.analysis.stoppedAt);
       expect(run1.candidate?.code).toBe(run2.candidate?.code);
 
-      const exec1 = await runInIsolate(run1.candidate!, { token: "abc-123" });
-      const exec2 = await runInIsolate(run2.candidate!, { token: "abc-123" });
+      const exec1 = await runInIsolate(run1.candidate!, { token: "abc-123" }, SUCCESS_PATH_RUNTIME_OPTIONS);
+      const exec2 = await runInIsolate(run2.candidate!, { token: "abc-123" }, SUCCESS_PATH_RUNTIME_OPTIONS);
 
       expect(exec1.status).toBe(exec2.status);
       expect(exec1.status).toBe("passed");
 
-      const fail1 = await runInIsolate(run1.candidate!, null);
-      const fail2 = await runInIsolate(run2.candidate!, null);
+      const fail1 = await runInIsolate(run1.candidate!, null, SUCCESS_PATH_RUNTIME_OPTIONS);
+      const fail2 = await runInIsolate(run2.candidate!, null, SUCCESS_PATH_RUNTIME_OPTIONS);
 
       expect(fail1.status).toBe(fail2.status);
       expect(fail1.error?.name).toBe(fail2.error?.name);

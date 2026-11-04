@@ -13,6 +13,7 @@ import {
   extractCandidateFunction,
 } from "../src/index.js";
 import { REPO_ROOT, TEST_CLI } from "./helpers/test-build.js";
+import { SUCCESS_PATH_BUDGET_MS, SUCCESS_PATH_CLI_ARGS } from "./helpers/budgets.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -153,7 +154,7 @@ describe("Locations in terminal and machine-readable output", () => {
   });
 
   it("reports correct runtime and taint finding locations in JSON and SARIF", async () => {
-    const result = await new AuditEngine({ silent: true, seed: 42, runs: 6 }).run(dir);
+    const result = await new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 6 }).run(dir);
     const actionLoc = expectedLocation(source, "crashes");
     // The data-flow stage reports the sink expression itself (not its JSX `{`
     // container); an ASCII-only variant of this line reports the same column.
@@ -190,7 +191,7 @@ describe("Locations in terminal and machine-readable output", () => {
   it("prints the correct line in terminal output", async () => {
     const { stdout } = await execFileAsync(
       process.execPath,
-      [TEST_CLI, "audit", dir, "--seed", "42", "--runs", "6"],
+      [TEST_CLI, "audit", dir, ...SUCCESS_PATH_CLI_ARGS, "--seed", "42", "--runs", "6"],
       { cwd: REPO_ROOT, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0" } }
     ).catch((err: { stdout: string }) => ({ stdout: err.stdout }));
 

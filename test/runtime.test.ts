@@ -9,6 +9,7 @@ import {
 import { parseModule } from "../src/parser/index.js";
 import type { CandidateFunctionSource } from "../src/runtime/types.js";
 import type { GeneratedPayload } from "../src/payload/types.js";
+import { SUCCESS_PATH_RUNTIME_OPTIONS } from "./helpers/budgets.js";
 
 describe("Runtime Subsystem", () => {
   describe("Payload Compatibility (src/runtime/compatibility.ts)", () => {
@@ -160,10 +161,10 @@ describe("Runtime Subsystem", () => {
         location: { file: "state.ts", line: 1, column: 1 },
       };
 
-      const res1 = await runInIsolate(counterCandidate, { val: 1 });
+      const res1 = await runInIsolate(counterCandidate, { val: 1 }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res1.status).toBe("passed");
 
-      const res2 = await runInIsolate(counterCandidate, { val: 2 });
+      const res2 = await runInIsolate(counterCandidate, { val: 2 }, SUCCESS_PATH_RUNTIME_OPTIONS);
       expect(res2.status).toBe("passed");
     });
   });

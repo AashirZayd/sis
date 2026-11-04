@@ -4,6 +4,7 @@ import { AuditEngine } from "../src/index.js";
 import { formatJson, formatSarif } from "../src/output/index.js";
 import { runInIsolate } from "../src/runtime/worker.js";
 import type { CandidateFunctionSource } from "../src/runtime/types.js";
+import { SUCCESS_PATH_BUDGET_MS } from "./helpers/budgets.js";
 
 describe("Phase 12: Real-World Hardening and Adversarial Fixture Validation", () => {
   describe("1. Nested Boundaries Fixture", () => {
@@ -77,7 +78,7 @@ describe("Phase 12: Real-World Hardening and Adversarial Fixture Validation", ()
   describe("5. Complex Destructuring Patterns", () => {
     it("synthesizes targeted payloads that trigger runtime destructuring errors and shrink them cleanly", async () => {
       const fixtureDir = path.resolve(process.cwd(), "test/fixtures/real-world/destructuring");
-      const engine = new AuditEngine({ silent: true, seed: 42, runs: 10 });
+      const engine = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 10 });
       const result = await engine.run(fixtureDir);
 
       expect(result.statistics.actionsFound).toBe(3);
@@ -137,7 +138,7 @@ describe("Phase 12: Real-World Hardening and Adversarial Fixture Validation", ()
   describe("9. False Positives and Noise Elimination", () => {
     it("produces zero findings for safe constructs (NEXT_PUBLIC_*, internal server-only helpers, valid Date)", async () => {
       const fixtureDir = path.resolve(process.cwd(), "test/fixtures/real-world/false-positives");
-      const engine = new AuditEngine({ silent: true, seed: 42, runs: 10 });
+      const engine = new AuditEngine({ timeoutMs: SUCCESS_PATH_BUDGET_MS, silent: true, seed: 42, runs: 10 });
       const result = await engine.run(fixtureDir);
 
       expect(result.findings).toHaveLength(0);
