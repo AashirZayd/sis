@@ -1,0 +1,12 @@
+# golden: error-conflicting-formats
+# command: sis audit test/fixtures/project --json --sarif
+# exit: 2
+# --- stdout ---
+
+# --- stderr ---
+SIS ERROR
+
+Invalid configuration:
+  Cannot specify both --json and --sarif simultaneously.
+
+Choose either --json or --sarif.

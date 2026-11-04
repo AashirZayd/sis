@@ -1,0 +1,43 @@
+# golden: export-shapes.terminal
+# command: sis audit test/fixtures/golden/export-shapes --format terminal --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+
+SIS  Speculative Invariant Synthesis
+Autonomous runtime verification for Next.js boundaries
+
+◇ DISCOVERY
+  Target: test/fixtures/golden/export-shapes (Directory)
+
+Scanning 1 source files...
+
+◆ DISCOVERY
+  ✓ 1 server boundary
+  ✓ 2 candidate Server Actions
+
+◆ TAINT ANALYSIS
+  ✓ No high-confidence secret flows detected
+
+◆ SPECULATIVE FUZZING
+  ◇ 4 boundary targets discovered
+  ⟳ 7 fuzz strategies applied
+  ✓ 12 boundary-directed payloads
+
+◆ PAYLOAD SYNTHESIS
+  ✓ 12 adversarial payloads
+
+◆ RUNTIME VERIFICATION
+  ✓ 0 passed
+  ⊘ 6 unsupported
+
+────────────────────────────────────────
+AUDIT COMPLETE
+  Files analyzed:        1
+  Server boundaries:     1
+  Candidate actions:     2
+  Runtime failures:      0
+  Taint violations:      0
+
+✓ SIS found 0 verified findings
+────────────────────────────────────────
+# --- stderr ---

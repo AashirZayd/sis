@@ -1,0 +1,41 @@
+# golden: route-under-api.terminal
+# command: sis audit test/fixtures/golden/route-under-api/app/api --format terminal --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+
+SIS  Speculative Invariant Synthesis
+Autonomous runtime verification for Next.js boundaries
+
+◇ DISCOVERY
+  Target: test/fixtures/golden/route-under-api/app/api (Directory)
+
+Scanning 1 source files...
+
+◆ DISCOVERY
+  ✓ 0 server boundaries
+  ✓ 0 candidate Server Actions
+
+◆ TAINT ANALYSIS
+  ✓ No high-confidence secret flows detected
+
+◆ REACT FLIGHT SERIALIZABILITY
+  ✖ 1 serialization violations
+
+  ✖ Server Action "GET" returns non-serializable value: Class instance "new ImageResponse()" cannot be passed to a Client Component
+    og/route.tsx:3
+
+◆ RUNTIME VERIFICATION
+  No candidate actions to execute.
+
+────────────────────────────────────────
+AUDIT COMPLETE
+  Files analyzed:        1
+  Server boundaries:     0
+  Candidate actions:     0
+  Serializability leaks: 1
+  Runtime failures:      0
+  Taint violations:      0
+
+✖ SIS found 1 verified finding
+────────────────────────────────────────
+# --- stderr ---

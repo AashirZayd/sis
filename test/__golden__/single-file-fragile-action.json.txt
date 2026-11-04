@@ -1,0 +1,141 @@
+# golden: single-file-fragile-action.json
+# command: sis audit test/fixtures/fragile-action.ts --format json --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/fragile-action.ts",
+  "summary": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "boundariesFound": 1,
+    "serverActionsFound": 1,
+    "verifiedFindings": 2,
+    "runtimeFailures": 2,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 2
+  },
+  "statistics": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "analysisErrors": 0,
+    "boundariesFound": 1,
+    "actionsFound": 1,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "payloadsGenerated": 6,
+    "executions": 5,
+    "passedExecutions": 3,
+    "failedExecutions": 2,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 1,
+    "shrinkAttempts": 7,
+    "verifiedReproCount": 2,
+    "fuzzTargetsDiscovered": 2,
+    "fuzzStrategiesApplied": 5,
+    "boundaryDirectedPayloads": 6,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 6,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 0,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "<ROOT>/test/fixtures/fragile-action.ts"
+  ],
+  "findings": [
+    {
+      "id": "SIS003-1",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "executeTransfer threw TypeError: Cannot read properties of null (reading 'toFixed')",
+      "file": "test/fixtures/fragile-action.ts",
+      "location": {
+        "line": 9,
+        "column": 23
+      },
+      "actionName": "executeTransfer",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "executeTransfer|failed|TypeError|cannot read properties of null (reading 'tofixed')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "amount": null,
+          "recipientId": "default"
+        }
+      },
+      "shrink": {
+        "attempts": 3,
+        "reductionRatio": 60,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {
+          "amount": null
+        }
+      }
+    },
+    {
+      "id": "SIS003-2",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "executeTransfer threw TypeError: payload.amount.toFixed is not a function",
+      "file": "test/fixtures/fragile-action.ts",
+      "location": {
+        "line": 9,
+        "column": 23
+      },
+      "actionName": "executeTransfer",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "primitive-mismatch",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "executeTransfer|failed|TypeError|payload.amount.tofixed is not a function",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "amount": "not-a-number",
+          "recipientId": "default"
+        }
+      },
+      "shrink": {
+        "attempts": 4,
+        "reductionRatio": 72,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {
+          "amount": ""
+        }
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "executeTransfer",
+      "file": "test/fixtures/fragile-action.ts",
+      "line": 9,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---

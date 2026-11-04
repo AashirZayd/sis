@@ -1,0 +1,361 @@
+# golden: real-world-runtime.json
+# command: sis audit test/fixtures/real-world/runtime --format json --seed 42 --runs 6 --timeout 500
+# exit: 1
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/real-world/runtime",
+  "summary": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "boundariesFound": 1,
+    "serverActionsFound": 4,
+    "verifiedFindings": 8,
+    "runtimeFailures": 7,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 8
+  },
+  "statistics": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "analysisErrors": 0,
+    "boundariesFound": 1,
+    "actionsFound": 4,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "propBoundariesFound": 0,
+    "verifiedSafeProps": 2,
+    "serializabilityViolations": 0,
+    "unknownSerializability": 2,
+    "payloadsGenerated": 24,
+    "executions": 15,
+    "passedExecutions": 7,
+    "failedExecutions": 7,
+    "timeoutExecutions": 1,
+    "unsupportedExecutions": 9,
+    "shrinkAttempts": 5,
+    "verifiedReproCount": 8,
+    "fuzzTargetsDiscovered": 8,
+    "fuzzStrategiesApplied": 6,
+    "boundaryDirectedPayloads": 24,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 24,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 0,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "actions.ts"
+  ],
+  "findings": [
+    {
+      "id": "SIS003-1",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "throwAction threw TypeError: Cannot read properties of null (reading 'code')",
+      "file": "actions.ts",
+      "location": {
+        "line": 3,
+        "column": 23
+      },
+      "actionName": "throwAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "throwAction|failed|TypeError|cannot read properties of null (reading 'code')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-2",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "typeErrorAction threw TypeError: Cannot read properties of undefined (reading 'toFixed')",
+      "file": "actions.ts",
+      "location": {
+        "line": 10,
+        "column": 23
+      },
+      "actionName": "typeErrorAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "structural-deletion",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of undefined (reading 'tofixed')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {}
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-3",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "typeErrorAction threw TypeError: Cannot read properties of null (reading 'amount')",
+      "file": "actions.ts",
+      "location": {
+        "line": 10,
+        "column": 23
+      },
+      "actionName": "typeErrorAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of null (reading 'amount')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS003-4",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "typeErrorAction threw TypeError: Cannot read properties of undefined (reading 'toFixed')",
+      "file": "actions.ts",
+      "location": {
+        "line": 10,
+        "column": 23
+      },
+      "actionName": "typeErrorAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "serialization-unsupported",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "typeErrorAction|failed|TypeError|cannot read properties of undefined (reading 'tofixed')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "name": "user"
+        }
+      },
+      "shrink": {
+        "attempts": 1,
+        "reductionRatio": 87.5,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {}
+      }
+    },
+    {
+      "id": "SIS003-5",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "typeErrorAction threw TypeError: payload.amount.toFixed is not a function",
+      "file": "actions.ts",
+      "location": {
+        "line": 10,
+        "column": 23
+      },
+      "actionName": "typeErrorAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "primitive-mismatch",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "typeErrorAction|failed|TypeError|payload.amount.tofixed is not a function",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "amount": "not-a-number"
+        }
+      },
+      "shrink": {
+        "attempts": 2,
+        "reductionRatio": 46.2,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {
+          "amount": ""
+        }
+      }
+    },
+    {
+      "id": "SIS003-6",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "infiniteLoopAction threw TypeError: Cannot read properties of null (reading 'loop')",
+      "file": "actions.ts",
+      "location": {
+        "line": 14,
+        "column": 23
+      },
+      "actionName": "infiniteLoopAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "infiniteLoopAction|failed|TypeError|cannot read properties of null (reading 'loop')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    },
+    {
+      "id": "SIS004-7",
+      "ruleId": "SIS004",
+      "ruleName": "timeout",
+      "type": "timeout",
+      "severity": "error",
+      "message": "infiniteLoopAction timed out after 500ms execution budget",
+      "file": "actions.ts",
+      "location": {
+        "line": 14,
+        "column": 23
+      },
+      "actionName": "infiniteLoopAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "prototype-sensitive",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "infiniteLoopAction|timeout|TimeoutError|script execution timed out execution budget",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": {
+          "loop": true
+        }
+      },
+      "shrink": {
+        "attempts": 2,
+        "reductionRatio": 66.7,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": {
+          "loop": true
+        }
+      }
+    },
+    {
+      "id": "SIS003-8",
+      "ruleId": "SIS003",
+      "ruleName": "runtime-exception",
+      "type": "runtime-exception",
+      "severity": "error",
+      "message": "recursiveAction threw TypeError: Cannot read properties of null (reading 'depth')",
+      "file": "actions.ts",
+      "location": {
+        "line": 21,
+        "column": 23
+      },
+      "actionName": "recursiveAction",
+      "fuzzTarget": "server-action-argument",
+      "strategy": "nullability",
+      "invariant": "runtime-safety",
+      "parameter": "payload",
+      "executionMode": "FULL",
+      "runtime": {
+        "failureSignature": "recursiveAction|failed|TypeError|cannot read properties of null (reading 'depth')",
+        "executionMs": "<T>",
+        "wallTimeMs": "<T>",
+        "timeoutMs": 500,
+        "payload": null
+      },
+      "shrink": {
+        "attempts": 0,
+        "reductionRatio": 0,
+        "minimalReproducerVerified": true,
+        "minimizedPayload": null
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "throwAction",
+      "file": "actions.ts",
+      "line": 3,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "typeErrorAction",
+      "file": "actions.ts",
+      "line": 10,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "infiniteLoopAction",
+      "file": "actions.ts",
+      "line": 14,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    },
+    {
+      "name": "recursiveAction",
+      "file": "actions.ts",
+      "line": 21,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---

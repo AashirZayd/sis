@@ -18,15 +18,20 @@ SIS is an autonomous runtime verification and speculative fuzzing tool for Next.
 git clone https://github.com/AashirZayd/sis.git
 cd sis
 
-# Install dependencies
-npm install
+# Install dependencies exactly as locked
+npm ci
 
-# Compile TypeScript
-npm run build
-
-# Run the test suite
+# Run the test suite (no prior build needed: the test run compiles src/
+# into node_modules/.cache/sis-test-build and never reads dist/)
 npm test
+
+# Compile dist/ when you want to run the CLI or the benchmark locally
+npm run build
 ```
+
+### Golden output snapshots
+
+`test/golden.test.ts` pins terminal, JSON and SARIF output and exit codes for the fixtures in `test/fixtures/golden/` and selected existing fixtures. Snapshots live in `test/__golden__/`. Some fixtures intentionally capture known-defective behavior from the audit (`audit/PHASE-2-FINDINGS-VALIDATION.md`). If your change alters a snapshot, update it with `npx vitest run test/golden.test.ts -u` **only when the change is intentional**, and explain each changed snapshot in the pull request, citing the defect it addresses.
 
 ---
 

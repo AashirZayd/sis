@@ -1,0 +1,70 @@
+# golden: unicode-prefix.json
+# command: sis audit test/fixtures/golden/unicode-prefix --format json --seed 42 --runs 6 --timeout 500
+# exit: 0
+# --- stdout ---
+{
+  "version": "1",
+  "tool": {
+    "name": "sis",
+    "version": "0.1.0"
+  },
+  "target": "<ROOT>/test/fixtures/golden/unicode-prefix",
+  "summary": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "boundariesFound": 1,
+    "serverActionsFound": 1,
+    "verifiedFindings": 0,
+    "runtimeFailures": 0,
+    "taintViolations": 0,
+    "analysisErrors": 0,
+    "shrinkSuccessCount": 0
+  },
+  "statistics": {
+    "filesScanned": 1,
+    "filesAnalyzed": 1,
+    "filesSkipped": 0,
+    "analysisErrors": 0,
+    "boundariesFound": 1,
+    "actionsFound": 1,
+    "taintSourcesFound": 0,
+    "taintViolations": 0,
+    "propBoundariesFound": 0,
+    "verifiedSafeProps": 0,
+    "serializabilityViolations": 0,
+    "unknownSerializability": 1,
+    "payloadsGenerated": 6,
+    "executions": 0,
+    "passedExecutions": 0,
+    "failedExecutions": 0,
+    "timeoutExecutions": 0,
+    "unsupportedExecutions": 6,
+    "shrinkAttempts": 0,
+    "verifiedReproCount": 0,
+    "fuzzTargetsDiscovered": 2,
+    "fuzzStrategiesApplied": 5,
+    "boundaryDirectedPayloads": 6,
+    "genericFallbackPayloads": 0,
+    "fullExecutions": 6,
+    "prefixExecutions": 0,
+    "staticOnlyActions": 0,
+    "unsupportedActions": 0
+  },
+  "files": [
+    "actions.ts"
+  ],
+  "findings": [],
+  "actions": [
+    {
+      "name": "describe",
+      "file": "actions.ts",
+      "line": 6,
+      "column": 23,
+      "executionCompatibility": "sandbox-compatible",
+      "executionMode": "FULL"
+    }
+  ],
+  "errors": []
+}
+# --- stderr ---
